@@ -1,0 +1,75 @@
+# Dependências do Node.js
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Cache e arquivos temporários do Next.js
+.next/
+out/
+dist/
+.turbo/
+
+# Logs e relatórios
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# Arquivos de ambiente (contém credenciais sensíveis)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Cache do editor (VS Code e outros)
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Testes e cobertura de código
+coverage/
+jest.config.js
+jest.setup.js
+
+# Cache do TypeScript
+*.tsbuildinfo
+
+# Configuração do ESLint e Prettier (se for gerado automaticamente)
+.eslintcache
+.prettier-cache
+
+# Arquivos do TurboPack (caso esteja ativado)
+.turbo/
+
+# Arquivos de saída de build do Next.js (caso utilize `next export`)
+out/
+
+# Arquivos de compilação do Next.js (caso utilize `next build`)
+.next/cache/
+.next/standalone/
+.next/static/
+
+# Relatórios do TypeScript (caso habilite diagnósticos)
+report.json
+
+# Arquivos da IDE WebStorm/JetBrains
+.idea/
+
+# Arquivos gerados pelo MacOS
+.DS_Store
+/.vs/FrotaVision/CopilotIndices/17.13.430.18484
+/.vs/FrotaVision/FileContentIndex
+/.vs/FrotaVision/v17
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json

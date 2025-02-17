@@ -1,0 +1,83 @@
+/* Container principal */
+.servico-container {
+    max-width: 80%;
+    margin: 0 auto;
+    text-align: center;
+    padding: 4vh 0;
+}
+
+/* Título */
+.servico-title {
+    font-weight: 600 !important;
+    margin-bottom: 2vh !important;
+}
+
+/* Container da imagem */
+.servico-image {
+    position: relative;
+    width: 100%;
+    max-height: 500px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+/* Adiciona o filtro azulado */
+.servico-image::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(22, 53, 114, 0.20); /* Azul escuro semi-transparente */
+    mix-blend-mode: multiply; /* Mistura com a imagem */
+    pointer-events: none; /* Não interfere na interação */
+}
+
+/* Grid de conteúdo */
+.servico-content {
+    display: flex;
+    justify-content: center;
+    text-align: left;
+    margin-top: 3vh;
+}
+
+
+.servico-subtitle-container{
+    margin-top: 2vh;
+}
+
+.servico-icon {
+    color:#1B3562;
+}
+
+/* Subtítulos */
+.servico-subtitle {
+    font-weight: 600 !important;
+}
+
+/* Texto */
+.servico-text {
+    color: #555;
+    font-size: 0.95rem !important;
+}
+
+/* Botão */
+.servico-button-container {
+    margin-top: 3vh;
+}
+
+.servico-button {
+    color: #1B3562 !important;
+    border-color: #1B3562 !important;
+    text-transform: none !important;
+    font-weight: bold !important;
+    border-radius: 0.75rem !important;
+    padding: 10px 20px !important;
+}
+
+.servico-button:hover {
+    color: #ffffff !important;
+    border-color: #1B3562 !important;
+    background-color: #1B3562 !important;
+}

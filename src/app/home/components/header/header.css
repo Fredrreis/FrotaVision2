@@ -1,0 +1,128 @@
+.header-container {
+    width: 100%;
+    margin: 0;
+}
+
+.header-toolbar-blue {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0;
+    margin: 0 9vw;
+}
+
+.header-blue-bg {
+    background-color: #1B3562;
+    width: 100%;
+}
+
+.header-white-bg {
+    background-color: #FFFFFF;
+    width: 100%;
+}
+
+.header-toolbar-white {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    margin: 0 9vw;
+}
+
+.header-logo {
+    width: 37%;
+    height: auto;
+}
+
+.nav-link {
+    position: relative;
+    color: #000000;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    padding-bottom: 0.3rem;
+    transition: color 0.3s ease;
+    font-size: 1rem;
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 0.2rem;
+    background-color: #173165;
+    border-radius: 0.2rem;
+    transition: width 0.3s ease-in-out;
+}
+
+.nav-link.active::after {
+    width: 100%;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-text {
+    color: #000000;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.nav-text.active {
+    color: #173165;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .header-toolbar-blue {
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem 0;
+        margin: 0 5vw;
+    }
+
+    .nav-link {
+        font-size: 0.9rem !important;
+        padding-bottom: 0.2rem;
+    }
+
+    .nav-text {
+        font-size: 0.9rem !important;
+    }
+
+    .header-white-bg {
+        display: none;
+    }
+
+    .header-logo {
+        width: 20vw;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-toolbar-blue {
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem 0;
+        margin: 0 2vw;
+    }
+
+    .nav-link {
+        font-size: 0.8rem !important;
+        padding-bottom: 0.1rem;
+    }
+
+    .nav-text {
+        font-size: 0.8rem !important;
+    }
+
+    .header-logo {
+        width: 35vw;
+        height: auto;
+    }
+}
