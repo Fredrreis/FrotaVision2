@@ -40,12 +40,12 @@
 
 .video-title {
     font-size: 2rem;
-    font-weight: bold;
+    font-weight: 600 !important;
     margin-bottom: 0.9rem;
 }
 
 .video-description {
-    font-size: 1rem;
+    font-size:  0.875rem !important;
     margin-bottom: 1.25rem;
     margin-top: 0.6rem !important;
 }
@@ -61,12 +61,12 @@
 }
 
 .video-button:hover {
-    background-color: #E5E5E5;
+    background-color: whitesmoke !important;
 }
 
 @media (max-width: 768px) {
     .video-title {
-        font-size: 1.3rem !important;
+        font-size: 1.1rem !important;
     }
 
     .video-description {
@@ -89,7 +89,7 @@
 
 @media (max-width: 480px) {
     .video-title {
-        font-size: 1.1rem !important;
+        font-size: 1.1rem !important
     }
 
     .video-description {
@@ -102,6 +102,7 @@
 
     .video-button {
         margin-top: 0.8rem !important;
+        font-size:  0.8rem !important;
         padding: 0.5rem 1rem !important;
     }
 

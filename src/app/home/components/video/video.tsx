@@ -21,8 +21,7 @@ export default function Video() {
           Feito para a sua frota
         </Typography>
         <Typography variant="body1" className="video-description">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua. Ut enim.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit
         </Typography>
         <Button variant="contained" className="video-button" endIcon={<ArrowForwardIcon />}>
           VER PLANOS
