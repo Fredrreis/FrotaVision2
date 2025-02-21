@@ -1,0 +1,105 @@
+.email-container {
+    background: rgb(0, 0, 0);
+    max-width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    padding: 4vh 14vw;
+  }
+  
+  .email-title {
+    color: whitesmoke !important;
+    font-weight: 600 !important;
+  }
+  
+  .email-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: justify;
+    margin-top: 4vh;
+    color: whitesmoke !important;
+  }
+  
+  .email-input-container {
+    display: flex;
+    margin-top: 0.5rem;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1vw;
+  }
+  
+  .email-input {
+    width: 23vw !important;
+    max-width: 600px !important;
+  }
+  
+  .email-input .MuiOutlinedInput-root {
+    border-radius: 0.75rem !important;
+    background-color: transparent !important;
+    border: 0.1rem solid gray !important;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  /* Efeito de foco com borda colorida */
+  .email-input .MuiOutlinedInput-root.Mui-focused {
+    border-color: #1B3562 !important;
+    box-shadow: 0 0 10px rgba(19, 81, 114, 0.5) !important;
+  }
+  
+  .email-input .MuiOutlinedInput-notchedOutline {
+    border: none !important;
+  }
+  
+  .email-input .MuiInputBase-input {
+    padding: 0.3rem 1.05rem !important;
+    font-size: 0.875rem !important;
+    color: rgb(255, 255, 255) !important;
+  }
+  
+  .email-input .MuiFormHelperText-root {
+    color: #ff6b6b !important;
+    font-size: 0.75rem !important;
+    margin-left: 0.5rem !important;
+  }
+  
+  .email-icon {
+    color: gray !important;
+  }
+  
+  .email-button {
+    background-color: #fff !important;
+    padding: 0.3rem 1.05rem !important;
+    color: black !important;
+    font-weight: bold !important;
+    border-radius: 0.75rem !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .email-button:hover {
+    background-color: black !important;
+    color: white !important;
+  }
+  
+  @media (max-width: 768px) {
+    .email-title{
+      font-size: 1.1rem !important;
+    }
+
+    .email-text {
+      font-size: 0.8rem !important;
+    }
+
+    .email-input{
+      width: 45vw !important;
+      margin-right: 3vw !important;
+    }
+
+    .email-input .MuiInputBase-input {
+      font-size: 0.8rem !important;
+    }
+  
+    .email-button{
+      font-size:  0.8rem !important;
+    }
+  }

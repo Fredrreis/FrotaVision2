@@ -1,5 +1,5 @@
 .planos-container {
-  background: black;
+  background: white;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -8,7 +8,7 @@
 
 .planos-titulo {
   font-weight: 600 !important;
-  color: white !important;
+  color: rgb(0, 0, 0) !important;
   margin-bottom: 4vh !important;
 }
 
@@ -16,128 +16,132 @@
   max-width: 70%;
   margin: 0 auto;
   background-color: transparent !important;
-  border-width: 1px !important;
+  box-shadow: none !important; /* Remove a sombra do Paper */
+  border: none !important;
+  overflow: visible !important; 
 }
 
 .planos-table {
   width: 100%;
-  border-collapse: collapse !important;
+  border-collapse: collapse;
+  box-shadow: none !important;
+  overflow: visible !important; /* Permite que o conteúdo saia da tabela */
+}
+
+.planos-table tbody tr:last-child {
+  border-bottom: none !important;
 }
 
 .table-header {
-  background-color: transparent !important;
   color: white !important;
   font-weight: 600;
   font-size: 1rem !important;
-  padding: 2rem 1rem 1rem 1rem; /* Aumente o padding-top para dar mais espaço */
+  padding: 1rem;
+  border-color: rgba(0, 0, 0, 0.29) !important;
   position: relative;
+  overflow: visible !important; /* Garante que o label não seja cortado */
+  padding-top: 2rem; /* Espaço extra para a legenda */
 }
 
-.premium-header {
-  background-color: rgba(255, 255, 255, 0.1) !important; /* Ajuste a cor conforme necessário */
-  border-radius: 0.75rem 0.75rem 0 0 !important;
+.table-header:nth-child(2) {
+  border-top-left-radius: 0.75rem !important;
 }
 
-.plano-header-container {
-  position: relative;
+.table-header:nth-last-child(1) {
+  border-top-right-radius: 0.75rem !important;
 }
 
-.plano-tag {
-  background-color: #1b3562 !important;
-  color: white !important;
-  font-size: 0.75rem !important;
-  padding: 0.5rem 1rem !important; /* Ajuste o padding para um tamanho menor */
-  border-radius: 0.5rem !important;
-  margin-bottom: 0.6rem !important;
-  display: inline-block !important;
-  position: absolute !important;
-  top: -3.5rem !important; /* Ajuste a distância para cima */
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-}
-
-.plano-header-button {
-  color: white !important;
-  background-color: #1b3562 !important;
-  text-transform: none !important;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-  border-radius: 0.75rem !important;
-  padding: 1rem !important;
-  font-weight: 600 !important;
-  width: 100%;
-}
-
-.premium-button {
-  background-color: #135172 !important;
-}
-
-.plano-header-button:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
+.recomendado-label {
+  position: absolute;
+  top: -18px; /* Move um pouco mais para cima */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #000000;
+  color: #ffffff;
+  font-size: 0.65rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  z-index: 10;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15); /* Suaviza o destaque */
 }
 
 .planos-subtitle {
   font-weight: 600;
-  font-size: 1rem !important;
+  margin-bottom: 0.3rem;
 }
 
 .plano-preco {
-  margin-top: 1vh !important;
   font-weight: bold;
+  font-size: 0.85rem !important;
 }
 
 .row-title {
   background-color: transparent !important;
   font-weight: bold;
   padding: 1rem;
-  color: #b1b1b1 !important;
+  border-color: rgba(0, 0, 0, 0.29) !important;
+  color: #000000 !important;
 }
 
-.premium-row {
-  background-color: rgba(255, 255, 255, 0.1) !important; /* Ajuste a cor conforme necessário */
+.row {
+  color: rgb(0, 0, 0) !important;
+  border-color: rgba(0, 0, 0, 0.29) !important;
 }
 
-.check-icon, .close-icon {
-  color: #b1b1b1;
-  font-size: 1.5rem;
+.row.premium {
+  background-color: whitesmoke !important;
 }
 
-.planos-table th,
-.planos-table td {
-  border: none !important;
+.check-icon {
+  color: rgb(0, 0, 0);
 }
 
-.planos-table tbody tr {
-  border-bottom: 1px solid #b1b1b1 !important;
-  border-width: 1px !important;
+.no-border-row td {
+  border-bottom: none !important;
 }
 
-.recomendado-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 2vh;
+.plano-button {
+  color: #1B3562 !important;
+  border: 0 !important;
+  background-color: transparent !important;
+  text-transform: none !important;
+  border-radius: 0.75rem !important;
+  font-weight: 450 !important;
+  padding: 0.5rem 1rem;
+  box-shadow: none !important;
+  transition: all 0.3s ease;
+}
+
+.plano-button.premium {
+  color: #135172 !important;
+}
+
+.plano-button:hover {
+  background-color: #1B3562 !important;
+  color: white !important;
 }
 
 @media (max-width: 768px) {
   .planos-table-container {
-    overflow-x: auto;
-  }
-
-  .planos-table {
-    min-width: 600px;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    position: relative !important;
+    padding-top: 1.3rem !important; /* Adiciona espaço extra para evitar cortes */
   }
 
   .planos-titulo {
     font-size: 1.1rem !important;
   }
 
-  .planos-subtitle {
-    font-size: 0.95rem !important;
+  .planos-subtitle{
+    font-size: 0.9rem !important;
   }
 
-  .plano-preco {
-    font-size: 0.9rem !important;
+  .plano-button, 
+  .plano-preco,
+  .row-title,
+  .row
+  {
+    font-size: 0.8rem !important;
   }
 }

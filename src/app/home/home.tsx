@@ -7,6 +7,7 @@ import Header from "./components/header/header";
 import Video from "./components/video/video";
 import Servico from "./components/servico/servico";
 import Planos from "./components/planos/planos";
+import Email from "./components/email/email";
 
 export interface HomeProps {}
 
@@ -18,6 +19,7 @@ export const Home: React.FC<HomeProps> = (props) => {
             <Video />
             <Servico />
             <Planos />
+            <Email />
         </>
     );
 };

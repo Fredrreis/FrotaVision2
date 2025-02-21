@@ -1,6 +1,7 @@
 import React from "react";
 import "./planos.css";
 import {
+  Box,
   Typography,
   Button,
   Table,
@@ -10,9 +11,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Box,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import CheckIcon from "@mui/icons-material/Check";
 import { motion } from "framer-motion";
 
@@ -29,7 +29,7 @@ export default function Planos() {
       dispositivos: "3 dispositivos",
       usuarios: "3 usuários",
       veiculos: "10 veículos",
-      relatorio: "Não",
+      relatorio: "Sim",
     },
     {
       nome: "PREMIUM",
@@ -63,30 +63,33 @@ export default function Planos() {
 
       <TableContainer component={Paper} className="planos-table-container">
         <Table className="planos-table">
-          <TableHead>
-            <TableRow>
-              <TableCell className="table-header" style={{ width: '40%' }}></TableCell>
-              {planos.map((plano, index) => (
-                <TableCell
-                  key={index}
-                  align="center"
-                  className={`table-header ${plano.nome === "PREMIUM" ? "premium-header" : ""}`}
-                  style={{ width: '20%' }}
-                >
-                  {plano.recomendado && (
-                    <Box className="plano-tag">Recomendado</Box>
-                  )}
-                  <Button className={`plano-header-button ${plano.nome === "PREMIUM" ? "premium-button" : ""}`} variant="text">
-                    <Typography variant="subtitle1" className="planos-subtitle">
-                      {plano.nome}
-                    </Typography>
-                  </Button>
-                  <Typography className="plano-preco" variant="body2">{plano.preco}/mês</Typography>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
+        <TableHead>
+          <TableRow>
+            <TableCell className="table-header"></TableCell>
+            {planos.map((plano, index) => (
+              <TableCell
+                key={index}
+                align="center"
+                className="table-header"
+                style={{
+                  width: "22%",
+                  backgroundColor: plano.recomendado ? "#135172" : "#1B3562",
+                  position: "relative",
+                }}
+              >
+                {plano.recomendado && (
+                  <Box className="recomendado-label">
+                    RECOMENDADO
+                  </Box>
+                )}
+                <Typography variant="subtitle1" className="planos-subtitle">
+                  {plano.nome}
+                </Typography>
+                <Typography className="plano-preco">{plano.preco}/mês</Typography>
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
           <TableBody>
             {[
               { label: "Dispositivos simultâneos", key: "dispositivos" },
@@ -100,22 +103,31 @@ export default function Planos() {
                   <TableCell
                     align="center"
                     key={idx}
-                    className={plano.nome === "PREMIUM" ? "premium-row" : ""}
-                    sx={{ color: "#b1b1b1" }}
+                    className={`row ${plano.nome === "PREMIUM" ? "premium" : ""}`}
                   >
-                    {item.key === "relatorio" ? (
-                      plano.relatorio === "Sim" ? (
-                        <CheckIcon className="check-icon" sx={{ fontSize: "small" }} />
-                      ) : (
-                        <CloseIcon className="close-icon" sx={{ fontSize: "small" }} />
-                      )
-                    ) : (
-                      plano[item.key as keyof typeof plano]
+                    {item.key === "relatorio" && plano.relatorio === "Sim" && (
+                      <CheckIcon className="check-icon" sx={{ fontSize: "small" }} />
                     )}
+                    {item.key !== "relatorio" && plano[item.key as keyof typeof plano]}
                   </TableCell>
                 ))}
               </TableRow>
             ))}
+            <TableRow className="no-border-row">
+              <TableCell></TableCell>
+              {planos.map((plano, index) => (
+                <TableCell align="center" key={index} sx={{backgroundColor: plano.recomendado ? "whitesmoke" : "white"}}>
+                  <Button
+                    variant="contained"
+                    sx={{ fontWeight: "regular" }}
+                    className={`plano-button ${plano.nome === "PREMIUM" ? "premium" : ""}`}
+                    endIcon={<KeyboardArrowRightIcon />}
+                  >
+                    Escolher este plano
+                  </Button>
+                </TableCell>
+              ))}
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>

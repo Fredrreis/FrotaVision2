@@ -18,21 +18,19 @@ const containerVariants = {
 
 const servicos = [
   {
-    icone: <LocalShippingIcon className="servico-icon" />,
+    icone: <LocalShippingIcon className="servico-icon" />, 
     titulo: "What is Lorem Ipsum?",
     descricao: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
   },
   {
-    icone: <EngineeringIcon className="servico-icon" />,
+    icone: <EngineeringIcon className="servico-icon" />, 
     titulo: "Where does it come from?",
-    descricao:
-      "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.",
+    descricao: "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.",
   },
   {
-    icone: <MoreTimeIcon className="servico-icon" />,
+    icone: <MoreTimeIcon className="servico-icon" />, 
     titulo: "Why do we use it?",
-    descricao:
-      "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+    descricao: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
   },
 ];
 
@@ -47,6 +45,7 @@ export default function Servico() {
       <Typography variant="h5" className="servico-title">
         Por que escolher o FrotaVision?
       </Typography>
+
       <Box className="servico-image">
         <Image
           src={ServicoImage}
