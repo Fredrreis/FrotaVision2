@@ -1,24 +1,20 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { MenuState } from './types';
+import { createSlice } from "@reduxjs/toolkit";
 
-const initialState: MenuState = {
-    currentMenu: 'home',
-    isLoaded: false,
-};
+interface MenuState {
+  isOpen: boolean;
+}
+
+const initialState: MenuState = { isOpen: false };
 
 const menuSlice = createSlice({
-    name: 'menu',
-    initialState,
-    reducers: {
-        changeMenu: (state, action: PayloadAction<string>) => {
-            state.currentMenu = action.payload;
-            state.isLoaded = false;
-        },
-        loadedMenu: (state, action: PayloadAction<string>) => {
-            state.isLoaded = action.payload === state.currentMenu;
-        }
+  name: "menu",
+  initialState,
+  reducers: {
+    toggleMenu: (state) => {
+      state.isOpen = !state.isOpen;
     },
+  },
 });
 
-export const { changeMenu, loadedMenu } = menuSlice.actions;
+export const { toggleMenu } = menuSlice.actions;
 export default menuSlice.reducer;

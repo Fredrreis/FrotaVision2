@@ -1,5 +1,6 @@
 import { createTheme } from "@mui/material/styles";
-import { Poppins } from "next/font/google"; // Importa a fonte otimizada pelo Next.js
+import { Poppins  } from "next/font/google";
+
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -7,9 +8,10 @@ const poppins = Poppins({
   display: "swap",
 });
 
+
 const theme = createTheme({
   typography: {
-    fontFamily: poppins.style.fontFamily, // Define Poppins como fonte padrão
+    fontFamily: poppins.style.fontFamily,
   },
   palette: {
     primary: {

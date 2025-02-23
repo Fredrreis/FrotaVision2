@@ -6,7 +6,7 @@
 }
 
 .servico-title {
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     margin-bottom: 3vh !important;
 }
 
@@ -69,7 +69,7 @@
 }
 
 .servico-subtitle {
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     text-align: left;
     width: 100%;
 }
@@ -133,7 +133,7 @@
     }
 
     .servico-subtitle {
-        font-size: 1rem !important;
+        font-size: 0.9rem !important;
         text-align: left;
         width: 100%;
     }

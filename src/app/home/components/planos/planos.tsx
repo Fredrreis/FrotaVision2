@@ -36,7 +36,7 @@ export default function Planos() {
       preco: "R$ 44,90",
       dispositivos: "6 dispositivos",
       usuarios: "6 usuários",
-      veiculos: "20 veículos",
+      veiculos: "30 veículos",
       relatorio: "Sim",
       recomendado: true,
     },

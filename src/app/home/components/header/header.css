@@ -1,6 +1,10 @@
 .header-container {
     width: 100%;
     margin: 0;
+    position: -webkit-sticky; /* Para compatibilidade com Safari */
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Certifique-se de que o z-index seja alto o suficiente para ficar acima de outros elementos */
 }
 
 .header-toolbar-blue {
@@ -52,9 +56,13 @@
     bottom: 0;
     width: 0;
     height: 0.2rem;
-    background-color: #173165;
+    background-color: #1B3562;
     border-radius: 0.2rem;
     transition: width 0.3s ease-in-out;
+}
+
+.nav-link.active {
+    color: #1B3562;
 }
 
 .nav-link.active::after {

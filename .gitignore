@@ -68,8 +68,32 @@ report.json
 
 # Arquivos gerados pelo MacOS
 .DS_Store
+
+# Arquivos gerados pelo Visual Studio
 /.vs/FrotaVision/CopilotIndices/17.13.430.18484
 /.vs/FrotaVision/FileContentIndex
 /.vs/FrotaVision/v17
 /.vs/slnx.sqlite
 /.vs/VSWorkspaceState.json
+
+# Arquivos de cache do npm
+.npm/
+
+# Arquivos de cache do Yarn
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Arquivos de cache do pnpm
+.pnpm-store/
+
+# Arquivos de configuração do IntelliJ IDEA
+.idea/
+
+# Arquivos de cache do Cypress (caso esteja usando Cypress para testes)
+.cypress_cache/
+
+# Arquivos de cache do Storybook (caso esteja usando Storybook)
+.storybook_cache/

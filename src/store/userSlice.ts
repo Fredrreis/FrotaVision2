@@ -1,45 +1,26 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { normalizeString } from '../modules/normalizeString';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UserState {
-    username: string;
-    isAuthenticated: boolean;
+  name: string;
+  email: string;
 }
 
-interface LoginPayload {
-    username: string;
-    password: string;
-}
-
-const initialState: UserState = {
-    username: '',
-    isAuthenticated: false,
-};
+const initialState: UserState = { name: "", email: "" };
 
 const userSlice = createSlice({
-    name: 'user',
-    initialState,
-    reducers: {
-        login: (state, action: PayloadAction<LoginPayload>) => {
-            action.payload.username = normalizeString(action.payload.username, { caseType: "normal", removeSpaces: true, removeSpecialChars: true });
-            action.payload.password = normalizeString(action.payload.password, { caseType: "normal", removeSpecialChars: true });
-
-            const { username, password } = action.payload;
-            
-            if(username === 'admin' && password === 'admin') {
-                state.username = username;
-                state.isAuthenticated = true;
-            } else {
-                state.username = '';
-                state.isAuthenticated = false;
-            }
-        },
-        logout: (state) => {
-            state.username = '';
-            state.isAuthenticated = false;
-        },
+  name: "user",
+  initialState,
+  reducers: {
+    setUser: (state, action: PayloadAction<UserState>) => {
+      state.name = action.payload.name;
+      state.email = action.payload.email;
     },
+    clearUser: (state) => {
+      state.name = "";
+      state.email = "";
+    },
+  },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { setUser, clearUser } = userSlice.actions;
 export default userSlice.reducer;
