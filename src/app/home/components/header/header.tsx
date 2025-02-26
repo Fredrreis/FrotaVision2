@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
+import { useRouter } from 'next/navigation';
 import FrotaVisionLogo from "../../../img/FrotaVisionLogo.png";
 import Image from 'next/image';
 import "./header.css";
 import { Link } from 'react-scroll';
 
 export default function Header() {
+    const router = useRouter()
     const [active, setActive] = useState("HOME");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -34,7 +36,12 @@ export default function Header() {
                         <Image src={FrotaVisionLogo} alt="FrotaVision Logo" className="header-logo" />
                     </Box>
                     <Box sx={{ display: "flex", gap: 2, marginLeft: 'auto' }}>
-                        <Button sx={{ color: "#FFF", textTransform: "none" }}>Log In</Button>
+                        <Button 
+                            onClick={() => router.push('/auth')}
+                            sx={{ color: "#FFF", textTransform: "none" }}
+                        >
+                            Log In
+                        </Button>
                         <Button 
                             variant="contained" 
                             sx={{ 
