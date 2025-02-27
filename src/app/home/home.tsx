@@ -19,14 +19,12 @@ export const Home: React.FC<HomeProps> = () => {
     const searchParams = useSearchParams();
     const sectionParam = searchParams.get("section");
     const [isClient, setIsClient] = useState(false);
+    const [hasScrolled, setHasScrolled] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
-        if (typeof window !== "undefined") {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
 
-        if (sectionParam === "planos") {
+        if (sectionParam === "planos" && !hasScrolled) {
             setTimeout(() => {
                 scroller.scrollTo("planos", {
                     duration: 800,
@@ -35,13 +33,16 @@ export const Home: React.FC<HomeProps> = () => {
                     offset: -130,
                 });
 
-                //Remove o parâmetro da URL após o scroll para evitar problemas ao dar F5 ou voltar para a Home
-                router.replace("/", { scroll: false });
+                setHasScrolled(true); 
+                
+                setTimeout(() => {
+                    router.replace("/", { scroll: false });
+                }, 500);
             }, 500);
         }
-    }, [sectionParam, router]);
+    }, [sectionParam, router, hasScrolled]);
 
-    if (!isClient) return null; // Evita renderização no SSR
+    if (!isClient) return null;
 
     return (
         <>

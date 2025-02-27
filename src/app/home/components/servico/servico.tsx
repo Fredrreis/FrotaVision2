@@ -29,7 +29,7 @@ const servicos = [
   },
   {
     icone: <MoreTimeIcon className="servico-icon" />, 
-    titulo: "Mais Agilidade na Tomada de Decisão",
+    titulo: "Agilidade na Tomada de Decisão",
     descricao: "Com uma plataforma intuitiva, você acessa rapidamente as informações essenciais, agiliza o planejamento de manutenção e melhora a produtividade da frota.",
   },
 ];

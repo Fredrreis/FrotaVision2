@@ -112,7 +112,7 @@ export default function Login() {
 
           <Typography variant="body2" className="register-link">
             Não tem uma conta?{" "}
-            <span onClick={() => router.push("/?section=planos")}>
+            <span onClick={() => window.location.href = "/?section=planos"}>
               Assine já
             </span>
           </Typography>
