@@ -7,7 +7,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import ServicoImage from "../../../img/two-guys-talking-about-work-work-garage-near-truck-transfer-documents-with-goods.png";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import EngineeringIcon from "@mui/icons-material/Engineering";
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 
@@ -18,19 +18,19 @@ const containerVariants = {
 
 const servicos = [
   {
-    icone: <LocalShippingIcon className="servico-icon" />, 
-    titulo: "What is Lorem Ipsum?",
-    descricao: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+    icone: <CurrencyExchangeIcon className="servico-icon" />, 
+    titulo: "Manutenção Preventiva Inteligente",
+    descricao: "Receba alertas automáticos sobre o momento ideal para realizar manutenções preventivas, evitando falhas inesperadas e reduzindo custos com reparos emergenciais.",
   },
   {
-    icone: <EngineeringIcon className="servico-icon" />, 
-    titulo: "Where does it come from?",
-    descricao: "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.",
+    icone: <LocalShippingIcon className="servico-icon" />, 
+    titulo: "Monitoramento Eficiente",
+    descricao: "Tenha total controle sobre os veículos da frota, acompanhando suas condições e garantindo que cada caminhão esteja sempre pronto para rodar com segurança e eficiência.",
   },
   {
     icone: <MoreTimeIcon className="servico-icon" />, 
-    titulo: "Why do we use it?",
-    descricao: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+    titulo: "Mais Agilidade na Tomada de Decisão",
+    descricao: "Com uma plataforma intuitiva, você acessa rapidamente as informações essenciais, agiliza o planejamento de manutenção e melhora a produtividade da frota.",
   },
 ];
 

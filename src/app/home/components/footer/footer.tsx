@@ -3,7 +3,7 @@
 import React from "react";
 import { Box, Typography, Link, IconButton, useMediaQuery, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import TwitterIcon from '@mui/icons-material/Twitter';
+import XIcon from '@mui/icons-material/X';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -13,7 +13,7 @@ export const Footer: React.FC = () => {
     const isMobile = useMediaQuery('(max-width:768px)');
 
     const sections = [
-        { title: "MINHA CONTA", links: ["Log In", "Cadastrar", "Cancelamento"] },
+        { title: "MINHA CONTA", links: ["Log In", "Assinatura", "Cancelamento"] },
         { title: "AJUDA", links: ["Suporte", "E-mail", "Ferramentas"] },
         { title: "SOBRE", links: ["Nossa História", "Media", "Trabalhe Conosco"] },
         { title: "LEGALIZAÇÃO", links: ["Termos de Uso", "Termos de Venda", "Políticas de Privacidade"] }
@@ -47,7 +47,7 @@ export const Footer: React.FC = () => {
 
             <Box className="footer-section">
                     <Box className="social-icons">
-                        <IconButton component="a" href="https://twitter.com" target="_blank"><TwitterIcon /></IconButton>
+                        <IconButton component="a" href="https://x.com" target="_blank"><XIcon /></IconButton>
                         <IconButton component="a" href="https://instagram.com" target="_blank"><InstagramIcon /></IconButton>
                         <IconButton component="a" href="https://youtube.com" target="_blank"><YouTubeIcon /></IconButton>
                         <IconButton component="a" href="https://linkedin.com" target="_blank"><LinkedInIcon /></IconButton>

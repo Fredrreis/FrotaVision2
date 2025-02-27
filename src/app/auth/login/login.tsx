@@ -11,15 +11,16 @@ import {
   Divider,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { signIn } from "next-auth/react";
 import GoogleIcon from "../../img/google.png";
 import MicrosoftIcon from "../../img/microsoft.png";
-import loginImg from "../../img/full-shot-woman-fixing-truck.jpg";
 import LogoFrotaVisionV2 from "../../img/FrotaVisionLogoV2.png"
 import "./login.css";
 
 export default function Login() {
+  const router = useRouter()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -99,24 +100,23 @@ export default function Login() {
               onClick={handleGoogleLogin}
             >
               <Image src={GoogleIcon} alt="Google Icon" width={20} height={20} />
-              Log in com Google
+              Login com Google
             </Button>
 
             {/* Botão da Microsoft (a ser implementado futuramente) */}
             <Button variant="outlined" className="login-social-button" disabled>
               <Image src={MicrosoftIcon} alt="Microsoft Icon" width={20} height={20} />
-              Log in com Microsoft
+              Login com Microsoft
             </Button>
           </Box>
 
           <Typography variant="body2" className="register-link">
-            Não tem uma conta? <span>Registre-se</span>
+            Não tem uma conta?{" "}
+            <span onClick={() => router.push("/?section=planos")}>
+              Assine já
+            </span>
           </Typography>
         </Box>
-      </Box>
-
-      <Box className="login-image-container">
-        <Image src={loginImg} alt="Login Img" className="login-image" />
       </Box>
     </motion.div>
   );

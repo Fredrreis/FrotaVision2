@@ -33,7 +33,7 @@ const theme = createTheme({
           width: '100%',
 
           '& .MuiOutlinedInput-root': {
-            height: '4.5vh',
+            height: '2.7rem',
             borderRadius: '0.75rem',
 
             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -49,17 +49,17 @@ const theme = createTheme({
 
           '& .MuiInputLabel-root': {
             fontSize: '0.875rem',
-            transform: 'translate(14px, 10px) scale(1)',
+            transform: 'translate(14px, 0.75rem) scale(1)',
             transition: 'transform 0.2s ease, font-size 0.2s ease',
           },
 
           '& .MuiInputLabel-root.Mui-focused': {
-            transform: 'translate(14px, -6px) scale(0.75)', // Ajuste da label ao focar
+            transform: 'translate(14px, -0.5rem) scale(0.85)', 
             color: '#1b3562'
           },
 
           '& .MuiInputLabel-root.MuiInputLabel-shrink': {
-            transform: 'translate(14px, -6px) scale(0.75)', // Mantém a label acima quando há valor no input
+            transform: 'translate(14px, -0.5rem) scale(0.85)',
           },
         },
       },

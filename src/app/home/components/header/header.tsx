@@ -5,12 +5,14 @@ import { Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem } from "@m
 import MenuIcon from '@mui/icons-material/Menu';
 import { useRouter } from 'next/navigation';
 import FrotaVisionLogo from "../../../img/FrotaVisionLogo.png";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import HelpIcon from '@mui/icons-material/Help';
 import Image from 'next/image';
 import "./header.css";
 import { Link } from 'react-scroll';
 
 export default function Header() {
-    const router = useRouter()
+    const router = useRouter();
     const [active, setActive] = useState("HOME");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -35,32 +37,43 @@ export default function Header() {
                     <Box>
                         <Image src={FrotaVisionLogo} alt="FrotaVision Logo" className="header-logo" />
                     </Box>
-                    <Box sx={{ display: "flex", gap: 2, marginLeft: 'auto' }}>
+                    <Box sx={{ display: "flex", gap: 2, marginLeft: 'auto', alignItems: "center" }}>
                         <Button 
-                            onClick={() => router.push('/auth')}
+                            onClick={() => router.push('/support')}
+                            className="header-fale-conosco"
                             sx={{ color: "#FFF", textTransform: "none" }}
+                            startIcon={<HelpIcon />}
                         >
-                            Log In
+                            Fale Conosco
                         </Button>
+
                         <Button 
-                            variant="contained" 
+                            onClick={() => router.push('/auth/login')}
                             sx={{ 
-                                backgroundColor: "#FFF", 
-                                borderRadius: "0.5rem",
-                                color: "#173165", 
+                                display: { xs: "none", md: "flex" },
+                                color: "#1B3562",  
                                 textTransform: "none", 
-                                display: { xs: 'none', md: 'block' },
-                                "&:hover": { backgroundColor: "#E5E5E5" } 
+                                backgroundColor: "white", 
+                                padding: "0.3rem", 
+                                borderRadius: "0.75rem" 
                             }}
                         >
-                            Inscreva-se
+                            Login
                         </Button>
+
+                        <IconButton 
+                            onClick={() => router.push('/auth/login')}
+                            sx={{ display: { xs: "flex", md: "none" }, color: "#FFF" }}
+                        >
+                            <AccountCircleIcon />
+                        </IconButton>
+
                         <IconButton
                             edge="start"
                             color="inherit"
                             aria-label="menu"
                             onClick={handleMenuOpen}
-                            sx={{ display: { xs: 'block', md: 'none', marginTop: "0.5rem" }, color: '#FFF' }}
+                            sx={{ display: { xs: 'block', md: 'none', marginTop: "0.5rem", marginLeft: "0.2rem" }, color: '#FFF' }}
                         >
                             <MenuIcon />
                         </IconButton>
@@ -78,7 +91,7 @@ export default function Header() {
                                         to={item.toLowerCase()}
                                         smooth={true}
                                         duration={500}
-                                        offset={-130} // Ajuste este valor conforme necessário
+                                        offset={-130}
                                         className={`nav-link ${active === item ? "active" : ""}`}
                                     >
                                         <Typography
@@ -106,7 +119,7 @@ export default function Header() {
                                 to={item.toLowerCase()}
                                 smooth={true}
                                 duration={500}
-                                offset={-130} // Ajuste este valor conforme necessário
+                                offset={-130}
                                 className={`nav-link ${active === item ? "active" : ""}`}
                                 onClick={() => handleMenuClick(item)}
                             >

@@ -1,134 +1,193 @@
 .login-container {
-    display: flex;
-    height: 100vh;
-    width: 100%;
-    background-color: #000000;
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  background-image: url("../../img/full-shot-woman-fixing-truck.jpg");
+  background-size: 75rem auto;
+  background-position: right center;
+  background-repeat: no-repeat;
+}
+
+/* Criando o filtro escuro */
+.login-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1b356250;
+  z-index: 1;
+}
+
+.login-form-container {
+  width: 40%;
+  padding: 4vh 8vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: whitesmoke;
+  border-radius: 0 2rem 2rem 0 !important;
+  position: relative;
+  z-index: 2;
+}
+
+.login-logo-img{
+  width: 20rem;
+  height: auto;
+}
+
+.login-subtitle {
+  color: rgb(0, 0, 0) !important;
+  margin-bottom: 4vh !important;
+  font-size: 0.875rem !important;
+}
+
+.login-inputs {
+  display: flex;
+  flex-direction: column;
+  width: 95%;
+  gap: 1.25rem;
+}
+
+.forgot-password {
+  color: #1b3562 !important;
+  text-align: right;
+  cursor: pointer;
+  font-size: 0.8rem !important;
+}
+
+.login-button {
+  background-color: #1b3562 !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+  border-radius: 0.75rem !important;
+  padding: 0.5rem !important;
+  margin-top: 3vh !important
+}
+
+.login-button:hover {
+  background-color: #162a51 !important;
+}
+
+.login-divider {
+  margin: 1.5rem 0 !important;
+  font-size: 0.875rem !important;
+  color: gray !important;
+}
+
+.login-social-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.login-social-button {
+  color: rgba(0, 0, 0, 0.7) !important;
+  display: flex !important;
+  width: 50%;
+  border-color:rgba(0, 0, 0, 0.2) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  border-radius: 0.75rem !important;
+  padding: 0.4rem !important;
+  text-transform: none !important;
+}
+
+.social-icon {
+  font-size: 1.2rem !important;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.875rem !important;
+  color: #333333 !important;
+}
+
+.register-link span {
+  color: #1b3562;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 1300) {
+  .login-container{
+    background-size: 55rem auto !important;
   }
-  
-  .login-form-container {
-    width: 50%;
-    padding: 4vh 8vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-color: whitesmoke;
-    align-items: center;
-  }
-  
+
   .login-logo-img{
-    width: 65%;
+    width: 15rem;
     height: auto;
   }
-  
-  .login-subtitle {
-    color: rgb(0, 0, 0) !important;
-    margin-bottom: 4vh !important;
+
+  .login-form-container{
+    width: 50%;
   }
-  
-  .login-inputs {
-    display: flex;
+
+  .login-social-buttons {
+    font-size: 0.8rem !important;
     flex-direction: column;
-    width: 95%;
-    gap: 1.25rem;
+    width: 100%;
   }
-  
-  .forgot-password {
-    color: #1b3562 !important;
-    text-align: right;
-    cursor: pointer;
+
+  .login-social-button {
+    width: 100%; /* Os botões ocupam toda a largura */
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+
+  .login-logo-img{
+    width: 15rem;
+    height: auto;
+  }
+
+  .login-form-container {
+    width: 100%; /* Ocupa quase toda a largura */
+    height: 100%;
+    padding: 0 9vw !important;
+    min-width: 20rem !important;
+    border-radius: 0rem !important; /* Suaviza os cantos */
+  }
+
+  .login-subtitle {
     font-size: 0.8rem !important;
   }
-  
-  .login-button {
-    background-color: #1b3562 !important;
-    color: #ffffff !important;
-    font-weight: bold !important;
-    border-radius: 0.75rem !important;
-    padding: 0.5rem !important;
-    margin-top: 3vh !important
+
+  .login-inputs {
+    width: 100%;
   }
-  
-  .login-button:hover {
-    background-color: #162a51 !important;
+
+  .forgot-password{
+    font-size: 0.7rem !important;
   }
-  
-  .login-divider {
-    margin: 1.5rem 0 !important;
-    font-size: 0.875rem !important;
-    color: gray !important;
+
+  .login-button{
+    margin-top: 2vh !important;
   }
-  
+
+  .login-divider{
+    font-size: 0.8rem !important;
+    margin: 0.5rem 0 !important;
+  }
+
   .login-social-buttons {
-    display: flex;
-    gap: 0.75rem;
+    font-size: 0.8rem !important;
+    flex-direction: column;
+    width: 100%;
   }
-  
+
   .login-social-button {
-    color: rgba(0, 0, 0, 0.7) !important;
-    display: flex !important;
-    width: 50%;
-    border-color:rgba(0, 0, 0, 0.2) !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.5rem !important;
-    border-radius: 0.75rem !important;
-    padding: 0.4rem !important;
-    text-transform: none !important;
+    width: 100%; /* Os botões ocupam toda a largura */
+    margin-bottom: 0.75rem;
   }
-  
-  .social-icon {
-    font-size: 1.2rem !important;
-  }
-  
+
   .register-link {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 0.875rem !important;
-    color: #333333 !important;
+    font-size: 0.8rem !important;
   }
-  
-  .register-link span {
-    color: #1b3562;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  
-  .login-image-container {
-    width: 80%;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: whitesmoke;
-    padding: 0;
-    margin: 0;
-    border: none;
-  }
-
-  .login-image {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    padding: 0 !important;
-    border-radius: 2rem 0 0 2rem !important;
-    margin: 0 !important;
-    border: none !important;
-  }
-
-  
-  /* Responsividade */
-  @media (max-width: 768px) {
-    .login-container {
-      flex-direction: column;
-    }
-  
-    .login-form-container {
-      width: 100%;
-      padding: 3vh 6vw;
-    }
-  
-    .login-image-container {
-      display: none;
-    }
-  }
-  
+}

@@ -1,0 +1,175 @@
+.register-container {
+    display: flex;
+    flex-direction: column; /* ✅ Mantém a logo fixa no topo e o form centralizado */
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    position: relative;
+}
+
+/* ✅ Header fixo no topo */
+.register-header {
+    width: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    top: 0;
+    left: 0;
+    background-color: #1b3562 !important;
+    padding: 0.3rem 15vw !important;
+}
+
+.register-toolbar {
+    display: flex;
+    justify-content: flex-start; /* Alinha a logo à esquerda */
+    width: 100%;
+    background-color: transparent;
+}
+
+.register-logo-img {
+    width: 10rem;
+    height: auto;
+}
+
+/* ✅ Formulário centralizado */
+.register-form {
+    width: 32rem;
+    padding: 2rem;
+    background: white;
+    box-shadow: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.register-step{
+    align-self: flex-start;
+    margin-bottom: 2vh !important;
+    color: #838383;
+    font-weight: 600 !important;
+}
+
+/* ✅ Estilos dos textos */
+.register-title {
+    font-weight: 600 !important;
+    align-self: flex-start;
+}
+
+.register-instructions, .register-campo, .register-plano-selecionado{
+    align-self:  flex-start;
+}
+
+.register-instructions{
+    margin: 2vh 0  !important;
+}
+
+.register-campo{
+    margin-bottom: 1vh !important;
+}
+
+.register-cancelamento{
+    font-size: 0.7rem !important;
+    color: #838383;
+    margin-top: 1vh !important;
+}
+
+.register-plano-selecionado {
+    color: rgb(0, 0, 0);
+    background-color: #f0f0f0 !important;
+    padding: 1rem;
+    margin-top: 1vh;
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.register-button, .register-button-back {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    border-radius: 0.75rem !important;
+    padding: 0.5rem !important;
+    margin-top: 2vh !important
+}
+
+.register-button{
+    background-color: #1b3562 !important;
+}
+
+.register-button-back{
+    background-color: black !important;
+}
+  
+.register-button:hover {
+    background-color: #162a51 !important;
+}
+
+.register-divider {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    margin: 1.5rem 0 !important;
+    font-size: 0.875rem !important;
+    color: #838383 !important;
+}
+
+.register-social-buttons {
+    display: flex;
+    width: 100% !important;
+    gap: 0.75rem;
+}
+
+.register-social-button {
+    color: rgba(0, 0, 0, 0.7) !important;
+    display: flex !important;
+    width: 50%;
+    border-color:rgba(0, 0, 0, 0.2) !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    border-radius: 0.75rem !important;
+    padding: 0.4rem !important;
+    text-transform: none !important;
+  }
+
+.register-check-circle-icon{
+    align-self: flex-start !important;
+    margin-bottom: 1vh;;
+    font-size: 2rem !important;
+}
+  
+
+/* ✅ Responsividade */
+@media (max-width: 768px) {
+    .register-header{
+        padding: 0.5rem 0.5rem !important;
+    }
+
+    .register-form {
+        width: 90%;
+        min-width: 20 !important;
+    }
+
+    .register-instructions{
+        font-size: 0.8rem !important;
+    }
+
+    .register-divider{
+        font-size: 0.8rem !important;
+    }
+
+    .register-social-buttons {
+        font-size: 0.8rem !important;
+        flex-direction: column;
+        width: 100%;
+      }
+    
+    .register-social-button {
+        width: 100%;
+        margin-bottom: 0.75rem;
+    }
+}

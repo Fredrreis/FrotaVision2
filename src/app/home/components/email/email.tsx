@@ -39,10 +39,8 @@ export default function Email() {
       </Typography>
       <Box className="email-text">
         <Typography variant="body2" className="email-text">
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the industry's standard dummy text ever
-          since the 1500s.  When an unknown printer took a galley of type and
-          scrambled it to make a type specimen book.
+          Mantenha-se atualizado com as últimas inovações do FrotaVision! Receba dicas exclusivas, promoções especiais e novidades sobre melhorias no sistema que vão ajudar a tornar a gestão 
+          da sua frota ainda mais eficiente. Inscreva-se e não perca nenhuma novidade!
         </Typography>
         <Box className="email-input-container">
           <FormControl className="email-form-control" variant="standard">

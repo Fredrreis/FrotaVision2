@@ -32,7 +32,7 @@
 }
 
 .header-logo {
-    width: 33%;
+    width: 10rem;
     height: auto;
 }
 
@@ -105,8 +105,11 @@
     }
 
     .header-logo {
-        width: 20vw;
-        height: auto;
+        width: 9rem;
+    }
+
+    .header-fale-conosco{
+        display: none !important;
     }
 }
 
@@ -128,7 +131,6 @@
     }
 
     .header-logo {
-        width: 35vw;
-        height: auto;
+        width: 8rem;
     }
 }

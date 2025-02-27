@@ -33,7 +33,7 @@ export default function Video() {
           Feito para a sua frota
         </Typography>
         <Typography variant="body1" className="video-description">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit
+          Gerencie manutenções e reduza custos com um sistema inteligente.
         </Typography>
         <Link
           to="planos"

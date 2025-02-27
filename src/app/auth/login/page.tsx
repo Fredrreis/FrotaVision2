@@ -2,7 +2,7 @@
 
 import React from "react";
 import Login from "./login";
-import './page.css';
+import '../../home/home.css';
 
 export default function App() {
     return (

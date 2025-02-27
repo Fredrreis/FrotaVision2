@@ -15,8 +15,11 @@ import {
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import CheckIcon from "@mui/icons-material/Check";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation"; // ✅ Para navegação
 
 export default function Planos() {
+  const router = useRouter(); // ✅ Instância do router
+
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -36,7 +39,7 @@ export default function Planos() {
       preco: "R$ 44,90",
       dispositivos: "6 dispositivos",
       usuarios: "6 usuários",
-      veiculos: "30 veículos",
+      veiculos: "25 veículos",
       relatorio: "Sim",
       recomendado: true,
     },
@@ -45,10 +48,27 @@ export default function Planos() {
       preco: "R$ 59,90",
       dispositivos: "10 dispositivos",
       usuarios: "10 usuários",
-      veiculos: "O que precisar",
+      veiculos: "Ilimitado",
       relatorio: "Sim",
     },
   ];
+
+    interface Plano {
+      nome: string;
+      preco: string;
+      dispositivos: string;
+      usuarios: string;
+      veiculos: string;
+      relatorio: string;
+      recomendado?: boolean;
+    }
+
+    const handleSelectPlan = (plano: Plano) => {
+      // 🔥 Converte o objeto do plano para JSON e compacta na URL corretamente
+      const planoCodificado = encodeURIComponent(JSON.stringify(plano));
+      router.push(`/auth/register?plano=${planoCodificado}`);
+    };
+    
 
   return (
     <motion.div
@@ -63,33 +83,31 @@ export default function Planos() {
 
       <TableContainer component={Paper} className="planos-table-container">
         <Table className="planos-table">
-        <TableHead>
-          <TableRow>
-            <TableCell className="table-header"></TableCell>
-            {planos.map((plano, index) => (
-              <TableCell
-                key={index}
-                align="center"
-                className="table-header"
-                style={{
-                  width: "22%",
-                  backgroundColor: plano.recomendado ? "#135172" : "#1B3562",
-                  position: "relative",
-                }}
-              >
-                {plano.recomendado && (
-                  <Box className="recomendado-label">
-                    RECOMENDADO
-                  </Box>
-                )}
-                <Typography variant="subtitle1" className="planos-subtitle">
-                  {plano.nome}
-                </Typography>
-                <Typography className="plano-preco">{plano.preco}/mês</Typography>
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
+          <TableHead>
+            <TableRow>
+              <TableCell className="table-header"></TableCell>
+              {planos.map((plano, index) => (
+                <TableCell
+                  key={index}
+                  align="center"
+                  className="table-header"
+                  style={{
+                    width: "22%",
+                    backgroundColor: plano.recomendado ? "#135172" : "#1B3562",
+                    position: "relative",
+                  }}
+                >
+                  {plano.recomendado && (
+                    <Box className="recomendado-label">RECOMENDADO</Box>
+                  )}
+                  <Typography variant="subtitle1" className="planos-subtitle">
+                    {plano.nome}
+                  </Typography>
+                  <Typography className="plano-preco">{plano.preco}/mês</Typography>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
           <TableBody>
             {[
               { label: "Dispositivos simultâneos", key: "dispositivos" },
@@ -116,12 +134,14 @@ export default function Planos() {
             <TableRow className="no-border-row">
               <TableCell></TableCell>
               {planos.map((plano, index) => (
-                <TableCell align="center" key={index} sx={{backgroundColor: plano.recomendado ? "whitesmoke" : "white"}}>
+                <TableCell align="center" key={index} sx={{ backgroundColor: plano.recomendado ? "whitesmoke" : "white" }}>
+                  {/* ✅ Agora passando o objeto inteiro do plano de forma compacta */}
                   <Button
                     variant="contained"
                     sx={{ fontWeight: "regular" }}
                     className={`plano-button ${plano.nome === "PREMIUM" ? "premium" : ""}`}
                     endIcon={<KeyboardArrowRightIcon />}
+                    onClick={() => handleSelectPlan(plano)}
                   >
                     Escolher este plano
                   </Button>
