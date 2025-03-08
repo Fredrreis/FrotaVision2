@@ -1,43 +1,56 @@
 .servico-container {
-    max-width: 70%;
+    max-width: 100%;
     margin: 0 auto;
     text-align: center;
-    padding: 3vh 0;
+    padding: 0 0 2rem 0;
 }
 
 .servico-title {
     font-weight: 600 !important;
-    margin-bottom: 3vh !important;
+    align-self: left !important;
+    margin-right: 27rem !important;
+    position: relative;
+    top: -3rem;
 }
 
-.servico-image {
-    position: relative;
-    width: 100%;
-    max-height: auto;
-    overflow: hidden;
-    border-radius: 0.75rem;
-    margin-bottom: 2vh;
-}
 
 .servico-content {
     display: flex;
-    justify-content: center;
+    flex-wrap: wrap;
     text-align: left;
-    gap: 2rem;
     transition: all 0.3s ease;
+    color: white;
 }
 
 .servico-item {
-    flex: 1;
-    max-width: 33%;
+    flex: 1 1 calc(50% - 9rem);
+    height: 50vh;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: center;
 }
 
+.servico-item.dark-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.644);
+    z-index: 1;
+}
+
+.servico-item.dark-overlay * {
+    position: relative;
+    z-index: 2;
+}
+
+
 .servico-icon {
-    color: #1b3562;
+    color: #ffffff;
     transition: transform 0.3s ease;
 }
 
@@ -47,7 +60,7 @@
 
 .arrow-icon {
     color: #838383;
-    margin-top: 2vh;
+    margin-top: 2rem !important;
     animation: bounce 1.5s infinite;
 }
 
@@ -75,7 +88,6 @@
 }
 
 .servico-text {
-    color: #555;
     font-size: 0.875rem !important;
     text-align: justify;
     width: 100%;
@@ -102,55 +114,6 @@
 }
 
 @media (max-width: 768px) {
-    .servico-image {
-        width: 100vw;
-        margin-left: -50vw;
-        left: 50%;
-        position: relative;
-        border-radius: 0;
-        margin-bottom: 3vh;
-        transition: all 0.3s ease;
-    }
-
-    .servico-content {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .servico-item {
-        max-width: 100%;
-        align-items: flex-start;
-        width: 100%;
-        transition: all 0.3s ease;
-    }
-
-    .servico-subtitle-container {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 0.25rem;
-        width: 100%;
-    }
-
-    .servico-subtitle {
-        font-size: 0.9rem !important;
-        text-align: left;
-        width: 100%;
-    }
-
-    .servico-text {
-        font-size: 0.8rem !important;
-        text-align: justify;
-        width: 100%;
-    }
-
-    .servico-container {
-        max-width: 80%;
-    }
-
-    .servico-title {
-        font-size: 1.1rem !important;
-    }
 
     .servico-button-container {
         font-size: 0.8rem !important;
