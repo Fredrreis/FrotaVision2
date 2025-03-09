@@ -1,0 +1,195 @@
+.menu-container {
+    width: 15.6rem;
+    min-width: 15.6rem;
+    min-height: 100vh;
+    height: auto;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0.2vw 0 0.5vw rgba(0, 0, 0, 0.1);
+}
+
+.menu-header {
+    background-color: #1B3562;
+    padding: 1.5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.menu-logo {
+    width: 10rem;
+    height: auto;
+}
+
+.menu-icons-header {
+    display: flex;
+    gap: 1vw;
+}
+
+.avatar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (min-width: 768px) {
+    .avatar-icon {
+        display: none !important;
+    }
+}
+
+.menu-lateral {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.user-info {
+    text-align: center;
+    padding: 2vh 0;
+    background-color: white;
+}
+
+.user-empresa { 
+    font-weight: 600 !important;
+    color: #1B3562;
+    margin-bottom: 0.5vh;
+}
+
+.user-avatar {
+    margin: 1rem auto !important;
+}
+
+.user-name {
+    font-weight: 600 !important;
+    margin-top: 0.5vh;
+}
+
+.user-role {
+    background-color: #e0e0e0;
+    color: black;
+    padding: 0.3rem 1.2rem;
+    border-radius: 1rem !important;
+    display: inline-block !important;
+    margin-top: 0.5vh !important;
+}
+
+.menu-list {
+    padding-top: 1vh !important;
+}
+
+.menu-item {
+    padding: 1rem 2.4rem !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: background 0.3s ease-in-out, color 0.3s ease-in-out !important;
+    position: relative;
+    cursor: pointer;
+}
+
+.menu-item.active {
+    color: #1B3562 !important;
+    font-weight: 600 !important;
+    background-color: rgba(27, 53, 98, 0.1) !important;
+}
+
+.menu-item.active::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 5px !important;
+    height: 100% !important;
+    background-color: #1B3562 !important;
+    transition: width 0.3s ease-in-out;
+}
+
+.menu-item:hover {
+    background-color: rgba(27, 53, 98, 0.05) !important;
+}
+
+.menu-icon {
+    color: #646464 !important;
+    min-width: 1.8rem !important;
+    transition: color 0.3s ease-in-out;
+}
+
+.menu-item.active .menu-icon {
+    color: #1B3562 !important;
+}
+
+.menu-text {
+    color: #646464 !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    transition: color 0.3s ease-in-out;
+}
+
+.menu-item.active .menu-text {
+    color: #1B3562 !important;
+    font-weight: 600 !important;
+}
+
+@media (max-width: 768px) {
+    .menu-container {
+        width: 100vw;
+        min-height: auto;
+        height: auto;
+    }
+
+    .menu-header {
+        width: 100%;
+        justify-content: space-between;
+        padding: 1vh 10% !important;
+    }
+
+    .menu-logo {
+        width: 8rem !important;
+    }
+
+    .menu-icons-header {
+        display: flex !important;
+    }
+
+    .menu-lateral {
+        display: none;
+    }
+
+    .drawer-menu {
+        width: 70vw;
+    }
+
+    .menu-item {
+        padding: 2vh 6vw !important;
+    }
+
+    .menu-icon {
+        margin-right: 0.5rem;
+    }
+
+    .menu-text {
+        font-size: 0.8rem !important;
+    }
+
+    .user-info-menu {
+        text-align: center;
+        padding: 2vh;
+    }
+
+    .user-info-menu .user-avatar {
+        width: 5rem;
+        height: 5rem;
+    }
+
+    .user-info-menu .user-name, 
+    .user-info-menu .user-empresa {
+        font-size: 0.9rem !important;
+    }
+
+    .user-info-menu .user-role {
+        font-size: 0.8rem !important;
+        padding: 0.5vh 2vw;
+    }
+}

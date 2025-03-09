@@ -34,7 +34,7 @@ const theme = createTheme({
 
           '& .MuiOutlinedInput-root': {
             height: '2.7rem',
-            borderRadius: '0.75rem',
+            borderRadius: '0.40rem',
 
             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
               borderColor: '#1b3562', // Cor da borda ao focar

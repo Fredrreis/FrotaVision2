@@ -2,17 +2,18 @@
     max-width: 100%;
     margin: 0 auto;
     text-align: center;
-    padding: 0 0 2rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .servico-title {
+    margin-left: 0 !important;
     font-weight: 600 !important;
-    align-self: left !important;
-    margin-right: 27rem !important;
-    position: relative;
-    top: -3rem;
+    align-self: flex-start !important;
+    margin-bottom: 1rem !important;
 }
-
 
 .servico-content {
     display: flex;
@@ -28,8 +29,9 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    padding-left: 6vw;
 }
 
 .servico-item.dark-overlay::after {
@@ -48,7 +50,6 @@
     z-index: 2;
 }
 
-
 .servico-icon {
     color: #ffffff;
     transition: transform 0.3s ease;
@@ -62,15 +63,6 @@
     color: #838383;
     margin-top: 2rem !important;
     animation: bounce 1.5s infinite;
-}
-
-@keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-8px);
-    }
 }
 
 .servico-subtitle-container {
@@ -93,29 +85,71 @@
     width: 100%;
 }
 
-.servico-button-container {
-    margin-top: 2vh;
-}
-
-.servico-button {
-    color: #1b3562 !important;
-    border-color: #1b3562 !important;
+.servico-saiba-mais-button{
+    color: #ffffff !important;
+    border-color: #ffffff !important;
     text-transform: none !important;
     font-weight: bold !important;
-    border-radius: 0.75rem !important;
-    padding: 0.625rem 1.25rem !important;
+    align-self: flex-start !important;
+    margin-top: 1rem !important;
+    border-radius: 0.40rem !important;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.servico-button:hover {
-    color: #ffffff !important;
-    border-color: #1b3562 !important;
-    background-color: #1b3562 !important;
+.servico-saiba-mais-button:hover{
+    color: #000000 !important;
+    border-color: #ffffff !important;
+    background-color: #ffffff !important;
 }
 
 @media (max-width: 768px) {
+    .servico-container {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
 
-    .servico-button-container {
+    .servico-content {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+
+    .servico-title {
+        font-size: 1.1rem !important;
+        text-align: center !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .servico-item {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: 10% !important;
+        text-align: center !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .servico-text {
         font-size: 0.8rem !important;
+        text-align: justify !important;
+        width: 100% !important;
+    }
+
+    .servico-subtitle {
+        font-size: 0.9rem !important;
+    }
+
+    .servico-subtitle-container {
+        justify-content: center !important;
+    }
+
+    .servico-saiba-mais-button {
+        font-size: 0.8rem !important;
+        padding: 0.5rem 1rem !important;
+        margin-top: 0.8rem !important;
     }
 }

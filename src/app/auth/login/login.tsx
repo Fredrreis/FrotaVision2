@@ -11,16 +11,16 @@ import {
   Divider,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { signIn } from "next-auth/react";
 import GoogleIcon from "../../img/google.png";
 import MicrosoftIcon from "../../img/microsoft.png";
-import LogoFrotaVisionV2 from "../../img/FrotaVisionLogoV2.png"
+import LogoFrotaVisionV2 from "../../img/FrotaVisionLogoV2.png";
 import "./login.css";
 
 export default function Login() {
-  const router = useRouter()
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -32,15 +32,17 @@ export default function Login() {
       password,
     });
 
-    if (result?.ok) {
-      alert("Login com e-mail e senha bem-sucedido!");
-    } else {
-      alert("E-mail ou senha inválidos");
-    }
+    router.push(`/ferramentas`);
+
+    // if (result?.ok) {
+    //   alert("Login com e-mail e senha bem-sucedido!");
+    // } else {
+    //   alert("E-mail ou senha inválidos");
+    // }
   };
 
   const handleGoogleLogin = () => {
-    signIn("google"); // ✅ Dispara o login com o Google
+    signIn("google");
   };
 
   return (
@@ -51,7 +53,11 @@ export default function Login() {
       transition={{ duration: 0.5 }}
     >
       <Box className="login-form-container">
-        <Image src={LogoFrotaVisionV2} alt="Frota Vision Logo" className="login-logo-img"/>
+        <Image
+          src={LogoFrotaVisionV2}
+          alt="Frota Vision Logo"
+          className="login-logo-img"
+        />
 
         <Typography variant="body2" className="login-subtitle">
           Coloque suas credenciais para ter acesso à conta
@@ -93,26 +99,34 @@ export default function Login() {
           <Divider className="login-divider">ou</Divider>
 
           <Box className="login-social-buttons">
-            {/* ✅ Botão de login com Google agora funcional */}
             <Button
               variant="outlined"
               className="login-social-button"
               onClick={handleGoogleLogin}
             >
-              <Image src={GoogleIcon} alt="Google Icon" width={20} height={20} />
+              <Image
+                src={GoogleIcon}
+                alt="Google Icon"
+                width={20}
+                height={20}
+              />
               Login com Google
             </Button>
 
-            {/* Botão da Microsoft (a ser implementado futuramente) */}
             <Button variant="outlined" className="login-social-button" disabled>
-              <Image src={MicrosoftIcon} alt="Microsoft Icon" width={20} height={20} />
+              <Image
+                src={MicrosoftIcon}
+                alt="Microsoft Icon"
+                width={20}
+                height={20}
+              />
               Login com Microsoft
             </Button>
           </Box>
 
           <Typography variant="body2" className="register-link">
             Não tem uma conta?{" "}
-            <span onClick={() => window.location.href = "/?section=planos"}>
+            <span onClick={() => (window.location.href = "/?section=planos")}>
               Assine já
             </span>
           </Typography>

@@ -9,7 +9,6 @@
     box-sizing: border-box !important;
     margin: 0 !important;
     position: static;
-    /* why pos absolute?? */
     left: 0;
     right: 0;
 }
@@ -36,8 +35,8 @@
 
 .footer-link {
     margin-bottom: 0.5rem;
-    color: #fff !important; /* Link color set to white */
-    text-decoration: none !important; /* Remove underline */
+    color: #fff !important;
+    text-decoration: none !important;
     font-size: 0.7rem !important;
 }
 
@@ -51,7 +50,7 @@
 }
 
 .social-icons a {
-    color: #fff; /* Ensure icons are white */
+    color: #fff;
 }
 
 .social-icons a:hover {
@@ -87,7 +86,7 @@
 
     .accordion-details {
         display: flex;
-        flex-direction: column; /* Links um abaixo do outro */
+        flex-direction: column;
         padding: 0.5rem 1rem;
     }
 

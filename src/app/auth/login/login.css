@@ -29,7 +29,6 @@
   justify-content: center;
   align-items: center;
   background-color: whitesmoke;
-  border-radius: 0 2rem 2rem 0 !important;
   position: relative;
   z-index: 2;
 }
@@ -63,7 +62,7 @@
   background-color: #1b3562 !important;
   color: #ffffff !important;
   font-weight: bold !important;
-  border-radius: 0.75rem !important;
+  border-radius: 0.40rem !important;
   padding: 0.5rem !important;
   margin-top: 3vh !important
 }
@@ -91,7 +90,7 @@
   align-items: center !important;
   justify-content: center !important;
   gap: 0.5rem !important;
-  border-radius: 0.75rem !important;
+  border-radius: 0.40rem !important;
   padding: 0.4rem !important;
   text-transform: none !important;
 }

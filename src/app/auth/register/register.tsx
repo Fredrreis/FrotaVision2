@@ -2,14 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Box, Typography, TextField, Button, Divider, Toolbar } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Divider,
+  Toolbar,
+} from "@mui/material";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import LogoFrotaVision from "../../img/FrotaVisionLogo.png";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackwardsIcon from "@mui/icons-material/ArrowBack";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 // Ajustando o caminho para o CSS
 import "./register.css";
@@ -71,10 +78,14 @@ export default function Register() {
       }
     };
 
-    window.addEventListener("popstate", () => handleRouteChange(window.location.pathname));
+    window.addEventListener("popstate", () =>
+      handleRouteChange(window.location.pathname)
+    );
 
     return () => {
-      window.removeEventListener("popstate", () => handleRouteChange(window.location.pathname));
+      window.removeEventListener("popstate", () =>
+        handleRouteChange(window.location.pathname)
+      );
     };
   }, [pathname]);
 
@@ -118,20 +129,24 @@ export default function Register() {
     <motion.div className="register-container">
       <Box className="register-header">
         <Toolbar className="register-toolbar">
-          <Image src={LogoFrotaVision} alt="Frota Vision Logo" className="register-logo-img" />
-            <Button 
-            onClick={() => router.push('/home')}
-            sx={{ 
-              color: "#1B3562",  
-              textTransform: "none", 
-              backgroundColor: "white", 
-              padding: "0.3rem 1rem", 
+          <Image
+            src={LogoFrotaVision}
+            alt="Frota Vision Logo"
+            className="register-logo-img"
+          />
+          <Button
+            onClick={() => router.push("/home")}
+            sx={{
+              color: "#1B3562",
+              textTransform: "none",
+              backgroundColor: "white",
+              padding: "0.3rem 1rem",
               borderRadius: "0.75rem",
-              marginLeft: "auto" // ✅ Garante que fique à direita
+              marginLeft: "auto", // ✅ Garante que fique à direita
             }}
-            >
-                Sair
-            </Button>
+          >
+            Sair
+          </Button>
         </Toolbar>
       </Box>
 
@@ -179,12 +194,30 @@ export default function Register() {
             </Button>
             <Divider className="register-divider">ou</Divider>
             <Box className="register-social-buttons">
-              <Button variant="outlined" className="register-social-button" onClick={handleGoogleSignIn}>
-                <Image src={GoogleIcon} alt="Google Icon" width={20} height={20} />
+              <Button
+                variant="outlined"
+                className="register-social-button"
+                onClick={handleGoogleSignIn}
+              >
+                <Image
+                  src={GoogleIcon}
+                  alt="Google Icon"
+                  width={20}
+                  height={20}
+                />
                 Sign in com Google
               </Button>
-              <Button variant="outlined" className="register-social-button" disabled>
-                <Image src={MicrosoftIcon} alt="Microsoft Icon" width={20} height={20} />
+              <Button
+                variant="outlined"
+                className="register-social-button"
+                disabled
+              >
+                <Image
+                  src={MicrosoftIcon}
+                  alt="Microsoft Icon"
+                  width={20}
+                  height={20}
+                />
                 Sign in com Microsoft
               </Button>
             </Box>
@@ -240,7 +273,7 @@ export default function Register() {
 
         {step === 3 && (
           <>
-            <CheckCircleIcon className="register-check-circle-icon"/>
+            <CheckCircleIcon className="register-check-circle-icon" />
             <Typography variant="h5" className="register-title">
               Confirme seus dados
             </Typography>
@@ -255,10 +288,16 @@ export default function Register() {
                 <strong>{planoSelecionado.preco}</strong>/mês
               </Typography>
               <Typography variant="body2" sx={{ fontSize: "0.875rem" }}>
-                {planoSelecionado.dispositivos} - {planoSelecionado.usuarios} - {planoSelecionado.veiculos} - Relatório: {planoSelecionado.relatorio}
+                {planoSelecionado.dispositivos} - {planoSelecionado.usuarios} -{" "}
+                {planoSelecionado.veiculos} - Relatório:{" "}
+                {planoSelecionado.relatorio}
               </Typography>
             </Box>
-            <Typography variant="body2" className="register-campo" sx={{ marginTop: "2vh" }}>
+            <Typography
+              variant="body2"
+              className="register-campo"
+              sx={{ marginTop: "2vh" }}
+            >
               <strong>E-mail:</strong> {formData.email}
             </Typography>
             <Typography variant="body2" className="register-campo">
@@ -267,7 +306,12 @@ export default function Register() {
             <Typography variant="body2" className="register-campo">
               <strong>CNPJ:</strong> {formData.cnpj}
             </Typography>
-            <Button variant="contained" className="register-button" fullWidth onClick={handleRegister}>
+            <Button
+              variant="contained"
+              className="register-button"
+              fullWidth
+              onClick={handleRegister}
+            >
               CONCLUIR ASSINATURA
             </Button>
             <Button

@@ -44,11 +44,11 @@
 }
 
 .table-header:nth-child(2) {
-  border-top-left-radius: 0.75rem !important;
+  border-top-left-radius: 0.40rem !important;
 }
 
 .table-header:nth-last-child(1) {
-  border-top-right-radius: 0.75rem !important;
+  border-top-right-radius: 0.40rem !important;
 }
 
 .recomendado-label {
@@ -106,7 +106,7 @@
   border: 0 !important;
   background-color: transparent !important;
   text-transform: none !important;
-  border-radius: 0.75rem !important;
+  border-radius: 0.40rem !important;
   font-weight: 450 !important;
   padding: 0.5rem 1rem;
   box-shadow: none !important;

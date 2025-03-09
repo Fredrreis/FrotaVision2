@@ -39,8 +39,10 @@ export default function Email() {
       </Typography>
       <Box className="email-text">
         <Typography variant="body2" className="email-text">
-          Mantenha-se atualizado com as últimas inovações do FrotaVision! Receba dicas exclusivas, promoções especiais e novidades sobre melhorias no sistema que vão ajudar a tornar a gestão 
-          da sua frota ainda mais eficiente. Inscreva-se e não perca nenhuma novidade!
+          Mantenha-se atualizado com as últimas inovações do FrotaVision! Receba
+          dicas exclusivas, promoções especiais e novidades sobre melhorias no
+          sistema que vão ajudar a tornar a gestão da sua frota ainda mais
+          eficiente. Inscreva-se e não perca nenhuma novidade!
         </Typography>
         <Box className="email-input-container">
           <FormControl className="email-form-control" variant="standard">
@@ -66,7 +68,11 @@ export default function Email() {
               }}
             />
           </FormControl>
-          <Button variant="contained" className="email-button" onClick={handleSubmit}>
+          <Button
+            variant="contained"
+            className="email-button"
+            onClick={handleSubmit}
+          >
             ENVIAR
           </Button>
         </Box>

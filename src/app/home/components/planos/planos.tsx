@@ -15,10 +15,10 @@ import {
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import CheckIcon from "@mui/icons-material/Check";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation"; // ✅ Para navegação
+import { useRouter } from "next/navigation";
 
 export default function Planos() {
-  const router = useRouter(); // ✅ Instância do router
+  const router = useRouter();
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -53,22 +53,20 @@ export default function Planos() {
     },
   ];
 
-    interface Plano {
-      nome: string;
-      preco: string;
-      dispositivos: string;
-      usuarios: string;
-      veiculos: string;
-      relatorio: string;
-      recomendado?: boolean;
-    }
+  interface Plano {
+    nome: string;
+    preco: string;
+    dispositivos: string;
+    usuarios: string;
+    veiculos: string;
+    relatorio: string;
+    recomendado?: boolean;
+  }
 
-    const handleSelectPlan = (plano: Plano) => {
-      // 🔥 Converte o objeto do plano para JSON e compacta na URL corretamente
-      const planoCodificado = encodeURIComponent(JSON.stringify(plano));
-      router.push(`/auth/register?plano=${planoCodificado}`);
-    };
-    
+  const handleSelectPlan = (plano: Plano) => {
+    const planoCodificado = encodeURIComponent(JSON.stringify(plano));
+    router.push(`/auth/register?plano=${planoCodificado}`);
+  };
 
   return (
     <motion.div
@@ -77,8 +75,8 @@ export default function Planos() {
       initial="hidden"
       animate="visible"
     >
-      <Typography variant="h5" className="planos-titulo">
-        Nossos planos
+      <Typography variant="h6" className="planos-titulo">
+        PLANOS
       </Typography>
 
       <TableContainer component={Paper} className="planos-table-container">
@@ -103,7 +101,9 @@ export default function Planos() {
                   <Typography variant="subtitle1" className="planos-subtitle">
                     {plano.nome}
                   </Typography>
-                  <Typography className="plano-preco">{plano.preco}/mês</Typography>
+                  <Typography className="plano-preco">
+                    {plano.preco}/mês
+                  </Typography>
                 </TableCell>
               ))}
             </TableRow>
@@ -121,12 +121,18 @@ export default function Planos() {
                   <TableCell
                     align="center"
                     key={idx}
-                    className={`row ${plano.nome === "PREMIUM" ? "premium" : ""}`}
+                    className={`row ${
+                      plano.nome === "PREMIUM" ? "premium" : ""
+                    }`}
                   >
                     {item.key === "relatorio" && plano.relatorio === "Sim" && (
-                      <CheckIcon className="check-icon" sx={{ fontSize: "small" }} />
+                      <CheckIcon
+                        className="check-icon"
+                        sx={{ fontSize: "small" }}
+                      />
                     )}
-                    {item.key !== "relatorio" && plano[item.key as keyof typeof plano]}
+                    {item.key !== "relatorio" &&
+                      plano[item.key as keyof typeof plano]}
                   </TableCell>
                 ))}
               </TableRow>
@@ -134,12 +140,19 @@ export default function Planos() {
             <TableRow className="no-border-row">
               <TableCell></TableCell>
               {planos.map((plano, index) => (
-                <TableCell align="center" key={index} sx={{ backgroundColor: plano.recomendado ? "whitesmoke" : "white" }}>
-                  {/* ✅ Agora passando o objeto inteiro do plano de forma compacta */}
+                <TableCell
+                  align="center"
+                  key={index}
+                  sx={{
+                    backgroundColor: plano.recomendado ? "whitesmoke" : "white",
+                  }}
+                >
                   <Button
                     variant="contained"
                     sx={{ fontWeight: "regular" }}
-                    className={`plano-button ${plano.nome === "PREMIUM" ? "premium" : ""}`}
+                    className={`plano-button ${
+                      plano.nome === "PREMIUM" ? "premium" : ""
+                    }`}
                     endIcon={<KeyboardArrowRightIcon />}
                     onClick={() => handleSelectPlan(plano)}
                   >
