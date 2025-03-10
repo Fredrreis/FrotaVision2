@@ -32,12 +32,12 @@ export const Ferramentas: React.FC = () => {
   // Renderiza o conteúdo correto baseado no menu selecionado
   const renderizarConteudo = () => {
     switch (paginaAtiva) {
-      case "CAMINHÕES":
+      case "VEÍCULOS":
         return <Veiculos />;
       case "MOTORISTAS":
         return <Motoristas />;
       default:
-        return <Notificacoes />; // Página padrão
+        return <Notificacoes />;
     }
   };
 

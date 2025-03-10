@@ -18,6 +18,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import EngineeringIcon from "@mui/icons-material/Engineering";
 import PeopleIcon from "@mui/icons-material/People";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import DescriptionIcon from "@mui/icons-material/Description";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
@@ -29,12 +30,12 @@ import React from "react";
 
 const menuItems = [
   { text: "NOTIFICAÇÕES", icon: <NotificationsIcon /> },
-  { text: "CAMINHÕES", icon: <LocalShippingIcon /> },
+  { text: "VEÍCULOS", icon: <LocalShippingIcon /> },
   { text: "MANUTENÇÕES", icon: <EngineeringIcon /> },
   { text: "MOTORISTAS", icon: <PeopleIcon /> },
   { text: "VIAGENS", icon: <TimelineIcon /> },
   { text: "RELATÓRIOS", icon: <DescriptionIcon /> },
-  { text: "USUÁRIOS", icon: <PeopleIcon /> },
+  { text: "USUÁRIOS", icon: <AccountCircleIcon /> },
   { text: "AJUDA", icon: <HelpOutlineIcon /> },
   { text: "SAIR", icon: <ExitToAppIcon /> },
 ];

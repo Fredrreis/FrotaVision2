@@ -1,0 +1,78 @@
+.motoristas-container {
+    padding: 2rem;
+    background-color: inherit;
+}
+
+/* Título */
+.motoristas-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.motoristas-title {
+    font-weight: 600 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.icon-title {
+    margin-right: 0.5rem !important;
+    font-size: 1.7rem !important;
+}
+
+/* Filtros */
+.motoristas-filtros {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+}
+
+/* Campo de Busca */
+.search-input {
+    width: 450px !important;
+}
+
+/* Botão de Cadastro */
+.botao-cadastrar {
+    background-color: #1B3562 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    text-transform: none !important;
+    border-radius: 0.3rem !important;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+    .motoristas-filtros {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .botao-cadastrar {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .motoristas-container {
+        padding: 1rem;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .botao-cadastrar {
+        width: 100%;
+        text-align: center;
+    }
+}

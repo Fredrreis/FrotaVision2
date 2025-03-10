@@ -1,0 +1,60 @@
+.modal-container {
+    border-radius: 0.40rem !important;
+}
+
+/* Formulário */
+.modal-formulario {
+    padding: 2.5rem 2.5rem 0 2.5rem !important;
+}
+
+/* Título do formulário */
+.modal-titulo {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.icone-seta {
+    font-size: 1.3rem !important;
+    color: #000000;
+}
+
+/* Campos do formulário */
+.modal-form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem; /* 🔹 Aumentei o espaçamento entre os inputs */
+}
+
+/* Estiliza o campo para parecer com o design */
+.modal-input {
+    border-radius: 0.40rem !important;
+    background-color: #f8f8f8 !important;
+}
+
+/* Remove a borda azul do campo ativo */
+.modal-input .MuiOutlinedInput-root {
+    border-radius: 0.40rem !important;
+}
+
+/* Botões */
+.modal-actions {
+    padding: 0.5rem 2.5rem 2.5rem 2.5rem !important;
+    display: flex !important;
+    justify-content: space-between !important;
+}
+
+.modal-cancelar {
+    background-color: #ccc !important;
+    color: black !important;
+    text-transform: none !important;
+    border-radius: 0.40rem !important;
+}
+
+.modal-editar {
+    background-color: #000000 !important;
+    color: white !important;
+    text-transform: none !important;
+    border-radius: 0.40rem !important;
+}
