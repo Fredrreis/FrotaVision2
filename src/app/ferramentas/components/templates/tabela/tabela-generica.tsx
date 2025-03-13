@@ -9,7 +9,6 @@ import {
   Paper,
   Tooltip,
 } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -23,11 +22,13 @@ interface TabelaProps {
   onEditar: (item: any) => void;
 }
 
-export default function TabelaGenerica({
-  colunas,
-  dados,
-  onEditar,
-}: TabelaProps) {
+const MAX_CHAR = 20;
+
+const truncateText = (text: string) => {
+  return text.length > MAX_CHAR ? text.substring(0, MAX_CHAR) + "..." : text;
+};
+
+export default function TabelaGenerica({ colunas, dados, onEditar }: TabelaProps) {
   const [orderBy, setOrderBy] = useState<string | null>(null);
   const [order, setOrder] = useState<"asc" | "desc" | null>(null);
 
@@ -46,25 +47,6 @@ export default function TabelaGenerica({
 
     if (typeof valorA === "number" && typeof valorB === "number") {
       return order === "asc" ? valorA - valorB : valorB - valorA;
-    }
-
-    const isData = (valor: any) =>
-      typeof valor === "string" &&
-      valor.match(/^\d{2}\/\d{2}\/\d{4}$/) !== null;
-
-    if (isData(valorA) && isData(valorB)) {
-      const converterData = (data: string) => {
-        const [dia, mes, ano] = data.split("/");
-        return new Date(
-          parseInt(ano),
-          parseInt(mes) - 1,
-          parseInt(dia)
-        ).getTime();
-      };
-
-      return order === "asc"
-        ? converterData(valorA) - converterData(valorB)
-        : converterData(valorB) - converterData(valorA);
     }
 
     return order === "asc"
@@ -103,31 +85,30 @@ export default function TabelaGenerica({
         </TableHead>
         <TableBody>
           {sortedDados.map((item, index) => (
-            <TableRow
-              key={index}
-              className={index % 2 === 0 ? "linha-par" : ""}
-            >
+            <TableRow key={index} className={index % 2 === 0 ? "linha-par" : ""}>
               {colunas.map(({ chave }) => (
                 <TableCell key={chave}>
-                  {chave === "nome" && item.manutencaoProxima ? (
-                    <span className="nome-com-alerta">
-                      {item[chave]}
-                      <Tooltip title="Manutenção Pendente">
-                        <NotificationImportantIcon className="icone-alerta" />
-                      </Tooltip>
-                    </span>
+                  {item[chave].length > MAX_CHAR ? (
+                    <Tooltip title={item[chave]} arrow>
+                      <span>{truncateText(item[chave])}</span>
+                    </Tooltip>
                   ) : (
                     item[chave]
+                  )}
+                  {chave === "nome" && item.manutencaoProxima && (
+                    <Tooltip title="Manutenção Pendente" arrow>
+                      <NotificationImportantIcon className="icone-alerta" />
+                    </Tooltip>
                   )}
                 </TableCell>
               ))}
               <TableCell>
-                <VisibilityIcon className="icone-acao visualizar" />
-                <EditIcon
-                  className="icone-acao editar"
-                  onClick={() => onEditar(item)}
-                />
-                <DeleteIcon className="icone-acao excluir" />
+                <Tooltip title="Editar" arrow>
+                  <EditIcon className="icone-acao editar" onClick={() => onEditar(item)} />
+                </Tooltip>
+                <Tooltip title="Deletar" arrow>
+                  <DeleteIcon className="icone-acao excluir" />
+                </Tooltip>
               </TableCell>
             </TableRow>
           ))}

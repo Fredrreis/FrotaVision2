@@ -9,7 +9,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward"; // Ícone da seta
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import "./modal-generico.css";
 
 interface ModalProps {
@@ -25,6 +25,7 @@ interface ModalProps {
   }[];
   dados: any;
   setDados: (novosDados: any) => void;
+  modoEdicao: boolean;
 }
 
 export default function ModalFormulario({
@@ -34,6 +35,7 @@ export default function ModalFormulario({
   colunas,
   dados,
   setDados,
+  modoEdicao,
 }: ModalProps) {
   useEffect(() => {
     if (!dados) {
@@ -58,14 +60,16 @@ export default function ModalFormulario({
         <Box className="modal-titulo">
           <ArrowForwardIcon className="icone-seta" />
           <Typography variant="h6" fontWeight={600} fontSize={"1.1rem"}>
-            EDIÇÃO
+            {modoEdicao ? "EDIÇÃO" : "CADASTRAR"}
           </Typography>
         </Box>
         <Typography
           variant="body2"
           sx={{ marginBottom: "1.5rem", color: "black" }}
         >
-          Por gentileza modifique como desejar as informações abaixo:
+          {modoEdicao
+            ? "Por gentileza modifique como desejar as informações abaixo:"
+            : "Preencha o(s) campo(s) para cadastrar um novo item:"}
         </Typography>
 
         {/* Campos do formulário */}
@@ -121,7 +125,7 @@ export default function ModalFormulario({
           Cancelar
         </Button>
         <Button onClick={onSalvar} className="modal-editar" variant="contained">
-          Salvar Edição
+          Salvar
         </Button>
       </DialogActions>
     </Dialog>

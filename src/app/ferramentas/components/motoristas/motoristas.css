@@ -71,8 +71,20 @@
         width: 100%;
     }
 
+    .search-icon {
+        font-size: 1.1rem !important;
+    }
+
+    .search-input input {
+        font-size: 0.8rem !important;
+    }
+
     .botao-cadastrar {
         width: 100%;
         text-align: center;
+    }
+
+    .motoristas-title{
+        font-size: 1.1rem !important;
     }
 }

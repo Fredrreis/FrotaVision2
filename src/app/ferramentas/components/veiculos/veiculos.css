@@ -28,7 +28,7 @@
 /* Campo de Busca */
 /* Correção para garantir que o tamanho do input seja aplicado */
 .search-input {
-    max-width: 20.5rem !important;
+    max-width: 30% !important;
 }
 
 /* Certificando-se de que o input interno do MUI também recebe o estilo */
@@ -39,7 +39,7 @@
 
 /* Filtro de Manutenção */
 .filtro-manutencao {
-    display: flex;
+    display: inline-block;
     align-items: center;
     gap: 1rem;
 }
@@ -72,10 +72,11 @@
     padding: 0.5rem 1rem !important;
     text-transform: none !important;
     border-radius: 0.3rem !important;
+    max-width: 25% !important;
 }
 
-/* Responsividade */
-@media (max-width: 1024px) {
+
+@media (max-width: 768px) {
     .veiculos-filtros {
         flex-direction: column;
         align-items: flex-start;
@@ -87,18 +88,16 @@
         align-items: flex-start;
     }
 
-    .botao-cadastrar {
-        width: 100%;
-    }
-}
-
-@media (max-width: 768px) {
     .veiculos-container {
         padding: 1rem !important;
     }
 
     .veiculos-title {
         font-size: 1.1rem !important;
+    }
+
+    .search-input{
+        max-width: 100% !important;
     }
 
     .search-icon {
@@ -118,7 +117,7 @@
     }
 
     .botao-cadastrar {
-        width: 100% !important;
+        max-width: 100% !important;
         text-align: center !important;
     }
 

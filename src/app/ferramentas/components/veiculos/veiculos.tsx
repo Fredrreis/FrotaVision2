@@ -21,7 +21,7 @@ const colunasVeiculos = [
   { chave: "nome", titulo: "Nome", ordenavel: false },
   { chave: "chassi", titulo: "Chassi", ordenavel: false },
   { chave: "descricao", titulo: "Descrição", ordenavel: false },
-  { chave: "quilometragem", titulo: "Quilometragem", ordenavel: true },
+  { chave: "km", titulo: "Km", ordenavel: true },
   { chave: "ano", titulo: "Ano", ordenavel: true },
   { chave: "dataCadastro", titulo: "Data de Cadastro", ordenavel: true },
 ];
@@ -36,7 +36,7 @@ const veiculosData = [
     nome: "Caminhão 1",
     chassi: "9BWZZZ377VT004251",
     descricao: "Modelo A, cor branca",
-    quilometragem: 134.5,
+    km: 134.5,
     ano: 2014,
     dataCadastro: "23/09/2023",
     manutencaoProxima: true,
@@ -46,7 +46,7 @@ const veiculosData = [
     nome: "Caminhão 2",
     chassi: "8ABCDZ998HT003122",
     descricao: "Modelo B, cor azul",
-    quilometragem: 256.8,
+    km: 256.8,
     ano: 2018,
     dataCadastro: "12/06/2022",
     manutencaoProxima: false,
@@ -56,7 +56,7 @@ const veiculosData = [
     nome: "Caminhão 3",
     chassi: "7XYYZZ123ET002233",
     descricao: "Modelo C, cor vermelha",
-    quilometragem: 98.2,
+    km: 98.2,
     ano: 2016,
     dataCadastro: "30/12/2021",
     manutencaoProxima: true,
@@ -66,7 +66,7 @@ const veiculosData = [
     nome: "Caminhão 4",
     chassi: "5LMNO999RT006789",
     descricao: "Modelo D, cor preta",
-    quilometragem: 430.1,
+    km: 430.1,
     ano: 2012,
     dataCadastro: "15/02/2023",
     manutencaoProxima: false,
@@ -76,7 +76,7 @@ const veiculosData = [
     nome: "Caminhão 5",
     chassi: "3ZXXTT667GH001111",
     descricao: "Modelo E, cor cinza",
-    quilometragem: 210.0,
+    km: 210.0,
     ano: 2020,
     dataCadastro: "08/07/2020",
     manutencaoProxima: true,
@@ -86,6 +86,7 @@ const veiculosData = [
 export default function Veiculos() {
   const [dados, setDados] = useState<any>(null);
   const [open, setOpen] = useState(false);
+  const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
   const [filtroManutencao, setFiltroManutencao] = useState("nao");
 
@@ -102,11 +103,22 @@ export default function Veiculos() {
 
   const handleEditar = (item: any) => {
     setDados(item);
+    setModoEdicao(true);
+    setOpen(true);
+  };
+
+  const handleCadastrar = () => {
+    setDados({});
+    setModoEdicao(false);
     setOpen(true);
   };
 
   const handleSalvar = () => {
-    console.log("Salvando dados:", dados);
+    if (modoEdicao) {
+      console.log("Salvando edição:", dados);
+    } else {
+      console.log("Cadastrando novo veículo:", dados);
+    }
     setOpen(false);
   };
 
@@ -161,6 +173,7 @@ export default function Veiculos() {
           variant="contained"
           className="botao-cadastrar"
           startIcon={<AddCircleOutlineIcon />}
+          onClick={handleCadastrar}
         >
           Cadastrar Veículo
         </Button>
@@ -179,6 +192,7 @@ export default function Veiculos() {
         colunas={colunasVeiculosModal}
         dados={dados}
         setDados={setDados}
+        modoEdicao={modoEdicao} // 🔹 Agora passamos essa prop para indicar se é edição ou cadastro
       />
     </Box>
   );

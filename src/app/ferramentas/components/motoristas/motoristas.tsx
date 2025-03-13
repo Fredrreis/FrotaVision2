@@ -24,7 +24,6 @@ const colunasMotoristas = [
   { chave: "ultimaViagem", titulo: "Data Última Viagem", ordenavel: true },
 ];
 
-// 🔥 Removemos "dataCadastro", "caminhaoDirigido" e "ultimaViagem" para o modal
 const colunasMotoristasModal = colunasMotoristas.filter(
   (coluna) =>
     !["dataCadastro", "caminhaoDirigido", "ultimaViagem"].includes(coluna.chave)
@@ -60,20 +59,31 @@ const motoristasData = [
 export default function Motoristas() {
   const [dados, setDados] = useState<any>(null);
   const [open, setOpen] = useState(false);
+  const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
 
-  // 🔍 **Filtrando os dados antes de passar para a TabelaGenerica**
   const dadosFiltrados = motoristasData.filter((motorista) =>
     motorista.nome.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleEditar = (item: any) => {
     setDados(item);
+    setModoEdicao(true);
+    setOpen(true);
+  };
+
+  const handleCadastrar = () => {
+    setDados({});
+    setModoEdicao(false);
     setOpen(true);
   };
 
   const handleSalvar = () => {
-    console.log("Salvando dados:", dados);
+    if (modoEdicao) {
+      console.log("Salvando edição:", dados);
+    } else {
+      console.log("Cadastrando novo motorista:", dados);
+    }
     setOpen(false);
   };
 
@@ -85,7 +95,6 @@ export default function Motoristas() {
         </Typography>
       </Box>
 
-      {/* 🔍 FILTROS */}
       <Box className="motoristas-filtros">
         <TextField
           variant="outlined"
@@ -106,6 +115,7 @@ export default function Motoristas() {
           variant="contained"
           className="botao-cadastrar"
           startIcon={<AddCircleOutlineIcon />}
+          onClick={handleCadastrar}
         >
           Cadastrar Motorista
         </Button>
@@ -124,6 +134,7 @@ export default function Motoristas() {
         colunas={colunasMotoristasModal}
         dados={dados}
         setDados={setDados}
+        modoEdicao={modoEdicao}
       />
     </Box>
   );
