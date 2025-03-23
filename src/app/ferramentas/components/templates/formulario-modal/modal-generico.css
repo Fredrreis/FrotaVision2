@@ -58,3 +58,7 @@
     text-transform: none !important;
     border-radius: 0.40rem !important;
 }
+
+.modal-editar:hover {
+    background-color: #1B3562 !important;
+}

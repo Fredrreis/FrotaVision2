@@ -122,10 +122,10 @@ export default function ModalFormulario({
           className="modal-cancelar"
           variant="contained"
         >
-          Cancelar
+          CANCELAR
         </Button>
         <Button onClick={onSalvar} className="modal-editar" variant="contained">
-          Salvar
+          SALVAR
         </Button>
       </DialogActions>
     </Dialog>

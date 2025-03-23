@@ -36,13 +36,13 @@
 .sort-icon {
     font-size: 1.2rem !important;
     cursor: pointer;
-    color: black !important; /* Ícone ativo */
+    color: black !important;
 }
 
 .sort-icon-inactive {
     font-size: 1.2rem !important;
-    color: rgb(87, 87, 87); /* Ícone inativo */
-    opacity: 0.6; /* Para suavizar a aparência do inativo */
+    color: rgb(87, 87, 87);
+    opacity: 0.6;
 }
 
 .linha-par {
@@ -69,16 +69,61 @@
     font-size: 1.3rem !important;
 }
 
-.editar, .excluir {
+.editar, .excluir, .visualizar {
     color: #646464;
 }
 
-.editar:hover {
+.editar:hover, .visualizar:hover {
     color: #1B3562;
 }
 
-.excluir:hover{
+.excluir:hover {
     color: #A30D11;
+}
+
+.modal-confirmacao .MuiPaper-root {
+    border-radius: 0.5rem !important;
+    padding: 1.1rem !important;
+    width: 100%;
+    max-width: 400px !important;
+}
+
+.modal-titulo {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #000000 !important;
+    text-align: center;
+}
+
+.modal-texto {
+    text-align: center !important;
+    color: #000000 !important;
+    margin-top: 0.5rem;
+}
+
+/* Botões do Modal */
+.modal-acoes {
+    display: flex;
+    justify-content: space-between !important;
+    margin-top: 1.5rem !important;
+}
+
+.botao-cancelar {
+    background-color: #ccc !important;
+    color: black !important;
+    margin-bottom: 0 !important;
+    border-radius: 0.40rem !important;
+}
+
+.botao-excluir {
+    background-color: #000000 !important;
+    color: white !important;
+    margin-bottom: 0 !important;
+    border-radius: 0.4rem !important;
+}
+
+.botao-excluir:hover {
+    background-color: #8c0b0e !important;
 }
 
 /* Responsividade */
@@ -92,8 +137,7 @@
     }
 }
 
-@media (max-width: 768px){
-
+@media (max-width: 768px) {
     .tabela-header-cell, .tabela-generica td {
         font-size: 0.8rem !important;
     }

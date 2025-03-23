@@ -107,6 +107,11 @@ export default function Veiculos() {
     setOpen(true);
   };
 
+  const handleExcluir = (item: any) => {
+    console.log("Excluindo item:", item);
+  };
+  
+
   const handleCadastrar = () => {
     setDados({});
     setModoEdicao(false);
@@ -183,8 +188,9 @@ export default function Veiculos() {
         colunas={colunasVeiculos}
         dados={dadosFiltrados}
         onEditar={handleEditar}
+        onExcluir={handleExcluir}
+        exibirVisualizar={true}
       />
-
       <ModalFormulario
         open={open}
         onClose={() => setOpen(false)}

@@ -78,7 +78,7 @@
 }
 
 .login-social-buttons {
-  display: flex;
+  display: flex !important;
   gap: 0.75rem;
 }
 
