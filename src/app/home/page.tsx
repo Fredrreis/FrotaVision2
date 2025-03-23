@@ -1,6 +1,6 @@
 // src/app/auth/page.tsx
 import React from "react";
-import { Home } from "./home";
+import Home from "./home";
 
 const HomePage: React.FC = () => {
   return (

@@ -16,7 +16,29 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import "./veiculos.css";
 
-const colunasVeiculos = [
+interface Veiculo extends Record<string, unknown> {
+  placa: string;
+  nome: string;
+  chassi: string;
+  descricao: string;
+  km: number;
+  ano: number;
+  dataCadastro: string;
+  manutencaoProxima: boolean;
+}
+
+const colunasVeiculos: {
+  chave:
+    | "placa"
+    | "nome"
+    | "chassi"
+    | "descricao"
+    | "km"
+    | "ano"
+    | "dataCadastro";
+  titulo: string;
+  ordenavel: boolean;
+}[] = [
   { chave: "placa", titulo: "Placa", ordenavel: false },
   { chave: "nome", titulo: "Nome", ordenavel: false },
   { chave: "chassi", titulo: "Chassi", ordenavel: false },
@@ -30,7 +52,7 @@ const colunasVeiculosModal = colunasVeiculos.filter(
   (coluna) => coluna.chave !== "dataCadastro"
 );
 
-const veiculosData = [
+const veiculosData: Veiculo[] = [
   {
     placa: "ABC1D34",
     nome: "Caminhão 1",
@@ -84,7 +106,7 @@ const veiculosData = [
 ];
 
 export default function Veiculos() {
-  const [dados, setDados] = useState<any>(null);
+  const [dados, setDados] = useState<Veiculo | null>(null);
   const [open, setOpen] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
@@ -101,19 +123,18 @@ export default function Veiculos() {
     return matchesSearch && matchesFiltro;
   });
 
-  const handleEditar = (item: any) => {
+  const handleEditar = (item: Veiculo) => {
     setDados(item);
     setModoEdicao(true);
     setOpen(true);
   };
 
-  const handleExcluir = (item: any) => {
+  const handleExcluir = (item: Veiculo) => {
     console.log("Excluindo item:", item);
   };
-  
 
   const handleCadastrar = () => {
-    setDados({});
+    setDados({} as Veiculo);
     setModoEdicao(false);
     setOpen(true);
   };
@@ -184,21 +205,21 @@ export default function Veiculos() {
         </Button>
       </Box>
 
-      <TabelaGenerica
+      <TabelaGenerica<Veiculo>
         colunas={colunasVeiculos}
         dados={dadosFiltrados}
         onEditar={handleEditar}
         onExcluir={handleExcluir}
         exibirVisualizar={true}
       />
-      <ModalFormulario
+      <ModalFormulario<Veiculo>
         open={open}
         onClose={() => setOpen(false)}
         onSalvar={handleSalvar}
         colunas={colunasVeiculosModal}
         dados={dados}
         setDados={setDados}
-        modoEdicao={modoEdicao} // 🔹 Agora passamos essa prop para indicar se é edição ou cadastro
+        modoEdicao={modoEdicao}
       />
     </Box>
   );

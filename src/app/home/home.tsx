@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "./home.css";
 import Header from "./components/header/header";
@@ -12,12 +12,21 @@ import { Footer } from "./components/footer/footer";
 import { Box } from "@mui/material";
 import { Element, scroller } from "react-scroll";
 
-export interface HomeProps {}
+// Export default com Suspense
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Carregando página inicial...</div>}>
+      <HomeContent />
+    </Suspense>
+  );
+}
 
-export const Home: React.FC<HomeProps> = () => {
+// Conteúdo da Home separado
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sectionParam = searchParams.get("section");
+
   const [isClient, setIsClient] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
 
@@ -66,4 +75,4 @@ export const Home: React.FC<HomeProps> = () => {
       <Footer />
     </>
   );
-};
+}

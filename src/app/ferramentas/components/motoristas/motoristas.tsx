@@ -13,6 +13,13 @@ import PeopleIcon from "@mui/icons-material/People";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import "./motoristas.css";
 
+interface Motorista extends Record<string, unknown> {
+  nome: string;
+  dataCadastro: string;
+  caminhaoDirigido: string;
+  ultimaViagem: string;
+}
+
 const colunasMotoristas = [
   { chave: "nome", titulo: "Nome", ordenavel: false },
   { chave: "dataCadastro", titulo: "Data de Cadastro", ordenavel: true },
@@ -29,7 +36,7 @@ const colunasMotoristasModal = colunasMotoristas.filter(
     !["dataCadastro", "caminhaoDirigido", "ultimaViagem"].includes(coluna.chave)
 );
 
-const motoristasData = [
+const motoristasData: Motorista[] = [
   {
     nome: "Eloise Taulner",
     dataCadastro: "14/09/2024",
@@ -57,7 +64,7 @@ const motoristasData = [
 ];
 
 export default function Motoristas() {
-  const [dados, setDados] = useState<any>(null);
+  const [dados, setDados] = useState<Motorista | null>(null);
   const [open, setOpen] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
@@ -66,22 +73,27 @@ export default function Motoristas() {
     motorista.nome.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleEditar = (item: any) => {
+  const handleEditar = (item: Motorista) => {
     setDados(item);
     setModoEdicao(true);
     setOpen(true);
   };
 
   const handleCadastrar = () => {
-    setDados({});
+    setDados({
+      nome: "",
+      dataCadastro: "",
+      caminhaoDirigido: "",
+      ultimaViagem: "",
+    });
     setModoEdicao(false);
     setOpen(true);
   };
 
   const handleSalvar = () => {
-    if (modoEdicao) {
+    if (modoEdicao && dados) {
       console.log("Salvando edição:", dados);
-    } else {
+    } else if (dados) {
       console.log("Cadastrando novo motorista:", dados);
     }
     setOpen(false);
@@ -133,7 +145,7 @@ export default function Motoristas() {
         onSalvar={handleSalvar}
         colunas={colunasMotoristasModal}
         dados={dados}
-        setDados={setDados}
+        setDados={setDados as (novosDados: Motorista) => void}
         modoEdicao={modoEdicao}
       />
     </Box>

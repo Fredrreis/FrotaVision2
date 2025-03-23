@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "../app/api/auth/[...nextauth]/route";
+import { authOptions } from "./auth-options";
 import { redirect } from "next/navigation";
 
 /**
@@ -10,8 +10,8 @@ export async function requireAuth() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/home"); // Redireciona para o login se o usuário não estiver autenticado
+    redirect("/home"); // Altere para "/login" se preferir
   }
 
-  return session; // Retorna a sessão se o usuário estiver logado
+  return session;
 }

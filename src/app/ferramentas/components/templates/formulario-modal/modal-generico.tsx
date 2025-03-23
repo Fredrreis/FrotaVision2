@@ -12,23 +12,25 @@ import {
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import "./modal-generico.css";
 
-interface ModalProps {
+interface Coluna {
+  chave: string;
+  titulo: string;
+  tipo?: "texto" | "selecao" | "area";
+  opcoes?: string[];
+  desativado?: boolean;
+}
+
+interface ModalProps<T extends Record<string, unknown>> {
   open: boolean;
   onClose: () => void;
   onSalvar: () => void;
-  colunas: {
-    chave: string;
-    titulo: string;
-    tipo?: "texto" | "selecao" | "area";
-    opcoes?: string[];
-    desativado?: boolean;
-  }[];
-  dados: any;
-  setDados: (novosDados: any) => void;
+  colunas: Coluna[];
+  dados: T | null;
+  setDados: (novosDados: T) => void;
   modoEdicao: boolean;
 }
 
-export default function ModalFormulario({
+export default function ModalFormulario<T extends Record<string, unknown>>({
   open,
   onClose,
   onSalvar,
@@ -36,14 +38,15 @@ export default function ModalFormulario({
   dados,
   setDados,
   modoEdicao,
-}: ModalProps) {
+}: ModalProps<T>) {
   useEffect(() => {
     if (!dados) {
-      setDados({});
+      setDados({} as T);
     }
   }, [dados, setDados]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!dados) return;
     setDados({ ...dados, [e.target.name]: e.target.value });
   };
 
@@ -56,7 +59,6 @@ export default function ModalFormulario({
       classes={{ paper: "modal-container" }}
     >
       <DialogContent className="modal-formulario">
-        {/* Título do formulário */}
         <Box className="modal-titulo">
           <ArrowForwardIcon className="icone-seta" />
           <Typography variant="h6" fontWeight={600} fontSize={"1.1rem"}>
@@ -72,7 +74,6 @@ export default function ModalFormulario({
             : "Preencha o(s) campo(s) para cadastrar um novo item:"}
         </Typography>
 
-        {/* Campos do formulário */}
         {colunas.map(
           ({ chave, titulo, tipo = "texto", opcoes, desativado }) => (
             <Box key={chave} className="modal-form-group">
@@ -81,7 +82,7 @@ export default function ModalFormulario({
                   select
                   label={titulo}
                   name={chave}
-                  value={dados?.[chave] || ""}
+                  value={dados?.[chave as keyof T] || ""}
                   onChange={handleChange}
                   fullWidth
                   variant="outlined"
@@ -99,7 +100,7 @@ export default function ModalFormulario({
                 <TextField
                   label={titulo}
                   name={chave}
-                  value={dados?.[chave] || ""}
+                  value={dados?.[chave as keyof T] || ""}
                   onChange={handleChange}
                   fullWidth
                   variant="outlined"
@@ -115,7 +116,6 @@ export default function ModalFormulario({
         )}
       </DialogContent>
 
-      {/* Botões de ação */}
       <DialogActions className="modal-actions">
         <Button
           onClick={onClose}

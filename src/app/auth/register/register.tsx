@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
 import {
   Box,
@@ -18,14 +18,19 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackwardsIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-// Ajustando o caminho para o CSS
 import "./register.css";
-
-// Ajustando o caminho para os ícones corretamente
 import GoogleIcon from "../../img/google.png";
 import MicrosoftIcon from "../../img/microsoft.png";
 
 export default function Register() {
+  return (
+    <Suspense fallback={<div>Carregando formulário...</div>}>
+      <RegisterContent />
+    </Suspense>
+  );
+}
+
+function RegisterContent() {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -59,7 +64,6 @@ export default function Register() {
     cnpj: "",
   });
 
-  // ✅ Atualiza o e-mail caso o usuário tenha logado pelo Google
   useEffect(() => {
     if (session?.user?.email) {
       setFormData((prevData) => ({
@@ -70,7 +74,6 @@ export default function Register() {
     }
   }, [session]);
 
-  // ✅ Deslogar o usuário caso ele saia da página de registro
   useEffect(() => {
     const handleRouteChange = (url: string) => {
       if (url !== pathname) {
@@ -98,18 +101,15 @@ export default function Register() {
 
   const handleRegister = async () => {
     alert("Cadastro concluído!");
-
     if (session) {
-      await signOut({ redirect: false }); // ✅ Desloga do Google após cadastro
+      await signOut({ redirect: false });
     }
-
     router.push("/");
   };
 
   const handleGoogleSignIn = async () => {
     try {
       const result = await signIn("google", { redirect: false });
-
       if (!result?.error) {
         // Sessão será atualizada automaticamente
       } else {
@@ -118,11 +118,6 @@ export default function Register() {
     } catch (error) {
       console.error("Erro ao autenticar com o Google:", error);
     }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
   return (
@@ -142,7 +137,7 @@ export default function Register() {
               backgroundColor: "white",
               padding: "0.3rem 1rem",
               borderRadius: "0.75rem",
-              marginLeft: "auto", // ✅ Garante que fique à direita
+              marginLeft: "auto",
             }}
           >
             Sair
@@ -150,7 +145,6 @@ export default function Register() {
         </Toolbar>
       </Box>
 
-      {/* ✅ Formulário centralizado */}
       <Box className="register-form">
         <Typography className="register-step" variant="body2">
           PASSO {step} DE 3

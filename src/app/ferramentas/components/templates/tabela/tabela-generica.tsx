@@ -14,7 +14,6 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
-  Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -25,11 +24,11 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
 import "./tabela-generica.css";
 
-interface TabelaProps {
-  colunas: { chave: string; titulo: string; ordenavel: boolean }[];
-  dados: any[];
-  onEditar: (item: any) => void;
-  onExcluir?: (item: any) => void;
+interface TabelaProps<T extends Record<string, unknown>> {
+  colunas: { chave: keyof T; titulo: string; ordenavel: boolean }[];
+  dados: T[];
+  onEditar: (item: T) => void;
+  onExcluir?: (item: T) => void;
   exibirVisualizar?: boolean;
 }
 
@@ -39,13 +38,19 @@ const truncateText = (text: string) => {
   return text.length > MAX_CHAR ? text.substring(0, MAX_CHAR) + "..." : text;
 };
 
-export default function TabelaGenerica({ colunas, dados, onEditar, onExcluir, exibirVisualizar = false }: TabelaProps) {
-  const [orderBy, setOrderBy] = useState<string | null>(null);
+export default function TabelaGenerica<T extends Record<string, unknown>>({
+  colunas,
+  dados,
+  onEditar,
+  onExcluir,
+  exibirVisualizar = false,
+}: TabelaProps<T>) {
+  const [orderBy, setOrderBy] = useState<keyof T | null>(null);
   const [order, setOrder] = useState<"asc" | "desc" | null>(null);
   const [openModal, setOpenModal] = useState(false);
-  const [itemSelecionado, setItemSelecionado] = useState<any | null>(null);
+  const [itemSelecionado, setItemSelecionado] = useState<T | null>(null);
 
-  const handleSort = (coluna: string, ordenavel: boolean) => {
+  const handleSort = (coluna: keyof T, ordenavel: boolean) => {
     if (!ordenavel) return;
     const isAsc = orderBy === coluna && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -67,7 +72,7 @@ export default function TabelaGenerica({ colunas, dados, onEditar, onExcluir, ex
       : String(valorB).localeCompare(String(valorA));
   });
 
-  const handleOpenModal = (item: any) => {
+  const handleOpenModal = (item: T) => {
     setItemSelecionado(item);
     setOpenModal(true);
   };
@@ -92,7 +97,7 @@ export default function TabelaGenerica({ colunas, dados, onEditar, onExcluir, ex
             <TableRow>
               {colunas.map(({ chave, titulo, ordenavel }) => (
                 <TableCell
-                  key={chave}
+                  key={String(chave)}
                   onClick={() => handleSort(chave, ordenavel)}
                   className="tabela-header-cell"
                 >
@@ -116,21 +121,26 @@ export default function TabelaGenerica({ colunas, dados, onEditar, onExcluir, ex
           </TableHead>
           <TableBody>
             {sortedDados.map((item, index) => (
-              <TableRow key={index} className={index % 2 === 0 ? "linha-par" : ""}>
+              <TableRow
+                key={index}
+                className={index % 2 === 0 ? "linha-par" : ""}
+              >
                 {colunas.map(({ chave }) => (
-                  <TableCell key={chave}>
-                    {item[chave].length > MAX_CHAR ? (
-                      <Tooltip title={item[chave]} arrow>
-                        <span>{truncateText(item[chave])}</span>
+                  <TableCell key={String(chave)}>
+                    {String(item[chave]).length > MAX_CHAR ? (
+                      <Tooltip title={String(item[chave])} arrow>
+                        <span>{truncateText(String(item[chave]))}</span>
                       </Tooltip>
                     ) : (
-                      item[chave]
+                      <span>{String(item[chave])}</span>
                     )}
-                    {chave === "nome" && item.manutencaoProxima && (
-                      <Tooltip title="Manutenção Pendente" arrow>
-                        <NotificationImportantIcon className="icone-alerta" />
-                      </Tooltip>
-                    )}
+                    {chave === "nome" &&
+                      (item as T & { manutencaoProxima?: boolean })
+                        .manutencaoProxima && (
+                        <Tooltip title="Manutenção Pendente" arrow>
+                          <NotificationImportantIcon className="icone-alerta" />
+                        </Tooltip>
+                      )}
                   </TableCell>
                 ))}
                 <TableCell>
@@ -140,10 +150,16 @@ export default function TabelaGenerica({ colunas, dados, onEditar, onExcluir, ex
                     </Tooltip>
                   )}
                   <Tooltip title="Editar" arrow>
-                    <EditIcon className="icone-acao editar" onClick={() => onEditar(item)} />
+                    <EditIcon
+                      className="icone-acao editar"
+                      onClick={() => onEditar(item)}
+                    />
                   </Tooltip>
                   <Tooltip title="Deletar" arrow>
-                    <DeleteIcon className="icone-acao excluir" onClick={() => handleOpenModal(item)} />
+                    <DeleteIcon
+                      className="icone-acao excluir"
+                      onClick={() => handleOpenModal(item)}
+                    />
                   </Tooltip>
                 </TableCell>
               </TableRow>
@@ -152,21 +168,40 @@ export default function TabelaGenerica({ colunas, dados, onEditar, onExcluir, ex
         </Table>
       </TableContainer>
 
-      {/* Modal de Confirmação - Estilizado */}
-      <Dialog open={openModal} onClose={handleCloseModal} className="modal-confirmacao">
-        <DialogTitle className="modal-titulo"><ArrowForwardIcon/>CONFIRMAR EXCLUSÃO</DialogTitle>
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        className="modal-confirmacao"
+      >
+        <DialogTitle className="modal-titulo">
+          <ArrowForwardIcon />
+          CONFIRMAR EXCLUSÃO
+        </DialogTitle>
         <DialogContent>
-            <DialogContentText className="modal-texto" variant="body2">
-              Tem certeza que deseja excluir o item <strong>{itemSelecionado?.nome || "selecionado"}</strong>?
-            </DialogContentText>
-            <DialogActions className="modal-acoes">
-              <Button onClick={handleCloseModal} className="botao-cancelar" variant="contained">
-                Cancelar
-              </Button>
-              <Button onClick={handleConfirmDelete} className="botao-excluir" variant="contained">
-                Excluir
-              </Button>
-            </DialogActions>
+          <DialogContentText className="modal-texto" variant="body2">
+            Tem certeza que deseja excluir o item{" "}
+            <strong>
+              {(itemSelecionado as T & { nome?: string })?.nome ||
+                "selecionado"}
+            </strong>
+            ?
+          </DialogContentText>
+          <DialogActions className="modal-acoes">
+            <Button
+              onClick={handleCloseModal}
+              className="botao-cancelar"
+              variant="contained"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              className="botao-excluir"
+              variant="contained"
+            >
+              Excluir
+            </Button>
+          </DialogActions>
         </DialogContent>
       </Dialog>
     </>

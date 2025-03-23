@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  FormControlLabel,
-  Checkbox,
-  Divider,
-} from "@mui/material";
+import { Box, Typography, TextField, Button, Divider } from "@mui/material";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -23,15 +15,8 @@ export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
 
   const handleManualLogin = async () => {
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-
     router.push(`/ferramentas`);
 
     // if (result?.ok) {
