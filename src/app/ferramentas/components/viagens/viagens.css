@@ -29,11 +29,8 @@
 
   .dropdows-container{
     display: flex !important;
-    width: 30% !important;
-  }
-
-  .dropdown-input{
-    margin: 0 1rem !important
+    width: 23rem !important;
+    gap: 1rem !important;
   }
 
   .MuiSelect-icon {
@@ -93,10 +90,18 @@
       font-size: 1.1rem !important;
     }
   
-    .search-input input {
+    .search-input input, .MuiSelect-select , .MuiMenuItem-root  {
       font-size: 0.8rem !important;
     }
-  
+
+    .dropdows-container {
+      width: 100% !important;
+    }
+    
+    .dropdown-input {
+      margin: 0 !important;
+    }
+
     .filtro-label {
       font-size: 0.8rem !important;
     }

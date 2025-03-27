@@ -19,7 +19,7 @@ import "./manutencoes.css";
 interface Manutencao extends Record<string, unknown> {
   veiculo: string;
   tipoVeiculo: string;
-  manutencao: string;
+  nome: string;
   km: number;
   horasMotor: number;
   descricao: string;
@@ -32,7 +32,7 @@ const colunasManutencoes: {
   chave:
     | "veiculo"
     | "tipoVeiculo"
-    | "manutencao"
+    | "nome"
     | "km"
     | "horasMotor"
     | "descricao"
@@ -44,7 +44,7 @@ const colunasManutencoes: {
 }[] = [
   { chave: "veiculo", titulo: "Veículo", ordenavel: false },
   { chave: "tipoVeiculo", titulo: "Tipo Caminhão", ordenavel: false },
-  { chave: "manutencao", titulo: "Manutenção", ordenavel: false },
+  { chave: "nome", titulo: "Manutenção", ordenavel: false },
   { chave: "km", titulo: "Km da Manutenção", ordenavel: true },
   { chave: "horasMotor", titulo: "Horas do Motor", ordenavel: true },
   { chave: "descricao", titulo: "Descrição", ordenavel: false },
@@ -59,7 +59,7 @@ const manutencoesData: Manutencao[] = [
   {
     veiculo: "Caminhão 1",
     tipoVeiculo: "Betoneira",
-    manutencao: "Troca de óleo",
+    nome: "Troca de óleo",
     km: 90.7,
     horasMotor: 4500,
     descricao: "Troca completa de óleo do motor.",
@@ -70,7 +70,7 @@ const manutencoesData: Manutencao[] = [
   {
     veiculo: "Caminhão 2",
     tipoVeiculo: "Basculante",
-    manutencao: "Reparo no motor",
+    nome: "Reparo no motor",
     km: 140.1,
     horasMotor: 5200,
     descricao: "Substituição de componentes do motor.",
@@ -81,7 +81,7 @@ const manutencoesData: Manutencao[] = [
   {
     veiculo: "Caminhão 3",
     tipoVeiculo: "Carga Seca",
-    manutencao: "Revisão completa",
+    nome: "Revisão completa",
     km: 50.2,
     horasMotor: 3900,
     descricao: "Revisão preventiva geral.",
@@ -101,7 +101,7 @@ export default function Manutencoes() {
   const dadosFiltrados = manutencoesData.filter((manutencao) => {
     const matchesSearch =
       manutencao.veiculo.toLowerCase().includes(search.toLowerCase()) ||
-      manutencao.manutencao.toLowerCase().includes(search.toLowerCase());
+      manutencao.nome.toLowerCase().includes(search.toLowerCase());
 
     const matchesFiltro =
       filtroTipo === "todos" ? true : manutencao.tipo === filtroTipo;

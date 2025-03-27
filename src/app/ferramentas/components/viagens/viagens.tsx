@@ -83,10 +83,20 @@ const viagensData: Viagem[] = [
     kmPercorrido: 470,
     descricao: "Carregamento de móveis",
   },
+  {
+    veiculo: "Caminhão 4",
+    motorista: "Ingrid Grimwall",
+    origem: "Belo Horizonte",
+    destino: "São Paulo",
+    dataSaida: "01/02/2024",
+    dataRetorno: "02/02/2024",
+    kmPercorrido: 520,
+    descricao: "Carregamento de cimento",
+  },
 ];
 
 const origensUnicas = [...new Set(viagensData.map((v) => v.origem))];
-const destinosUnicos = [...new Set(viagensData.map((v) => v.destino))];
+const destinosUnicas = [...new Set(viagensData.map((v) => v.destino))];
 
 export default function Viagens() {
   const [dados, setDados] = useState<Viagem | null>(null);
@@ -96,15 +106,20 @@ export default function Viagens() {
   const [filtroOrigem, setFiltroOrigem] = useState("");
   const [filtroDestino, setFiltroDestino] = useState("");
 
+  const encurtarTextoResponsivo = (texto: string, limite = 12): string => {
+    if (typeof window !== "undefined" && window.innerWidth < 768 && texto.length > limite) {
+      return texto.slice(0, limite) + "...";
+    }
+    return texto;
+  };
+
   const dadosFiltrados = viagensData.filter((viagem) => {
     const matchesSearch =
       viagem.veiculo.toLowerCase().includes(search.toLowerCase()) ||
       viagem.motorista.toLowerCase().includes(search.toLowerCase());
 
     const matchesOrigem = filtroOrigem ? viagem.origem === filtroOrigem : true;
-    const matchesDestino = filtroDestino
-      ? viagem.destino === filtroDestino
-      : true;
+    const matchesDestino = filtroDestino ? viagem.destino === filtroDestino : true;
 
     return matchesSearch && matchesOrigem && matchesDestino;
   });
@@ -169,6 +184,8 @@ export default function Viagens() {
             SelectProps={{
               displayEmpty: true,
               IconComponent: KeyboardArrowDownIcon,
+              renderValue: (value: unknown) =>
+                              typeof value === "string" && value ? encurtarTextoResponsivo(value) : encurtarTextoResponsivo("Todas as Origens"),
               MenuProps: {
                 TransitionComponent: Fade,
               },
@@ -191,13 +208,15 @@ export default function Viagens() {
             SelectProps={{
               displayEmpty: true,
               IconComponent: KeyboardArrowDownIcon,
+              renderValue: (value: unknown) =>
+                              typeof value === "string" && value ? encurtarTextoResponsivo(value) : encurtarTextoResponsivo("Todos os Destinos"),
               MenuProps: {
                 TransitionComponent: Fade,
               },
             }}
           >
-            <MenuItem value="">Todas os Destinos</MenuItem>
-            {destinosUnicos.map((destino) => (
+            <MenuItem value="">Todos os Destinos</MenuItem>
+            {destinosUnicas.map((destino) => (
               <MenuItem key={destino} value={destino}>
                 {destino}
               </MenuItem>
