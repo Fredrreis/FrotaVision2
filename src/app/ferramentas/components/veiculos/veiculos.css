@@ -45,7 +45,7 @@
 }
 
 .filtro-label {
-    font-size: 0.9rem;
+    font-size: 0.875rem !important;
     font-weight: 500;
 }
 
@@ -56,12 +56,17 @@
     gap: 0.5rem;
 }
 
+.radio-button.MuiRadio-root {
+    padding: 0.5rem !important; /* reduz espaço interno */
+    transform: scale(0.7); /* escala menor */
+  }  
+
 .radio-button.Mui-checked {
     color: #1B3562 !important;
 }
 
 .radio-text {
-    font-size: 0.9rem !important;
+    font-size: 0.875rem !important;
 }
 
 /* Botão de Cadastro */

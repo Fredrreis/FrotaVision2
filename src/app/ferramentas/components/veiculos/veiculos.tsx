@@ -31,6 +31,7 @@ const colunasVeiculos: {
   chave:
     | "placa"
     | "nome"
+    | "tipoVeiculo"
     | "chassi"
     | "descricao"
     | "km"
@@ -41,11 +42,12 @@ const colunasVeiculos: {
 }[] = [
   { chave: "placa", titulo: "Placa", ordenavel: false },
   { chave: "nome", titulo: "Nome", ordenavel: false },
+  { chave: "tipoVeiculo", titulo: "Tipo Caminhão", ordenavel: false },
   { chave: "chassi", titulo: "Chassi", ordenavel: false },
   { chave: "descricao", titulo: "Descrição", ordenavel: false },
   { chave: "km", titulo: "Km", ordenavel: true },
   { chave: "ano", titulo: "Ano", ordenavel: true },
-  { chave: "dataCadastro", titulo: "Data de Cadastro", ordenavel: true },
+  { chave: "dataCadastro", titulo: "Data", ordenavel: true },
 ];
 
 const colunasVeiculosModal = colunasVeiculos.filter(
@@ -56,6 +58,7 @@ const veiculosData: Veiculo[] = [
   {
     placa: "ABC1D34",
     nome: "Caminhão 1",
+    tipoVeiculo: "Betoneira",
     chassi: "9BWZZZ377VT004251",
     descricao: "Modelo A, cor branca",
     km: 134.5,
@@ -66,6 +69,7 @@ const veiculosData: Veiculo[] = [
   {
     placa: "XYZ2E56",
     nome: "Caminhão 2",
+    tipoVeiculo: "Basculante",
     chassi: "8ABCDZ998HT003122",
     descricao: "Modelo B, cor azul",
     km: 256.8,
@@ -76,6 +80,7 @@ const veiculosData: Veiculo[] = [
   {
     placa: "LMN3F78",
     nome: "Caminhão 3",
+    tipoVeiculo: "Carga Seca",
     chassi: "7XYYZZ123ET002233",
     descricao: "Modelo C, cor vermelha",
     km: 98.2,
@@ -86,6 +91,7 @@ const veiculosData: Veiculo[] = [
   {
     placa: "OPQ4G90",
     nome: "Caminhão 4",
+    tipoVeiculo: "Sider",
     chassi: "5LMNO999RT006789",
     descricao: "Modelo D, cor preta",
     km: 430.1,
@@ -96,6 +102,7 @@ const veiculosData: Veiculo[] = [
   {
     placa: "RST5H12",
     nome: "Caminhão 5",
+    tipoVeiculo: "Prancha",
     chassi: "3ZXXTT667GH001111",
     descricao: "Modelo E, cor cinza",
     km: 210.0,
@@ -210,7 +217,7 @@ export default function Veiculos() {
         dados={dadosFiltrados}
         onEditar={handleEditar}
         onExcluir={handleExcluir}
-        exibirVisualizar={true}
+        exibirExaminar={true}
       />
       <ModalFormulario<Veiculo>
         open={open}

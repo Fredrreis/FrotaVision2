@@ -24,7 +24,7 @@ import MicrosoftIcon from "../../img/microsoft.png";
 
 export default function Register() {
   return (
-    <Suspense fallback={<div>Carregando formulário...</div>}>
+    <Suspense fallback={<Box>Carregando formulário...</Box>}>
       <RegisterContent />
     </Suspense>
   );

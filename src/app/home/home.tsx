@@ -15,7 +15,7 @@ import { Element, scroller } from "react-scroll";
 // Export default com Suspense
 export default function Home() {
   return (
-    <Suspense fallback={<div>Carregando página inicial...</div>}>
+    <Suspense fallback={<Box>Carregando página inicial...</Box>}>
       <HomeContent />
     </Suspense>
   );

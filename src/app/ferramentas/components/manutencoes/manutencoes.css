@@ -1,0 +1,125 @@
+.manutencoes-container {
+    padding: 2rem;
+    background-color: inherit;
+  }
+  
+  .manutencoes-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .manutencoes-title {
+    font-weight: 600 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  
+  .manutencoes-filtros {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+  
+  .search-input {
+    max-width: 30% !important;
+  }
+  
+  .search-input input {
+    width: 100% !important;
+  }
+  
+  .filtro-status {
+    display: inline-block;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .filtro-label {
+    font-size: 0.875rem !important;
+    font-weight: 500;
+  }
+  
+  .radio-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .radio-button.MuiRadio-root {
+    padding: 0.5rem !important; /* reduz espaço interno */
+    transform: scale(0.7); /* escala menor */
+  }  
+  
+  .radio-button.Mui-checked {
+    color: #1B3562 !important;
+  }
+  
+  .radio-text {
+    font-size: 0.875rem !important;
+  }
+  
+  .botao-cadastrar {
+    background-color: #1B3562 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    text-transform: none !important;
+    border-radius: 0.3rem !important;
+    max-width: 25% !important;
+  }
+  
+  @media (max-width: 768px) {
+    .manutencoes-filtros {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  
+    .filtro-status {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .manutencoes-container {
+      padding: 1rem !important;
+    }
+  
+    .manutencoes-title {
+      font-size: 1.1rem !important;
+    }
+  
+    .search-input {
+      max-width: 100% !important;
+    }
+  
+    .search-icon {
+      font-size: 1.1rem !important;
+    }
+  
+    .search-input input {
+      font-size: 0.8rem !important;
+    }
+  
+    .filtro-label {
+      font-size: 0.8rem !important;
+    }
+  
+    .radio-text {
+      font-size: 0.8rem !important;
+    }
+  
+    .botao-cadastrar {
+      max-width: 100% !important;
+      text-align: center !important;
+    }
+  
+    .filtro-status {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 0.5rem !important;
+    }
+  }
+  

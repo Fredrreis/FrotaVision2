@@ -24,7 +24,7 @@
 .tabela-header-cell {
     padding: 1.1rem !important;
     font-weight: 600 !important;
-    cursor: pointer;
+    min-width: 8rem !important;
 }
 
 .tabela-header-content {
@@ -69,11 +69,11 @@
     font-size: 1.3rem !important;
 }
 
-.editar, .excluir, .visualizar {
+.editar, .excluir, .examinar {
     color: #646464;
 }
 
-.editar:hover, .visualizar:hover {
+.editar:hover, .examinar:hover {
     color: #1B3562;
 }
 
@@ -138,6 +138,8 @@
 }
 
 @media (max-width: 768px) {
+
+
     .tabela-header-cell, .tabela-generica td {
         font-size: 0.8rem !important;
     }

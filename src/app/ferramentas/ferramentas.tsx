@@ -8,12 +8,15 @@ import "./ferramentas.css";
 import Notificacoes from "./components/notificacoes/notificacoes";
 import Veiculos from "./components/veiculos/veiculos";
 import Motoristas from "./components/motoristas/motoristas";
+import Manutencoes from "./components/manutencoes/manutencoes";
+import Viagens from "./components/viagens/viagens";
+
+import { AnimatePresence, motion } from "framer-motion";
 
 export const Ferramentas: React.FC = () => {
   const [paginaAtiva, setPaginaAtiva] = useState("NOTIFICAÇÕES");
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detecta quando a tela fica menor que 768px
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -24,21 +27,43 @@ export const Ferramentas: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Atualiza a página ativa ao clicar no menu
   const handleMenuClick = (pagina: string) => {
     setPaginaAtiva(pagina);
   };
 
-  // Renderiza o conteúdo correto baseado no menu selecionado
   const renderizarConteudo = () => {
+    let componente: React.ReactNode;
+
     switch (paginaAtiva) {
       case "VEÍCULOS":
-        return <Veiculos />;
+        componente = <Veiculos />;
+        break;
       case "MOTORISTAS":
-        return <Motoristas />;
+        componente = <Motoristas />;
+        break;
+      case "MANUTENÇÕES":
+        componente = <Manutencoes />;
+        break;
+      case "VIAGENS":
+        componente = <Viagens />;
+        break;
       default:
-        return <Notificacoes />;
+        componente = <Notificacoes />;
     }
+
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={paginaAtiva}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          {componente}
+        </motion.div>
+      </AnimatePresence>
+    );
   };
 
   return (

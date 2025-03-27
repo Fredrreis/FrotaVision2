@@ -29,7 +29,7 @@ interface TabelaProps<T extends Record<string, unknown>> {
   dados: T[];
   onEditar: (item: T) => void;
   onExcluir?: (item: T) => void;
-  exibirVisualizar?: boolean;
+  exibirExaminar?: boolean;
 }
 
 const MAX_CHAR = 20;
@@ -43,7 +43,7 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
   dados,
   onEditar,
   onExcluir,
-  exibirVisualizar = false,
+  exibirExaminar = false,
 }: TabelaProps<T>) {
   const [orderBy, setOrderBy] = useState<keyof T | null>(null);
   const [order, setOrder] = useState<"asc" | "desc" | null>(null);
@@ -144,9 +144,9 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
                   </TableCell>
                 ))}
                 <TableCell>
-                  {exibirVisualizar && (
-                    <Tooltip title="Visualizar" arrow>
-                      <VisibilityIcon className="icone-acao visualizar" />
+                  {exibirExaminar && (
+                    <Tooltip title="Examinar" arrow>
+                      <VisibilityIcon className="icone-acao examinar" />
                     </Tooltip>
                   )}
                   <Tooltip title="Editar" arrow>

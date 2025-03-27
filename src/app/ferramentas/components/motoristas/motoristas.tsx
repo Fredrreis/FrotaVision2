@@ -79,6 +79,10 @@ export default function Motoristas() {
     setOpen(true);
   };
 
+  const handleExcluir = (item: Motorista) => {
+    console.log("Excluindo item:", item);
+  };
+
   const handleCadastrar = () => {
     setDados({
       nome: "",
@@ -133,19 +137,21 @@ export default function Motoristas() {
         </Button>
       </Box>
 
-      <TabelaGenerica
+      <TabelaGenerica<Motorista>
         colunas={colunasMotoristas}
         dados={dadosFiltrados}
         onEditar={handleEditar}
+        onExcluir={handleExcluir}
+        exibirExaminar={false}
       />
 
-      <ModalFormulario
+      <ModalFormulario<Motorista>
         open={open}
         onClose={() => setOpen(false)}
         onSalvar={handleSalvar}
         colunas={colunasMotoristasModal}
         dados={dados}
-        setDados={setDados as (novosDados: Motorista) => void}
+        setDados={setDados}
         modoEdicao={modoEdicao}
       />
     </Box>
