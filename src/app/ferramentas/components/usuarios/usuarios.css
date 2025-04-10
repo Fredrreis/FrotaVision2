@@ -1,21 +1,21 @@
-.viagens-container {
+.usuarios-container {
     padding: 2rem;
     background-color: inherit;
   }
   
-  .viagens-header {
+  .usuarios-header {
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
   }
   
-  .viagens-title {
+  .usuarios-title {
     font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
   }
   
-  .viagens-filtros {
+  .usuarios-filtros {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -26,25 +26,8 @@
   .search-input {
     max-width: 30% !important;
   }
-
-  .dropdows-container{
-    display: flex !important;
-    width: 23rem !important;
-    gap: 1rem !important;
-  }
-
-  .MuiSelect-icon {
-    font-size: 1.2rem !important;
-    right: 0.7rem;
-  }
-
-  .dropdown-input .MuiSelect-select {
-    padding: 1rem !important;
-    display: flex;
-    align-items: center;
-  }
   
-  .search-input input, .dropdown-input input {
+  .search-input input {
     width: 100% !important;
   }
   
@@ -59,22 +42,17 @@
   }
   
   @media (max-width: 768px) {
-    .viagens-filtros {
+    .usuarios-filtros {
       flex-direction: column;
       align-items: flex-start;
       gap: 1rem;
     }
   
-    .filtro-status {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .viagens-container {
+    .usuarios-container {
       padding: 1rem !important;
     }
   
-    .viagens-title {
+    .usuarios-title {
       font-size: 1.1rem !important;
     }
   
@@ -86,35 +64,13 @@
       font-size: 1.1rem !important;
     }
   
-    .search-input input, .MuiSelect-select  {
-      font-size: 0.8rem !important;
-    }
-
-    .dropdows-container {
-      width: 100% !important;
-    }
-    
-    .dropdown-input {
-      margin: 0 !important;
-    }
-
-    .filtro-label {
-      font-size: 0.8rem !important;
-    }
-  
-    .radio-text {
+    .search-input input {
       font-size: 0.8rem !important;
     }
   
     .botao-cadastrar {
       max-width: 100% !important;
       text-align: center !important;
-    }
-  
-    .filtro-status {
-      flex-direction: column !important;
-      align-items: flex-start !important;
-      gap: 0.5rem !important;
     }
   }
   

@@ -1,0 +1,125 @@
+.notificacoes-container {
+  padding: 2rem;
+  background-color: inherit;
+}
+
+.notificacoes-title {
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 1rem !important;
+}
+
+.icon-title {
+  margin-right: 0.5rem;
+}
+
+.notificacoes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notificacao-card {
+  border: 1px solid #ccc;
+  border-radius: 0.4rem !important;
+  background-color: #fff;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.notificacao-card:not(.expandida) {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.notificacao-card.nova {
+  border-left: 5px solid #1B3562;
+}
+
+.notificacao-card.urgente {
+  border-left: 5px solid #a91a1a;
+}
+
+.notificacao-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notificacao-caminhao {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.notificacao-detalhes {
+  padding: 1.5rem 1.5rem;
+  background-color: transparent;
+  border-top: 1px solid #ddd;
+}
+
+.notificacao-detalhes .MuiTypography-root {
+  margin-bottom: 1rem;
+  line-height: 1.6rem;
+}
+
+.destacar-quilometragem {
+  color: #a91a1a;
+  font-weight: 600;
+}
+
+.quilometragem-padrao {
+  color: #555;
+  font-weight: 600;
+}
+
+.notificacao-acao {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.botao-ver-caminhao {
+  text-transform: none !important;
+  color: black !important;
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .notificacoes-container {
+    padding: 1rem !important;
+  }
+
+  .notificacao-caminhao {
+    font-size: 0.9rem;
+  }
+
+  .notificacao-detalhes {
+    font-size: 0.85rem;
+  }
+
+  .notificacao-acao {
+    justify-content: center;
+  }
+}
+
+/* 🔔 Animação de ícone pulsante para novas notificações */
+@keyframes pulsar {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.icone-pulsando {
+  animation: pulsar 1.2s ease-in-out infinite;
+}

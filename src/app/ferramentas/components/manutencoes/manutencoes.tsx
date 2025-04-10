@@ -1,6 +1,6 @@
 import { useState } from "react";
 import TabelaGenerica from "../templates/tabela/tabela-generica";
-import ModalFormulario from "../templates/formulario-modal/modal-generico";
+import ModalFormulario from "../templates/formulario-modal/formulario-generico";
 import {
   Box,
   Typography,

@@ -1,0 +1,130 @@
+.filtro-popup {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  margin-top: 0.3rem;
+  width: 20rem;
+  background-color: white;
+  z-index: 20;
+  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
+  font-size: 0.7rem !important;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.animated-slide-down {
+  animation: slideDown 0.2s ease-in-out;
+}
+
+.slide-up-out {
+  animation: slideUp 0.2s ease-in-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.filtro-header-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.7rem;
+}
+
+.filtro-header-icon {
+  font-size: 1.2rem !important;
+  color: #000;
+}
+
+.filtro-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filtro-form-group {
+  flex: 1 1 calc(50% - 0.5rem);
+  min-width: 7rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.filtro-range-wrapper {
+  flex: 1 1 100%;
+}
+
+.filtro-input input {
+  font-size: 0.7rem !important;
+}
+
+.MuiSelect-select {
+  font-size: 0.7rem !important;
+  padding-top: 1rem !important;
+  display: flex;
+  align-items: center;
+}
+
+.MuiInputLabel-root {
+  font-size: 0.7rem !important;
+}
+
+.MuiMenuItem-root {
+  font-size: 0.7rem !important;
+}
+
+.filtro-range-slider {
+  color: black !important;
+}
+
+.filtro-range-label {
+  font-size: 0.7rem !important;
+  color: #000;
+  font-family: inherit;
+}
+
+.filtro-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.filtro-cancelar {
+  background-color: #ccc !important;
+  color: black !important;
+  border-radius: 0.4rem !important;
+  text-transform: none !important;
+  font-size: 0.7rem !important;
+  padding: 0.3rem 0.9rem !important;
+}
+
+.filtro-aplicar {
+  background-color: #000000 !important;
+  color: white !important;
+  border-radius: 0.4rem !important;
+  text-transform: none !important;
+  font-size: 0.7rem !important;
+  padding: 0.3rem 0.9rem !important;
+}
+
+.filtro-aplicar:hover {
+  background-color: #1B3562 !important;
+}

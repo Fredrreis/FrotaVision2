@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import "./modal-generico.css";
+import "./formulario-generico.css";
 
 interface Coluna {
   chave: string;

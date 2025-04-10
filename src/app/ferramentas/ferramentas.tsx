@@ -10,6 +10,7 @@ import Veiculos from "./components/veiculos/veiculos";
 import Motoristas from "./components/motoristas/motoristas";
 import Manutencoes from "./components/manutencoes/manutencoes";
 import Viagens from "./components/viagens/viagens";
+import Usuarios from "./components/usuarios/usuarios";
 
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -46,6 +47,9 @@ export const Ferramentas: React.FC = () => {
         break;
       case "VIAGENS":
         componente = <Viagens />;
+        break;
+      case "USUÁRIOS":
+        componente = <Usuarios />;
         break;
       default:
         componente = <Notificacoes />;
