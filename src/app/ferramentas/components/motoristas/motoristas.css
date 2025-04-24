@@ -45,6 +45,24 @@
     border-radius: 0.3rem !important;
 }
 
+/* Botão de Filtros Avançados */
+.botao-filtrar {
+    background-color: #1B3562 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    text-transform: none !important;
+    border-radius: 0.3rem !important;
+}
+
+/* Container do input + botão filtro */
+.search-filtros-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
+}
+
 /* Responsividade */
 @media (max-width: 1024px) {
     .motoristas-filtros {
@@ -84,7 +102,13 @@
         text-align: center;
     }
 
-    .motoristas-title{
+    .motoristas-title {
         font-size: 1.1rem !important;
+    }
+
+    .search-filtros-container {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
     }
 }

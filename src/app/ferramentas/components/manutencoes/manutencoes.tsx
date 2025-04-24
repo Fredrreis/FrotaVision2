@@ -7,13 +7,12 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import EngineeringIcon from "@mui/icons-material/Engineering";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import FiltroAvancado from "../filtro/filtro-avancado";
 import "./manutencoes.css";
 
 interface Manutencao extends Record<string, unknown> {
@@ -28,20 +27,7 @@ interface Manutencao extends Record<string, unknown> {
   tipo: string;
 }
 
-const colunasManutencoes: {
-  chave:
-    | "veiculo"
-    | "tipoVeiculo"
-    | "nome"
-    | "km"
-    | "horasMotor"
-    | "descricao"
-    | "data"
-    | "custo"
-    | "tipo";
-  titulo: string;
-  ordenavel: boolean;
-}[] = [
+const colunasManutencoes = [
   { chave: "veiculo", titulo: "Veículo", ordenavel: false },
   { chave: "tipoVeiculo", titulo: "Tipo Caminhão", ordenavel: false },
   { chave: "nome", titulo: "Manutenção", ordenavel: false },
@@ -52,8 +38,6 @@ const colunasManutencoes: {
   { chave: "custo", titulo: "Custo", ordenavel: true },
   { chave: "tipo", titulo: "Tipo", ordenavel: false },
 ];
-
-const colunasManutencoesModal = colunasManutencoes;
 
 const manutencoesData: Manutencao[] = [
   {
@@ -91,22 +75,106 @@ const manutencoesData: Manutencao[] = [
   },
 ];
 
+const tiposVeiculo = [...new Set(manutencoesData.map((m) => m.tipoVeiculo))];
+const tiposManutencao = [...new Set(manutencoesData.map((m) => m.tipo))];
+const maxKm = Math.max(...manutencoesData.map((m) => m.km));
+const maxCusto = Math.max(
+  ...manutencoesData.map((m) => parseFloat(m.custo.replace(",", ".")))
+);
+const maxHorasMotor = Math.max(...manutencoesData.map((m) => m.horasMotor));
+
+const filtrosAvancadosConfig = [
+  {
+    name: "tipoVeiculo",
+    label: "Tipo Caminhão",
+    type: "select" as const,
+    options: tiposVeiculo,
+  },
+  {
+    name: "data",
+    label: "Data",
+    type: "data" as const,
+  },
+  {
+    name: "tipo",
+    label: "Tipo Manutenção",
+    type: "select" as const,
+    options: tiposManutencao,
+  },
+  {
+    name: "horasMotor",
+    label: "Horas do Motor",
+    type: "range" as const,
+    min: 0,
+    max: maxHorasMotor,
+  },
+  {
+    name: "custo",
+    label: "Custo",
+    type: "range" as const,
+    min: 0,
+    max: maxCusto,
+  },
+  {
+    name: "km",
+    label: "Km",
+    type: "range" as const,
+    min: 0,
+    max: maxKm,
+  },
+];
+
+function formatarDataISOparaBR(iso: string): string {
+  const [ano, mes, dia] = iso.split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
 export default function Manutencoes() {
   const [dados, setDados] = useState<Manutencao | null>(null);
   const [open, setOpen] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
-  const [filtroTipo, setFiltroTipo] = useState("todos");
+  const [openFiltros, setOpenFiltros] = useState(false);
+  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
+    {}
+  );
 
-  const dadosFiltrados = manutencoesData.filter((manutencao) => {
-    const matchesSearch =
-      manutencao.veiculo.toLowerCase().includes(search.toLowerCase()) ||
-      manutencao.nome.toLowerCase().includes(search.toLowerCase());
+  const dadosFiltrados = manutencoesData.filter((m) => {
+    const matchSearch =
+      m.veiculo.toLowerCase().includes(search.toLowerCase()) ||
+      m.nome.toLowerCase().includes(search.toLowerCase());
 
-    const matchesFiltro =
-      filtroTipo === "todos" ? true : manutencao.tipo === filtroTipo;
+    const matchTipoVeiculo = filtrosAvancados.tipoVeiculo
+      ? m.tipoVeiculo === filtrosAvancados.tipoVeiculo
+      : true;
 
-    return matchesSearch && matchesFiltro;
+    const matchHorasMotor = filtrosAvancados.horasMotor
+      ? m.horasMotor <= Number(filtrosAvancados.horasMotor)
+      : true;
+
+    const matchData = filtrosAvancados.data
+      ? m.data === formatarDataISOparaBR(filtrosAvancados.data)
+      : true;
+
+    const matchCusto = filtrosAvancados.custo
+      ? parseFloat(m.custo.replace(",", ".")) <= filtrosAvancados.custo
+      : true;
+
+    const matchTipo = filtrosAvancados.tipo
+      ? m.tipo === filtrosAvancados.tipo
+      : true;
+
+    const matchKm = filtrosAvancados.km ? m.km <= filtrosAvancados.km : true;
+
+    return (
+      matchSearch &&
+      matchTipoVeiculo &&
+      matchHorasMotor &&
+      matchData &&
+      matchCusto &&
+      matchTipo &&
+      matchKm
+    );
   });
 
   const handleEditar = (item: Manutencao) => {
@@ -126,11 +194,10 @@ export default function Manutencoes() {
   };
 
   const handleSalvar = () => {
-    if (modoEdicao) {
-      console.log("Salvando edição:", dados);
-    } else {
-      console.log("Cadastrando nova manutenção:", dados);
-    }
+    console.log(
+      modoEdicao ? "Salvando edição:" : "Cadastrando nova manutenção:",
+      dados
+    );
     setOpen(false);
   };
 
@@ -143,48 +210,32 @@ export default function Manutencoes() {
       </Box>
 
       <Box className="manutencoes-filtros">
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="Buscar por veículo ou manutenção"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-input"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon className="search-icon" />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Box className="filtro-status">
-          <Typography variant="body2" className="filtro-label">
-            Filtrar por tipo de manutenção
-          </Typography>
-          <RadioGroup
-            row
-            value={filtroTipo}
-            onChange={(e) => setFiltroTipo(e.target.value)}
-            className="radio-group"
+        <Box className="search-filtros-container">
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Buscar por veículo ou manutenção"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-input"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon className="search-icon" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Button
+            variant="outlined"
+            className="botao-filtrar"
+            endIcon={<FilterAltOutlinedIcon />}
+            onClick={() => setOpenFiltros(true)}
           >
-            <FormControlLabel
-              value="todos"
-              control={<Radio className="radio-button" />}
-              label={<Typography className="radio-text">Todos</Typography>}
-            />
-            <FormControlLabel
-              value="Preventiva"
-              control={<Radio className="radio-button" />}
-              label={<Typography className="radio-text">Preventiva</Typography>}
-            />
-            <FormControlLabel
-              value="Corretiva"
-              control={<Radio className="radio-button" />}
-              label={<Typography className="radio-text">Corretiva</Typography>}
-            />
-          </RadioGroup>
+            Filtros Avançados
+          </Button>
         </Box>
+
         <Button
           variant="contained"
           className="botao-cadastrar"
@@ -202,14 +253,25 @@ export default function Manutencoes() {
         onExcluir={handleExcluir}
         exibirExaminar={false}
       />
+
       <ModalFormulario<Manutencao>
         open={open}
         onClose={() => setOpen(false)}
         onSalvar={handleSalvar}
-        colunas={colunasManutencoesModal}
+        colunas={colunasManutencoes}
         dados={dados}
         setDados={setDados}
         modoEdicao={modoEdicao}
+      />
+
+      <FiltroAvancado
+        open={openFiltros}
+        onClose={() => setOpenFiltros(false)}
+        filters={filtrosAvancadosConfig}
+        values={filtrosAvancados}
+        onChange={setFiltrosAvancados}
+        onApply={() => setOpenFiltros(false)}
+        onClear={() => setFiltrosAvancados({})}
       />
     </Box>
   );

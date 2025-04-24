@@ -31,14 +31,22 @@
     width: 100% !important;
   }
   
-  .botao-cadastrar {
-    background-color: #1B3562 !important;
+  /* Botão de Cadastro */
+  .botao-cadastrar, .botao-filtrar {
     color: white !important;
+    background-color: #1B3562 !important;
     font-weight: 600 !important;
     padding: 0.5rem 1rem !important;
     text-transform: none !important;
     border-radius: 0.3rem !important;
     max-width: 25% !important;
+  }
+
+  .search-filtros-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
   }
   
   @media (max-width: 768px) {
@@ -72,5 +80,11 @@
       max-width: 100% !important;
       text-align: center !important;
     }
+
+    .search-filtros-container {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+  }
   }
   

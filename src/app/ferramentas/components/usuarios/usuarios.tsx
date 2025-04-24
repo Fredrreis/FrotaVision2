@@ -12,6 +12,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import FiltroAvancado from "../filtro/filtro-avancado";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import "./usuarios.css";
 
 interface Usuario extends Record<string, unknown> {
@@ -54,7 +55,12 @@ const dadosUsuarios: Usuario[] = [
 ];
 
 const filtrosAvancadosConfig = [
-  { name: "permissoes", label: "Permissões", type: "select" as const, options: ["Admin", "Editor", "Visualizador"] },
+  {
+    name: "permissoes",
+    label: "Permissões",
+    type: "select" as const,
+    options: ["Admin", "Editor", "Visualizador"],
+  },
   { name: "data", label: "Data", type: "data" as const },
 ];
 
@@ -69,7 +75,9 @@ export default function Usuarios() {
   const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
-  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>({});
+  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
+    {}
+  );
 
   const dadosFiltrados = dadosUsuarios.filter((usuario) => {
     const matchSearch =
@@ -121,27 +129,32 @@ export default function Usuarios() {
       </Box>
 
       <Box className="usuarios-filtros">
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="Buscar por nome ou email"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-input"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon className="search-icon" />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Button
-          variant="outlined"
-          onClick={() => setOpenFiltros(true)}
-        >
-          Filtros Avançados
-        </Button>
+        <Box className="search-filtros-container">
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Buscar por nome ou email"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-input"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon className="search-icon" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Button
+            variant="outlined"
+            className="botao-filtrar"
+            endIcon={<FilterAltOutlinedIcon />}
+            onClick={() => setOpenFiltros(true)}
+          >
+            Filtros Avançados
+          </Button>
+        </Box>
+
         <Button
           variant="contained"
           className="botao-cadastrar"

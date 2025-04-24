@@ -1,7 +1,7 @@
 .filtro-popup {
   position: absolute;
-  top: 20%;
-  left: 50%;
+  top: 18%;
+  left: 38%;
   margin-top: 0.3rem;
   width: 20rem;
   background-color: white;
@@ -99,6 +99,11 @@
   font-size: 0.7rem !important;
   color: #000;
   font-family: inherit;
+}
+
+.MuiSlider-valueLabel {
+  font-size: 0.7rem !important;
+  border-radius: 0.4rem !important;
 }
 
 .filtro-actions {

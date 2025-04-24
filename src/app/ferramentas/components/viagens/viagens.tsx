@@ -7,13 +7,12 @@ import {
   Button,
   TextField,
   InputAdornment,
-  MenuItem,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import Fade from "@mui/material/Fade";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import FiltroAvancado from "../filtro/filtro-avancado";
 import "./viagens.css";
 
 interface Viagem extends Record<string, unknown> {
@@ -27,19 +26,7 @@ interface Viagem extends Record<string, unknown> {
   descricao: string;
 }
 
-const colunasViagens: {
-  chave:
-    | "veiculo"
-    | "motorista"
-    | "origem"
-    | "destino"
-    | "dataSaida"
-    | "dataRetorno"
-    | "kmPercorrido"
-    | "descricao";
-  titulo: string;
-  ordenavel: boolean;
-}[] = [
+const colunasViagens = [
   { chave: "veiculo", titulo: "Veículo", ordenavel: false },
   { chave: "motorista", titulo: "Motorista", ordenavel: false },
   { chave: "origem", titulo: "Origem", ordenavel: false },
@@ -49,8 +36,6 @@ const colunasViagens: {
   { chave: "kmPercorrido", titulo: "Km Percorrido", ordenavel: true },
   { chave: "descricao", titulo: "Descrição", ordenavel: false },
 ];
-
-const colunasViagensModal = colunasViagens;
 
 const viagensData: Viagem[] = [
   {
@@ -97,31 +82,90 @@ const viagensData: Viagem[] = [
 
 const origensUnicas = [...new Set(viagensData.map((v) => v.origem))];
 const destinosUnicas = [...new Set(viagensData.map((v) => v.destino))];
+const maxKm = Math.max(...viagensData.map((v) => v.kmPercorrido));
+
+const filtrosAvancadosConfig = [
+  {
+    name: "origem",
+    label: "Origem",
+    type: "select" as const,
+    options: origensUnicas,
+  },
+  {
+    name: "destino",
+    label: "Destino",
+    type: "select" as const,
+    options: destinosUnicas,
+  },
+  {
+    name: "dataSaida",
+    label: "Data de Saída",
+    type: "data" as const,
+  },
+  {
+    name: "dataRetorno",
+    label: "Data de Retorno",
+    type: "data" as const,
+  },
+  {
+    name: "km",
+    label: "Km",
+    type: "range" as const,
+    min: 0,
+    max: maxKm,
+  },
+];
+
+function formatarDataISOparaBR(iso: string): string {
+  const [ano, mes, dia] = iso.split("-");
+  return `${dia}/${mes}/${ano}`;
+}
 
 export default function Viagens() {
   const [dados, setDados] = useState<Viagem | null>(null);
   const [open, setOpen] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
-  const [filtroOrigem, setFiltroOrigem] = useState("");
-  const [filtroDestino, setFiltroDestino] = useState("");
-
-  const encurtarTextoResponsivo = (texto: string, limite = 12): string => {
-    if (typeof window !== "undefined" && window.innerWidth < 768 && texto.length > limite) {
-      return texto.slice(0, limite) + "...";
-    }
-    return texto;
-  };
+  const [openFiltros, setOpenFiltros] = useState(false);
+  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
+    {}
+  );
 
   const dadosFiltrados = viagensData.filter((viagem) => {
     const matchesSearch =
       viagem.veiculo.toLowerCase().includes(search.toLowerCase()) ||
       viagem.motorista.toLowerCase().includes(search.toLowerCase());
 
-    const matchesOrigem = filtroOrigem ? viagem.origem === filtroOrigem : true;
-    const matchesDestino = filtroDestino ? viagem.destino === filtroDestino : true;
+    const matchOrigem = filtrosAvancados.origem
+      ? viagem.origem === filtrosAvancados.origem
+      : true;
 
-    return matchesSearch && matchesOrigem && matchesDestino;
+    const matchDestino = filtrosAvancados.destino
+      ? viagem.destino === filtrosAvancados.destino
+      : true;
+
+    const matchSaida = filtrosAvancados.dataSaida
+      ? viagem.dataSaida === formatarDataISOparaBR(filtrosAvancados.dataSaida)
+      : true;
+
+    const matchRetorno = filtrosAvancados.dataRetorno
+      ? viagem.dataRetorno ===
+        formatarDataISOparaBR(filtrosAvancados.dataRetorno)
+      : true;
+
+    const matchKm =
+      filtrosAvancados.kmPercorrido !== undefined
+        ? viagem.kmPercorrido <= filtrosAvancados.kmPercorrido
+        : true;
+
+    return (
+      matchOrigem &&
+      matchDestino &&
+      matchSaida &&
+      matchRetorno &&
+      matchKm &&
+      matchesSearch
+    );
   });
 
   const handleEditar = (item: Viagem) => {
@@ -141,11 +185,10 @@ export default function Viagens() {
   };
 
   const handleSalvar = () => {
-    if (modoEdicao) {
-      console.log("Salvando edição:", dados);
-    } else {
-      console.log("Cadastrando nova viagem:", dados);
-    }
+    console.log(
+      modoEdicao ? "Salvando edição:" : "Cadastrando nova viagem:",
+      dados
+    );
     setOpen(false);
   };
 
@@ -158,71 +201,32 @@ export default function Viagens() {
       </Box>
 
       <Box className="viagens-filtros">
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="Buscar por veículo ou motorista"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-input"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon className="search-icon" />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Box className="dropdows-container">
+        <Box className="search-filtros-container">
           <TextField
-            select
             variant="outlined"
             size="small"
-            value={filtroOrigem}
-            onChange={(e) => setFiltroOrigem(e.target.value)}
-            className="dropdown-input origem-dropdown"
-            SelectProps={{
-              displayEmpty: true,
-              IconComponent: KeyboardArrowDownIcon,
-              renderValue: (value: unknown) =>
-                              typeof value === "string" && value ? encurtarTextoResponsivo(value) : encurtarTextoResponsivo("Todas as Origens"),
-              MenuProps: {
-                TransitionComponent: Fade,
-              },
+            placeholder="Buscar por veículo ou motorista"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-input"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon className="search-icon" />
+                </InputAdornment>
+              ),
             }}
-          >
-            <MenuItem value="">Todas as Origens</MenuItem>
-            {origensUnicas.map((origem) => (
-              <MenuItem key={origem} value={origem}>
-                {origem}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            select
+          />
+          <Button
             variant="outlined"
-            size="small"
-            value={filtroDestino}
-            onChange={(e) => setFiltroDestino(e.target.value)}
-            className="dropdown-input destino-dropdown"
-            SelectProps={{
-              displayEmpty: true,
-              IconComponent: KeyboardArrowDownIcon,
-              renderValue: (value: unknown) =>
-                              typeof value === "string" && value ? encurtarTextoResponsivo(value) : encurtarTextoResponsivo("Todos os Destinos"),
-              MenuProps: {
-                TransitionComponent: Fade,
-              },
-            }}
+            className="botao-filtrar"
+            endIcon={<FilterAltOutlinedIcon />}
+            onClick={() => setOpenFiltros(true)}
           >
-            <MenuItem value="">Todos os Destinos</MenuItem>
-            {destinosUnicas.map((destino) => (
-              <MenuItem key={destino} value={destino}>
-                {destino}
-              </MenuItem>
-            ))}
-          </TextField>
+            Filtros Avançados
+          </Button>
         </Box>
+
         <Button
           variant="contained"
           className="botao-cadastrar"
@@ -240,14 +244,25 @@ export default function Viagens() {
         onExcluir={handleExcluir}
         exibirExaminar={false}
       />
+
       <ModalFormulario<Viagem>
         open={open}
         onClose={() => setOpen(false)}
         onSalvar={handleSalvar}
-        colunas={colunasViagensModal}
+        colunas={colunasViagens}
         dados={dados}
         setDados={setDados}
         modoEdicao={modoEdicao}
+      />
+
+      <FiltroAvancado
+        open={openFiltros}
+        onClose={() => setOpenFiltros(false)}
+        filters={filtrosAvancadosConfig}
+        values={filtrosAvancados}
+        onChange={setFiltrosAvancados}
+        onApply={() => setOpenFiltros(false)}
+        onClear={() => setFiltrosAvancados({})}
       />
     </Box>
   );

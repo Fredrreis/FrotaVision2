@@ -70,9 +70,9 @@
 }
 
 /* Botão de Cadastro */
-.botao-cadastrar {
-    background-color: #1B3562 !important;
+.botao-cadastrar, .botao-filtrar {
     color: white !important;
+    background-color: #1B3562 !important;
     font-weight: 600 !important;
     padding: 0.5rem 1rem !important;
     text-transform: none !important;
@@ -80,6 +80,12 @@
     max-width: 25% !important;
 }
 
+.search-filtros-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
+}
 
 @media (max-width: 768px) {
     .veiculos-filtros {
@@ -130,5 +136,11 @@
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 0.5rem !important; 
+    }
+
+    .search-filtros-container {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
     }
 }

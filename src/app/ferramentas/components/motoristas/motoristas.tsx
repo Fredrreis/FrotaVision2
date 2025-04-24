@@ -11,6 +11,8 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import PeopleIcon from "@mui/icons-material/People";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import FiltroAvancado from "../filtro/filtro-avancado";
 import "./motoristas.css";
 
 interface Motorista extends Record<string, unknown> {
@@ -63,15 +65,55 @@ const motoristasData: Motorista[] = [
   },
 ];
 
+// Campos únicos para filtro do tipo select
+const opcoesCaminhao = [
+  ...new Set(motoristasData.map((m) => m.caminhaoDirigido)),
+];
+
+const filtrosAvancadosConfig = [
+  { name: "dataCadastro", label: "Data de Cadastro", type: "data" as const },
+  {
+    name: "caminhaoDirigido",
+    label: "Último Caminhão Dirigido",
+    type: "select" as const,
+    options: opcoesCaminhao,
+  },
+  { name: "ultimaViagem", label: "Data Última Viagem", type: "data" as const },
+];
+
+function formatarDataISOparaBR(iso: string): string {
+  const [ano, mes, dia] = iso.split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
 export default function Motoristas() {
   const [dados, setDados] = useState<Motorista | null>(null);
   const [open, setOpen] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
-
-  const dadosFiltrados = motoristasData.filter((motorista) =>
-    motorista.nome.toLowerCase().includes(search.toLowerCase())
+  const [openFiltros, setOpenFiltros] = useState(false);
+  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
+    {}
   );
+
+  const dadosFiltrados = motoristasData.filter((motorista) => {
+    const matchSearch = motorista.nome
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchCadastro = filtrosAvancados.dataCadastro
+      ? motorista.dataCadastro ===
+        formatarDataISOparaBR(filtrosAvancados.dataCadastro)
+      : true;
+    const matchCaminhao = filtrosAvancados.caminhaoDirigido
+      ? motorista.caminhaoDirigido === filtrosAvancados.caminhaoDirigido
+      : true;
+    const matchUltima = filtrosAvancados.ultimaViagem
+      ? motorista.ultimaViagem ===
+        formatarDataISOparaBR(filtrosAvancados.ultimaViagem)
+      : true;
+
+    return matchSearch && matchCadastro && matchCaminhao && matchUltima;
+  });
 
   const handleEditar = (item: Motorista) => {
     setDados(item);
@@ -112,21 +154,32 @@ export default function Motoristas() {
       </Box>
 
       <Box className="motoristas-filtros">
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="Buscar por nome"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-input"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
+        <Box className="search-filtros-container">
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Buscar por nome"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-input"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Button
+            variant="outlined"
+            className="botao-filtrar"
+            endIcon={<FilterAltOutlinedIcon />}
+            onClick={() => setOpenFiltros(true)}
+          >
+            Filtros Avançados
+          </Button>
+        </Box>
+
         <Button
           variant="contained"
           className="botao-cadastrar"
@@ -153,6 +206,16 @@ export default function Motoristas() {
         dados={dados}
         setDados={setDados}
         modoEdicao={modoEdicao}
+      />
+
+      <FiltroAvancado
+        open={openFiltros}
+        onClose={() => setOpenFiltros(false)}
+        filters={filtrosAvancadosConfig}
+        values={filtrosAvancados}
+        onChange={setFiltrosAvancados}
+        onApply={() => setOpenFiltros(false)}
+        onClear={() => setFiltrosAvancados({})}
       />
     </Box>
   );

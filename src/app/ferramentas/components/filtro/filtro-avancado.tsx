@@ -6,17 +6,17 @@ import {
   Button,
   IconButton,
   Typography,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
-import { useEffect, useRef, useState } from 'react';
-import SnackBarCustomizada from '../snackbar/snackbar';
-import './filtro-avancado.css';
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import { useEffect, useRef, useState } from "react";
+import SnackBarCustomizada from "../snackbar/snackbar";
+import "./filtro-avancado.css";
 
 interface FilterField {
   name: string;
   label: string;
-  type: 'text' | 'number' | 'select' | 'range' | 'data';
+  type: "text" | "number" | "select" | "range" | "data";
   options?: string[];
   min?: number;
   max?: number;
@@ -64,18 +64,20 @@ export default function AdvancedFilter({
     function handleMouseDown(event: MouseEvent) {
       const target = event.target as HTMLElement;
       const isInsidePopup = ref.current?.contains(target);
-      const isInsideDropdown = !!document.querySelector('.MuiPopover-root')?.contains(target);
+      const isInsideDropdown = !!document
+        .querySelector(".MuiPopover-root")
+        ?.contains(target);
       if (!isInsidePopup && !isInsideDropdown) {
         requestClose();
       }
     }
 
     if (visible || closing) {
-      document.addEventListener('mousedown', handleMouseDown);
+      document.addEventListener("mousedown", handleMouseDown);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener("mousedown", handleMouseDown);
     };
   }, [visible, closing]);
 
@@ -100,7 +102,7 @@ export default function AdvancedFilter({
   };
 
   const handleClear = () => {
-    const cleared = Object.fromEntries(filters.map((f) => [f.name, '']));
+    const cleared = Object.fromEntries(filters.map((f) => [f.name, ""]));
     setLocalValues(cleared);
     onClear();
     setSnackbarClearOpen(true);
@@ -112,7 +114,9 @@ export default function AdvancedFilter({
     <>
       <Box
         ref={ref}
-        className={`filtro-popup ${closing ? 'slide-up-out' : 'animated-slide-down'}`}
+        className={`filtro-popup ${
+          closing ? "slide-up-out" : "animated-slide-down"
+        }`}
       >
         <Box className="filtro-header-box">
           <FilterAltOutlinedIcon className="filtro-header-icon" />
@@ -125,14 +129,16 @@ export default function AdvancedFilter({
           {filters.map((filter) => (
             <Box
               key={filter.name}
-              className={`filtro-form-group ${filter.type === 'range' ? 'filtro-range-wrapper' : ''}`}
+              className={`filtro-form-group ${
+                filter.type === "range" ? "filtro-range-wrapper" : ""
+              }`}
             >
-              {filter.type === 'select' ? (
+              {filter.type === "select" ? (
                 <TextField
                   select
                   label={filter.label}
                   name={filter.name}
-                  value={localValues[filter.name] ?? ''}
+                  value={localValues[filter.name] ?? ""}
                   onChange={(e) => handleChange(filter.name, e.target.value)}
                   fullWidth
                   variant="outlined"
@@ -145,9 +151,11 @@ export default function AdvancedFilter({
                     </MenuItem>
                   ))}
                 </TextField>
-              ) : filter.type === 'range' ? (
+              ) : filter.type === "range" ? (
                 <Box width="100%">
-                  <Typography className="filtro-range-label">{filter.label}</Typography>
+                  <Typography className="filtro-range-label">
+                    {filter.label}
+                  </Typography>
                   <Slider
                     value={localValues[filter.name] ?? filter.max ?? 0}
                     onChange={(_, value) => handleChange(filter.name, value)}
@@ -155,19 +163,29 @@ export default function AdvancedFilter({
                     max={filter.max}
                     className="filtro-range-slider"
                     valueLabelDisplay="on"
-                    valueLabelFormat={(value) => `${value} km`}
+                    valueLabelFormat={(value) => {
+                      if (filter.name === "custo")
+                        return `R$ ${value.toFixed(2)}`;
+                      if (filter.name === "km") return `${value} km`;
+                      if (filter.name === "horasMotor") return `${value} h`;
+                      return value;
+                    }}
                   />
                   <Box display="flex" justifyContent="space-between" mt={-1}>
-                    <Typography className="filtro-range-label">{filter.min}</Typography>
-                    <Typography className="filtro-range-label">{filter.max}</Typography>
+                    <Typography className="filtro-range-label">
+                      {filter.min}
+                    </Typography>
+                    <Typography className="filtro-range-label">
+                      {filter.max}
+                    </Typography>
                   </Box>
                 </Box>
-              ) : filter.type === 'data' ? (
+              ) : filter.type === "data" ? (
                 <TextField
                   label={filter.label}
                   name={filter.name}
                   type="date"
-                  value={localValues[filter.name] ?? ''}
+                  value={localValues[filter.name] ?? ""}
                   onChange={(e) => handleChange(filter.name, e.target.value)}
                   fullWidth
                   variant="outlined"
@@ -180,7 +198,7 @@ export default function AdvancedFilter({
                   label={filter.label}
                   name={filter.name}
                   type={filter.type}
-                  value={localValues[filter.name] ?? ''}
+                  value={localValues[filter.name] ?? ""}
                   onChange={(e) => handleChange(filter.name, e.target.value)}
                   fullWidth
                   variant="outlined"

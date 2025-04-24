@@ -11,6 +11,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import FiltroAvancado from "../filtro/filtro-avancado";
 import "./veiculos.css";
 
@@ -105,10 +106,15 @@ const tiposUnicos = [...new Set(dadosVeiculos.map((v) => v.tipo))];
 const maxKm = Math.max(...dadosVeiculos.map((v) => v.km));
 
 const filtrosAvancadosConfig = [
-  { name: "tipo", label: "Tipo Caminhão", type: "select" as const, options: tiposUnicos },
+  {
+    name: "tipo",
+    label: "Tipo Caminhão",
+    type: "select" as const,
+    options: tiposUnicos,
+  },
   { name: "ano", label: "Ano", type: "number" as const },
   { name: "data", label: "Data", type: "data" as const },
-  { name: "km", label: "Km", type: "range" as const, min: 0, max: maxKm }
+  { name: "km", label: "Km", type: "range" as const, min: 0, max: maxKm },
 ];
 
 function formatarDataISOparaBR(iso: string): string {
@@ -122,18 +128,25 @@ export default function Veiculos() {
   const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
-  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>({});
+  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
+    {}
+  );
 
   const dadosFiltrados = dadosVeiculos.filter((veiculo) => {
     const matchSearch =
       veiculo.nome.toLowerCase().includes(search.toLowerCase()) ||
       veiculo.placa.toLowerCase().includes(search.toLowerCase());
 
-    const matchTipo = filtrosAvancados.tipo ? veiculo.tipo === filtrosAvancados.tipo : true;
-    const matchAno = filtrosAvancados.ano ? veiculo.ano === Number(filtrosAvancados.ano) : true;
-    const matchKm = filtrosAvancados.km !== undefined && filtrosAvancados.km !== ''
-      ? veiculo.km <= Number(filtrosAvancados.km)
+    const matchTipo = filtrosAvancados.tipo
+      ? veiculo.tipo === filtrosAvancados.tipo
       : true;
+    const matchAno = filtrosAvancados.ano
+      ? veiculo.ano === Number(filtrosAvancados.ano)
+      : true;
+    const matchKm =
+      filtrosAvancados.km !== undefined && filtrosAvancados.km !== ""
+        ? veiculo.km <= Number(filtrosAvancados.km)
+        : true;
     const matchData = filtrosAvancados.data
       ? veiculo.data === formatarDataISOparaBR(filtrosAvancados.data)
       : true;
@@ -167,35 +180,40 @@ export default function Veiculos() {
   };
 
   return (
-    <Box className="viagens-container">
-      <Box className="viagens-header">
-        <Typography variant="h6" className="viagens-title">
+    <Box className="veiculos-container">
+      <Box className="veiculos-header">
+        <Typography variant="h6" className="veiculos-title">
           <TimelineIcon className="icon-title" /> VEÍCULOS
         </Typography>
       </Box>
 
-      <Box className="viagens-filtros">
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="Buscar por placa ou nome"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-input"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon className="search-icon" />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Button
-          variant="outlined"
-          onClick={() => setOpenFiltros(true)}
-        >
-          Filtros Avançados
-        </Button>
+      <Box className="veiculos-filtros">
+        <Box className="search-filtros-container">
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Buscar por placa ou nome"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-input"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon className="search-icon" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Button
+            variant="outlined"
+            className="botao-filtrar"
+            endIcon={<FilterAltOutlinedIcon />}
+            onClick={() => setOpenFiltros(true)}
+          >
+            Filtros Avançados
+          </Button>
+        </Box>
+
         <Button
           variant="contained"
           className="botao-cadastrar"

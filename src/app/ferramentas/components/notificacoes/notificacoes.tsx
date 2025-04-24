@@ -11,7 +11,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import CircleIcon from "@mui/icons-material/Circle";
 import WarningIcon from "@mui/icons-material/Warning";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import "./notificacoes.css";
@@ -58,7 +58,8 @@ const notificacoesIniciais: Notificacao[] = [
     caminhão: "Caminhão 5",
     tipo: "Prancha",
     peça: "Pneu dianteiro esquerdo",
-    descricao: "Pressão abaixo do recomendado. Verificar possibilidade de furo.",
+    descricao:
+      "Pressão abaixo do recomendado. Verificar possibilidade de furo.",
     vidaUtil: "100km",
     atual: "95km",
   },
@@ -102,23 +103,34 @@ export default function Notificacoes() {
               <CardContent className="notificacao-header">
                 <Box>
                   {n.nova && (
-                    <Typography variant="body2" fontWeight={600} color="#1B3562">
+                    <Typography
+                      variant="body2"
+                      fontWeight={600}
+                      color="#1B3562"
+                    >
                       NOVA
                     </Typography>
                   )}
                   {isUrgente && (
-                    <Typography variant="body2" fontWeight={600} color="#a91a1a">
+                    <Typography
+                      variant="body2"
+                      fontWeight={600}
+                      color="#a91a1a"
+                    >
                       URGENTE
                     </Typography>
                   )}
                   <Typography variant="body2" className="notificacao-caminhao">
-                    <Box component="span" fontWeight={600}>{n.caminhão}</Box> - {n.peça}
+                    <Box component="span" fontWeight={600}>
+                      {n.caminhão}
+                    </Box>{" "}
+                    - {n.peça}
                   </Typography>
                 </Box>
 
                 <Box display="flex" alignItems="center" gap={1}>
                   {n.nova && (
-                    <NotificationsActiveIcon
+                    <CircleIcon
                       className="icone-pulsando"
                       sx={{ color: "#1B3562", fontSize: 20 }}
                       titleAccess="Nova notificação"
@@ -138,25 +150,56 @@ export default function Notificacoes() {
 
               <Collapse in={isExpandida}>
                 <Box className="notificacao-detalhes">
-                  <Typography variant="body2" gutterBottom sx={{ color: "#555" }}>
-                    <Box component="span" fontWeight={600}>Tipo Caminhão:</Box> {n.tipo}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom sx={{ color: "#555" }}>
-                    <Box component="span" fontWeight={600}>Descrição:</Box> {n.descricao}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom sx={{ color: "#555" }}>
-                    <Box component="span" fontWeight={600}>Quilometragem de Vida Útil:</Box> {n.vidaUtil}
+                  <Typography
+                    variant="body2"
+                    gutterBottom
+                    sx={{ color: "#555" }}
+                  >
+                    <Box component="span" fontWeight={600}>
+                      Tipo Caminhão:
+                    </Box>{" "}
+                    {n.tipo}
                   </Typography>
                   <Typography
                     variant="body2"
                     gutterBottom
-                    className={isUrgente ? "destacar-quilometragem" : "quilometragem-padrao"}
+                    sx={{ color: "#555" }}
                   >
-                    <Box component="span" fontWeight={600}>Quilometragem Atual:</Box> {n.atual}
+                    <Box component="span" fontWeight={600}>
+                      Descrição:
+                    </Box>{" "}
+                    {n.descricao}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    gutterBottom
+                    sx={{ color: "#555" }}
+                  >
+                    <Box component="span" fontWeight={600}>
+                      Quilometragem de Vida Útil:
+                    </Box>{" "}
+                    {n.vidaUtil}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    gutterBottom
+                    className={
+                      isUrgente
+                        ? "destacar-quilometragem"
+                        : "quilometragem-padrao"
+                    }
+                  >
+                    <Box component="span" fontWeight={600}>
+                      Quilometragem Atual:
+                    </Box>{" "}
+                    {n.atual}
                   </Typography>
 
                   <Box className="notificacao-acao">
-                    <Button endIcon={<ArrowForwardIcon />} className="botao-ver-caminhao">
+                    <Button
+                      endIcon={<ArrowForwardIcon />}
+                      className="botao-ver-caminhao"
+                    >
                       Verificar caminhão
                     </Button>
                   </Box>
