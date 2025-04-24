@@ -10,7 +10,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import { useEffect, useRef, useState } from "react";
-import SnackBarCustomizada from "../snackbar/snackbar";
+import SnackBarCustomizada from "../../snackbar/snackbar";
 import "./filtro-avancado.css";
 
 interface FilterField {

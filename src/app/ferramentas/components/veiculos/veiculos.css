@@ -1,146 +1,171 @@
 .veiculos-container {
-    padding: 2rem;
-    background-color: inherit;
+  padding: 2rem;
+  background-color: inherit;
 }
 
 /* Título */
 .veiculos-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .veiculos-title {
-    font-weight: 600 !important;
-    display: flex !important;
-    align-items: center !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 /* Filtros */
 .veiculos-filtros {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    gap: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
 }
 
 /* Campo de Busca */
-/* Correção para garantir que o tamanho do input seja aplicado */
 .search-input {
-    max-width: 30% !important;
+  max-width: 30% !important;
 }
 
-/* Certificando-se de que o input interno do MUI também recebe o estilo */
 .search-input input {
-    width: 100% !important;
+  width: 100% !important;
 }
 
+/* Agrupamento dos campos de busca e filtros */
+.search-filtros-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-grow: 1;
+}
+
+/* Container de botões */
+.botoes-container {
+  display: flex;
+  min-width: 20rem;        /* 👈 garante espaço para os botões */
+  justify-content: space-between;
+}
+
+/* Botões principais */
+.botao-cadastrar, .botao-filtrar{
+  background-color: #1B3562 !important;
+  color: white !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 1rem !important;
+  text-transform: none !important;
+  border-radius: 0.3rem !important;
+  white-space: nowrap !important;
+
+}
+
+.botao-cadastrar{
+  min-width: 12rem !important;  /* 👈 largura confortável */
+  max-width: 100% !important;
+}
+
+.botao-exportar{
+  background-color: black !important;
+  text-transform: none !important;
+  border-radius: 0.3rem !important;
+}
 
 /* Filtro de Manutenção */
 .filtro-manutencao {
-    display: inline-block;
-    align-items: center;
-    gap: 1rem;
+  display: inline-block;
+  align-items: center;
+  gap: 1rem;
 }
 
 .filtro-label {
-    font-size: 0.875rem !important;
-    font-weight: 500;
+  font-size: 0.875rem !important;
+  font-weight: 500;
 }
 
-/* Estiliza os radio buttons */
+/* Radio Buttons */
 .radio-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .radio-button.MuiRadio-root {
-    padding: 0.5rem !important; /* reduz espaço interno */
-    transform: scale(0.7); /* escala menor */
-  }  
+  padding: 0.5rem !important;
+  transform: scale(0.7);
+}
 
 .radio-button.Mui-checked {
-    color: #1B3562 !important;
+  color: #1B3562 !important;
 }
 
 .radio-text {
-    font-size: 0.875rem !important;
+  font-size: 0.875rem !important;
 }
 
-/* Botão de Cadastro */
-.botao-cadastrar, .botao-filtrar {
-    color: white !important;
-    background-color: #1B3562 !important;
-    font-weight: 600 !important;
-    padding: 0.5rem 1rem !important;
-    text-transform: none !important;
-    border-radius: 0.3rem !important;
-    max-width: 25% !important;
-}
-
-.search-filtros-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-grow: 1;
-}
-
+/* Responsivo */
 @media (max-width: 768px) {
-    .veiculos-filtros {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
+  .veiculos-filtros {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
 
-    .filtro-manutencao {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  .filtro-manutencao {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .veiculos-container {
-        padding: 1rem !important;
-    }
+  .veiculos-container {
+    padding: 1rem !important;
+  }
 
-    .veiculos-title {
-        font-size: 1.1rem !important;
-    }
+  .veiculos-title {
+    font-size: 1.1rem !important;
+  }
 
-    .search-input{
-        max-width: 100% !important;
-    }
+  .search-input {
+    max-width: 100% !important;
+  }
 
-    .search-icon {
-        font-size: 1.1rem !important;
-    }
+  .search-icon {
+    font-size: 1.1rem !important;
+  }
 
-    .search-input input {
-        font-size: 0.8rem !important;
-    }
-    
-    .filtro-label{
-        font-size: 0.8rem !important;
-    }
+  .search-input input {
+    font-size: 0.8rem !important;
+  }
 
-    .radio-text{
-        font-size: 0.8rem !important;
-    }
+  .filtro-label {
+    font-size: 0.8rem !important;
+  }
 
-    .botao-cadastrar {
-        max-width: 100% !important;
-        text-align: center !important;
-    }
+  .radio-text {
+    font-size: 0.8rem !important;
+  }
 
-    .filtro-manutencao {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 0.5rem !important; 
-    }
+  .botao-cadastrar,
+  .botao-exportar {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+  }
 
-    .search-filtros-container {
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
-    }
+  .filtro-manutencao {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+
+  .search-filtros-container {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .botoes-container {
+    flex-direction: column;
+    width: 100%;
+  }
 }

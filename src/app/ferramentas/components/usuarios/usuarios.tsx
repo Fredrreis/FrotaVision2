@@ -1,6 +1,6 @@
 import { useState } from "react";
-import TabelaGenerica from "../templates/tabela/tabela-generica";
-import ModalFormulario from "../templates/formulario-modal/formulario-generico";
+import TabelaGenerica from "../components/tabela/tabela-generica";
+import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import {
   Box,
   Typography,
@@ -9,8 +9,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import FiltroAvancado from "../filtro/filtro-avancado";
+import FiltroAvancado from "../components/filtro/filtro-avancado";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import "./usuarios.css";
@@ -158,7 +157,6 @@ export default function Usuarios() {
         <Button
           variant="contained"
           className="botao-cadastrar"
-          startIcon={<AddCircleOutlineIcon />}
           onClick={handleCadastrar}
         >
           Cadastrar Usuário

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import TabelaGenerica from "../templates/tabela/tabela-generica";
-import ModalFormulario from "../templates/formulario-modal/formulario-generico";
+import TabelaGenerica from "../components/tabela/tabela-generica";
+import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import {
   Box,
   Typography,
@@ -10,9 +10,8 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import PeopleIcon from "@mui/icons-material/People";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import FiltroAvancado from "../filtro/filtro-avancado";
+import FiltroAvancado from "../components/filtro/filtro-avancado";
 import "./motoristas.css";
 
 interface Motorista extends Record<string, unknown> {
@@ -183,7 +182,6 @@ export default function Motoristas() {
         <Button
           variant="contained"
           className="botao-cadastrar"
-          startIcon={<AddCircleOutlineIcon />}
           onClick={handleCadastrar}
         >
           Cadastrar Motorista

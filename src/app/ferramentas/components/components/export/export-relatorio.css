@@ -1,0 +1,112 @@
+.exportar-popup {
+  position: absolute;
+  top: 18%;
+  left: 80%;
+  width: 20rem;
+  background-color: white;
+  z-index: 30;
+  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
+  font-size: 0.7rem;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* Animações */
+.animated-slide-down {
+  animation: slideDown 0.2s ease-in-out;
+}
+
+.slide-up-out {
+  animation: slideUp 0.2s ease-in-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* Header do popup */
+.exportar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.7rem;
+}
+
+.exportar-icon {
+  font-size: 1.2rem !important;
+  color: #000;
+}
+
+/* Campo de seleção */
+.exportar-form-group {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Label do grupo de checkboxes */
+.exportar-label {
+  font-size: 0.7rem !important;
+  color: #000;
+  margin-bottom: 0.5rem;
+}
+
+/* Botão Baixar */
+.exportar-aplicar, .exportar-toggle {
+  color: white !important;
+  background-color: black !important;
+  border-radius: 0.4rem !important;
+  text-transform: none !important;
+  font-size: 0.7rem !important;
+  width: 100% !important;
+  margin-top: 1rem !important;
+  padding: 0.3rem 0.9rem !important;
+}
+
+.exportar-toggle{
+  background-color: #ccc !important;
+  color: black !important;
+  border-color: #ccc !important;
+}
+
+.exportar-aplicar:disabled {
+  background-color: #d3d3d3 !important;
+  color: #ffffff !important;
+  cursor: not-allowed !important;
+}
+
+/* Checkboxes */
+
+.exportar-colunas {
+  margin-top: 1rem;
+}
+
+.exportar-checkbox .MuiFormControlLabel-label {
+  font-size: 0.7rem !important;
+}
+
+.exportar-checkbox .MuiSvgIcon-root {
+  border-radius: 0.4rem !important;
+  width: 0.9rem !important;
+  height: 0.9rem !important;
+}

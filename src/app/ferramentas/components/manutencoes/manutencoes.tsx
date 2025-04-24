@@ -1,6 +1,6 @@
 import { useState } from "react";
-import TabelaGenerica from "../templates/tabela/tabela-generica";
-import ModalFormulario from "../templates/formulario-modal/formulario-generico";
+import TabelaGenerica from "../components/tabela/tabela-generica";
+import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import {
   Box,
   Typography,
@@ -10,9 +10,8 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import EngineeringIcon from "@mui/icons-material/Engineering";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import FiltroAvancado from "../filtro/filtro-avancado";
+import FiltroAvancado from "../components/filtro/filtro-avancado";
 import "./manutencoes.css";
 
 interface Manutencao extends Record<string, unknown> {
@@ -239,7 +238,6 @@ export default function Manutencoes() {
         <Button
           variant="contained"
           className="botao-cadastrar"
-          startIcon={<AddCircleOutlineIcon />}
           onClick={handleCadastrar}
         >
           Cadastrar Manutenção

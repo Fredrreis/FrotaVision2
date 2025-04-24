@@ -95,7 +95,11 @@ const theme = createTheme({
     MuiCheckbox: {
       styleOverrides: {
         root: {
+          color: "#1b3562",
           fontFamily: poppins.style.fontFamily,
+          "&.Mui-checked": {
+          color: "#1b3562",
+      }
         },
       },
     },

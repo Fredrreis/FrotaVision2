@@ -1,6 +1,8 @@
+// /pages/veiculos.tsx
 import { useState } from "react";
-import TabelaGenerica from "../templates/tabela/tabela-generica";
-import ModalFormulario from "../templates/formulario-modal/formulario-generico";
+import TabelaGenerica from "../components/tabela/tabela-generica";
+import ModalFormulario from "../components/formulario-modal/formulario-generico";
+import ExportarRelatorioDialog from "../components/export/export-relatorio";
 import {
   Box,
   Typography,
@@ -10,9 +12,9 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import TimelineIcon from "@mui/icons-material/Timeline";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import FiltroAvancado from "../filtro/filtro-avancado";
+import IosShareIcon from "@mui/icons-material/IosShare";
+import FiltroAvancado from "../components/filtro/filtro-avancado";
 import "./veiculos.css";
 
 interface Veiculo extends Record<string, unknown> {
@@ -128,6 +130,7 @@ export default function Veiculos() {
   const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
+  const [openExportar, setOpenExportar] = useState(false);
   const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
     {}
   );
@@ -214,14 +217,24 @@ export default function Veiculos() {
           </Button>
         </Box>
 
-        <Button
-          variant="contained"
-          className="botao-cadastrar"
-          startIcon={<AddCircleOutlineIcon />}
-          onClick={handleCadastrar}
-        >
-          Cadastrar Veículo
-        </Button>
+        <Box className="botoes-container">
+          <Button
+            variant="contained"
+            className="botao-cadastrar"
+            onClick={handleCadastrar}
+          >
+            Cadastrar Veículo
+          </Button>
+
+          <Button
+            variant="contained"
+            className="botao-exportar"
+            startIcon={<IosShareIcon />}
+            onClick={() => setOpenExportar(true)}
+          >
+            Exportar
+          </Button>
+        </Box>
       </Box>
 
       <TabelaGenerica<Veiculo>
@@ -250,6 +263,13 @@ export default function Veiculos() {
         onChange={setFiltrosAvancados}
         onApply={() => setOpenFiltros(false)}
         onClear={() => setFiltrosAvancados({})}
+      />
+
+      <ExportarRelatorioDialog
+        open={openExportar}
+        onClose={() => setOpenExportar(false)}
+        colunas={colunasVeiculos.map((c) => c.titulo)}
+        dados={dadosFiltrados}
       />
     </Box>
   );
