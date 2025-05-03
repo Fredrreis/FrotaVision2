@@ -51,8 +51,10 @@ export const Ferramentas: React.FC = () => {
       case "USUÁRIOS":
         componente = <Usuarios />;
         break;
-      default:
+      case "NOTIFICAÇÕES":
         componente = <Notificacoes />;
+        break;
+      default:
     }
 
     return (

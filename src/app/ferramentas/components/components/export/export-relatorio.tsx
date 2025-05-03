@@ -16,7 +16,10 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import IosShareIcon from "@mui/icons-material/IosShare";
-import SnackBarCustomizada from "../../snackbar/snackbar";
+import SnackBarCustomizada from "../snackbar/snackbar";
+import FormatIndentIncreaseIcon from '@mui/icons-material/FormatIndentIncrease';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ArticleIcon from '@mui/icons-material/Article';
 import "./export-relatorio.css";
 
 interface ExportarRelatorioDialogProps {
@@ -67,7 +70,7 @@ export default function ExportarRelatorioDialog({
   }, [visible, closing]);
 
   useEffect(() => {
-    if (formato !== "excel") {
+    if (formato !== "csv") {
       setColunasSelecionadas(colunas);
     }
   }, [formato, colunas]);
@@ -83,8 +86,8 @@ export default function ExportarRelatorioDialog({
 
   const handleExportar = async () => {
     if (formato === "pdf") exportarPdf(colunas, dados);
-    else if (formato === "excel") exportarCsv(colunasSelecionadas, dados);
-    else if (formato === "word") await exportarDocx(colunas, dados);
+    else if (formato === "csv") exportarCsv(colunasSelecionadas, dados);
+    else if (formato === "docx") await exportarDocx(colunas, dados);
 
     setSnackbarOpen(true);
     setTimeout(() => setSnackbarOpen(false), 3000);
@@ -98,7 +101,7 @@ export default function ExportarRelatorioDialog({
   };
 
   const isExportDisabled =
-    formato === "excel" && colunasSelecionadas.length === 0;
+    formato === "csv" && colunasSelecionadas.length === 0;
 
   if (!visible && !closing) return null;
 
@@ -128,13 +131,13 @@ export default function ExportarRelatorioDialog({
             size="small"
             className="filtro-input"
           >
-            <MenuItem value="pdf">PDF</MenuItem>
-            <MenuItem value="excel">Excel</MenuItem>
-            <MenuItem value="word">Word</MenuItem>
+            <MenuItem value="pdf"><PictureAsPdfIcon className="dropdown-icons" /> Pdf</MenuItem>
+            <MenuItem value="csv"><FormatIndentIncreaseIcon className="dropdown-icons" /> Csv</MenuItem>
+            <MenuItem value="docx"><ArticleIcon className="dropdown-icons" /> Docx</MenuItem>
           </TextField>
         </Box>
 
-        {formato === "excel" && (
+        {formato === "csv" && (
           <Box className="exportar-colunas">
             <Typography className="exportar-label">
               Selecione as colunas para o relatório:
@@ -165,7 +168,7 @@ export default function ExportarRelatorioDialog({
         )}
 
         <Box className="exportar-actions">
-          {formato === "excel" && (
+          {formato === "csv" && (
             <Button
               onClick={handleToggleAll}
               className="exportar-toggle"

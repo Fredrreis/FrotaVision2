@@ -1,7 +1,7 @@
 .exportar-popup {
   position: absolute;
-  top: 18%;
-  left: 80%;
+  top: 20%;
+  left: 77%;
   width: 20rem;
   background-color: white;
   z-index: 30;
@@ -56,6 +56,11 @@
   color: #000;
 }
 
+.dropdown-icons{
+  margin-right: 0.5rem !important;
+  font-size: 1.2rem !important
+}
+
 /* Campo de seleção */
 .exportar-form-group {
   flex: 1 1 100%;
@@ -103,6 +108,15 @@
 
 .exportar-checkbox .MuiFormControlLabel-label {
   font-size: 0.7rem !important;
+}
+
+/* Alinhar ícone e texto no valor selecionado */
+.MuiSelect-select {
+  display: flex !important;
+  align-items: center !important;
+  font-size: 0.7rem !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.6rem !important;
 }
 
 .exportar-checkbox .MuiSvgIcon-root {

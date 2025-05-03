@@ -34,7 +34,6 @@ const menuItems = [
   { text: "MANUTENÇÕES", icon: <EngineeringIcon /> },
   { text: "MOTORISTAS", icon: <PeopleIcon /> },
   { text: "VIAGENS", icon: <TimelineIcon /> },
-  { text: "RELATÓRIOS", icon: <DescriptionIcon /> },
   { text: "USUÁRIOS", icon: <AccountCircleIcon /> },
   { text: "AJUDA", icon: <HelpOutlineIcon /> },
   { text: "SAIR", icon: <ExitToAppIcon /> },
