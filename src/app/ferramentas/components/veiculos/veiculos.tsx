@@ -1,5 +1,10 @@
+"use client";
 // /pages/veiculos.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  listarVeiculos,
+  Veiculo as VeiculoAPI,
+} from "../../../../api/services/veiculoService";
 import TabelaGenerica from "../components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
@@ -17,7 +22,8 @@ import IosShareIcon from "@mui/icons-material/IosShare";
 import FiltroAvancado from "../components/filtro/filtro-avancado";
 import "./veiculos.css";
 
-interface Veiculo extends Record<string, unknown> {
+interface Veiculo {
+  [key: string]: string | number | boolean;
   placa: string;
   nome: string;
   tipo: string;
@@ -28,19 +34,7 @@ interface Veiculo extends Record<string, unknown> {
   data: string;
 }
 
-const colunasVeiculos: {
-  chave:
-    | "placa"
-    | "nome"
-    | "tipo"
-    | "chassi"
-    | "descricao"
-    | "km"
-    | "ano"
-    | "data";
-  titulo: string;
-  ordenavel: boolean;
-}[] = [
+const colunasVeiculos = [
   { chave: "placa", titulo: "Placa", ordenavel: false },
   { chave: "nome", titulo: "Nome", ordenavel: false },
   { chave: "tipo", titulo: "Tipo Caminhão", ordenavel: false },
@@ -51,80 +45,16 @@ const colunasVeiculos: {
   { chave: "data", titulo: "Data", ordenavel: true },
 ];
 
-const dadosVeiculos: Veiculo[] = [
-  {
-    placa: "ABC1D34",
-    nome: "Caminhão 1",
-    tipo: "Betoneira",
-    chassi: "9BWZZZ377VT004251",
-    descricao: "Modelo A, cor branca",
-    km: 134.5,
-    ano: 2014,
-    data: "23/09/2023",
-  },
-  {
-    placa: "XYZ2E56",
-    nome: "Caminhão 2",
-    tipo: "Basculante",
-    chassi: "8ABCDZ998HT003122",
-    descricao: "Modelo B, cor azul",
-    km: 256.8,
-    ano: 2018,
-    data: "23/09/2023",
-  },
-  {
-    placa: "LMN3F78",
-    nome: "Caminhão 3",
-    tipo: "Carga Seca",
-    chassi: "7XYYZ123ET002233",
-    descricao: "Modelo C, cor vermelha",
-    km: 98.2,
-    ano: 2016,
-    data: "30/12/2021",
-  },
-  {
-    placa: "OPQ4G90",
-    nome: "Caminhão 4",
-    tipo: "Sider",
-    chassi: "5LMNO999RT006789",
-    descricao: "Modelo D, cor preta",
-    km: 430.1,
-    ano: 2012,
-    data: "15/02/2023",
-  },
-  {
-    placa: "RST5H12",
-    nome: "Caminhão 5",
-    tipo: "Prancha",
-    chassi: "3ZXXTT667GH001111",
-    descricao: "Modelo E, cor cinza",
-    km: 210,
-    ano: 2020,
-    data: "08/07/2020",
-  },
-];
-
-const tiposUnicos = [...new Set(dadosVeiculos.map((v) => v.tipo))];
-const maxKm = Math.max(...dadosVeiculos.map((v) => v.km));
-
-const filtrosAvancadosConfig = [
-  {
-    name: "tipo",
-    label: "Tipo Caminhão",
-    type: "select" as const,
-    options: tiposUnicos,
-  },
-  { name: "ano", label: "Ano", type: "number" as const },
-  { name: "data", label: "Data", type: "data" as const },
-  { name: "km", label: "Km", type: "range" as const, min: 0, max: maxKm },
-];
-
 function formatarDataISOparaBR(iso: string): string {
-  const [ano, mes, dia] = iso.split("-");
+  const data = new Date(iso);
+  const dia = String(data.getDate()).padStart(2, "0");
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
+  const ano = data.getFullYear();
   return `${dia}/${mes}/${ano}`;
 }
 
 export default function Veiculos() {
+  const [dadosApi, setDadosApi] = useState<VeiculoAPI[]>([]);
   const [dados, setDados] = useState<Veiculo | null>(null);
   const [open, setOpen] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
@@ -135,27 +65,59 @@ export default function Veiculos() {
     {}
   );
 
-  const dadosFiltrados = dadosVeiculos.filter((veiculo) => {
-    const matchSearch =
-      veiculo.nome.toLowerCase().includes(search.toLowerCase()) ||
-      veiculo.placa.toLowerCase().includes(search.toLowerCase());
+  useEffect(() => {
+    listarVeiculos()
+      .then(setDadosApi)
+      .catch((err) => console.error("Erro ao buscar veículos:", err));
+  }, []);
 
-    const matchTipo = filtrosAvancados.tipo
-      ? veiculo.tipo === filtrosAvancados.tipo
-      : true;
-    const matchAno = filtrosAvancados.ano
-      ? veiculo.ano === Number(filtrosAvancados.ano)
-      : true;
-    const matchKm =
-      filtrosAvancados.km !== undefined && filtrosAvancados.km !== ""
-        ? veiculo.km <= Number(filtrosAvancados.km)
+  const dadosFiltrados: Veiculo[] = dadosApi
+    .map((v) => ({
+      placa: v.placa,
+      nome: v.apelido,
+      tipo: String(v.tipo),
+      chassi: v.chassi,
+      descricao: v.descricao,
+      km: v.quilometragem,
+      ano: v.ano,
+      data: formatarDataISOparaBR(v.data_cadastro),
+    }))
+    .filter((veiculo) => {
+      const matchSearch =
+        veiculo.nome.toLowerCase().includes(search.toLowerCase()) ||
+        veiculo.placa.toLowerCase().includes(search.toLowerCase());
+
+      const matchTipo = filtrosAvancados.tipo
+        ? veiculo.tipo === filtrosAvancados.tipo
         : true;
-    const matchData = filtrosAvancados.data
-      ? veiculo.data === formatarDataISOparaBR(filtrosAvancados.data)
-      : true;
+      const matchAno = filtrosAvancados.ano
+        ? veiculo.ano === Number(filtrosAvancados.ano)
+        : true;
+      const matchKm =
+        filtrosAvancados.km !== undefined && filtrosAvancados.km !== ""
+          ? veiculo.km <= Number(filtrosAvancados.km)
+          : true;
+      const matchData = filtrosAvancados.data
+        ? veiculo.data === formatarDataISOparaBR(filtrosAvancados.data)
+        : true;
 
-    return matchSearch && matchTipo && matchAno && matchKm && matchData;
-  });
+      return matchSearch && matchTipo && matchAno && matchKm && matchData;
+    });
+
+  const tiposUnicos = [...new Set(dadosFiltrados.map((v) => v.tipo))];
+  const maxKm = Math.max(0, ...dadosFiltrados.map((v) => v.km));
+
+  const filtrosAvancadosConfig = [
+    {
+      name: "tipo",
+      label: "Tipo Caminhão",
+      type: "select" as const,
+      options: tiposUnicos,
+    },
+    { name: "ano", label: "Ano", type: "number" as const },
+    { name: "data", label: "Data", type: "data" as const },
+    { name: "km", label: "Km", type: "range" as const, min: 0, max: maxKm },
+  ];
 
   const handleEditar = (item: Veiculo) => {
     setDados(item);
