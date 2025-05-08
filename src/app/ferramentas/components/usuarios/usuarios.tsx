@@ -1,6 +1,12 @@
-import { useState } from "react";
+"use client";
+import { useEffect, useRef, useState } from "react";
+import {
+  listarUsuarios,
+  Usuario as UsuarioAPI,
+} from "@/api/services/usuarioService";
 import TabelaGenerica from "../components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
+import ExportarRelatorioDialog from "../components/export/export-relatorio";
 import {
   Box,
   Typography,
@@ -9,76 +15,87 @@ import {
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import FiltroAvancado from "../components/filtro/filtro-avancado";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import IosShareIcon from "@mui/icons-material/IosShare";
+import FiltroAvancado from "../components/filtro/filtro-avancado";
+import Carregamento from "../../../components/carregamento/carregamento";
+import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
+import { motion } from "framer-motion";
 import "./usuarios.css";
 
-interface Usuario extends Record<string, unknown> {
-  email: string;
+interface Usuario {
   nome: string;
+  email: string;
   data: string;
+  dataOriginal: string;
   permissoes: string;
+  [key: string]: string;
 }
 
-const colunasUsuarios: {
-  chave: string;
-  titulo: string;
-  ordenavel: boolean;
-}[] = [
+const colunasUsuarios = [
   { chave: "email", titulo: "Email", ordenavel: false },
   { chave: "nome", titulo: "Nome de Usuário", ordenavel: false },
   { chave: "data", titulo: "Data", ordenavel: true },
   { chave: "permissoes", titulo: "Permissões do Usuário", ordenavel: false },
 ];
 
-const dadosUsuarios: Usuario[] = [
-  {
-    email: "paulo@example.com",
-    nome: "Paulo Franco",
-    data: "12/01/2023",
-    permissoes: "Admin",
-  },
-  {
-    email: "maria@example.com",
-    nome: "Maria Souza",
-    data: "25/02/2023",
-    permissoes: "Editor",
-  },
-  {
-    email: "ana@example.com",
-    nome: "Ana Lima",
-    data: "05/03/2023",
-    permissoes: "Visualizador",
-  },
-];
-
-const filtrosAvancadosConfig = [
-  {
-    name: "permissoes",
-    label: "Permissões",
-    type: "select" as const,
-    options: ["Admin", "Editor", "Visualizador"],
-  },
-  { name: "data", label: "Data", type: "data" as const },
-];
-
-function formatarDataISOparaBR(iso: string): string {
-  const [ano, mes, dia] = iso.split("-");
-  return `${dia}/${mes}/${ano}`;
-}
+const mapeamentoCampos = {
+  Email: "email",
+  "Nome de Usuário": "nome",
+  Data: "data",
+  "Permissões do Usuário": "permissoes",
+};
 
 export default function Usuarios() {
+  const [dadosApi, setDadosApi] = useState<UsuarioAPI[]>([]);
+  const [carregando, setCarregando] = useState(true);
   const [dados, setDados] = useState<Usuario | null>(null);
   const [open, setOpen] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
+  const [openExportar, setOpenExportar] = useState(false);
   const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
     {}
   );
 
-  const dadosFiltrados = dadosUsuarios.filter((usuario) => {
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    listarUsuarios()
+      .then((res) => {
+        if (!controller.signal.aborted) {
+          setDadosApi(res);
+        }
+      })
+      .catch((err) => {
+        if (!controller.signal.aborted) {
+          console.error("Erro:", err);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setCarregando(false);
+        }
+      });
+
+    return () => {
+      controller.abort(); // cancela requisição
+    };
+  }, []);
+
+  const usuariosData: Usuario[] = dadosApi.map((u) => ({
+    nome: u.nome_usuario || "—",
+    email: u.email || "—",
+    data: formatarDataISOcomHora(u.data_cadastro),
+    dataOriginal: u.data_cadastro,
+    permissoes: "Admin", // valor temporário
+  }));
+
+  const dadosFiltrados = usuariosData.filter((usuario) => {
     const matchSearch =
       usuario.nome.toLowerCase().includes(search.toLowerCase()) ||
       usuario.email.toLowerCase().includes(search.toLowerCase());
@@ -88,11 +105,27 @@ export default function Usuarios() {
       : true;
 
     const matchData = filtrosAvancados.data
-      ? usuario.data === formatarDataISOparaBR(filtrosAvancados.data)
+      ? compareDateISO(usuario.dataOriginal, filtrosAvancados.data)
       : true;
 
     return matchSearch && matchPermissao && matchData;
   });
+
+  const permissoesUnicas = [...new Set(usuariosData.map((u) => u.permissoes))];
+
+  const filtrosAvancadosConfig = [
+    {
+      name: "permissoes",
+      label: "Permissões",
+      type: "select" as const,
+      options: permissoesUnicas,
+    },
+    {
+      name: "data",
+      label: "Data",
+      type: "data" as const,
+    },
+  ];
 
   const handleEditar = (item: Usuario) => {
     setDados(item);
@@ -111,85 +144,114 @@ export default function Usuarios() {
   };
 
   const handleSalvar = () => {
-    if (modoEdicao) {
-      console.log("Salvando edição:", dados);
-    } else {
-      console.log("Cadastrando novo usuário:", dados);
-    }
+    console.log(
+      modoEdicao ? "Salvando edição:" : "Cadastrando novo usuário:",
+      dados
+    );
     setOpen(false);
   };
 
-  return (
-    <Box className="usuarios-container">
-      <Box className="usuarios-header">
-        <Typography variant="h6" className="usuarios-title">
-          <AccountCircleIcon className="icon-title" /> USUÁRIOS
-        </Typography>
-      </Box>
+  if (carregando) {
+    return <Carregamento animationUrl="/lotties/carregamento.json" />;
+  }
 
-      <Box className="usuarios-filtros">
-        <Box className="search-filtros-container">
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="Buscar por nome ou email"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="search-input"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon className="search-icon" />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Button
-            variant="outlined"
-            className="botao-filtrar"
-            endIcon={<FilterAltOutlinedIcon />}
-            onClick={() => setOpenFiltros(true)}
-          >
-            Filtros Avançados
-          </Button>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Box className="usuarios-container">
+        <Box className="usuarios-header">
+          <Typography variant="h6" className="usuarios-title">
+            <AccountCircleIcon className="icon-title" /> USUÁRIOS
+          </Typography>
         </Box>
 
-        <Button
-          variant="contained"
-          className="botao-cadastrar"
-          onClick={handleCadastrar}
-        >
-          Cadastrar Usuário
-        </Button>
+        <Box className="usuarios-filtros">
+          <Box className="search-filtros-container">
+            <TextField
+              variant="outlined"
+              size="small"
+              placeholder="Buscar por nome ou email"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="search-input"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon className="search-icon" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button
+              variant="outlined"
+              className="botao-filtrar"
+              endIcon={<FilterAltOutlinedIcon />}
+              onClick={() => setOpenFiltros(true)}
+            >
+              Filtros Avançados
+            </Button>
+          </Box>
+
+          <Box className="botoes-container">
+            <Button
+              variant="contained"
+              className="botao-cadastrar"
+              onClick={handleCadastrar}
+            >
+              Cadastrar Usuário
+            </Button>
+
+            <Button
+              variant="contained"
+              className="botao-exportar"
+              startIcon={<IosShareIcon />}
+              onClick={() => setOpenExportar(true)}
+            >
+              Exportar
+            </Button>
+          </Box>
+        </Box>
+
+        <TabelaGenerica<Usuario>
+          colunas={colunasUsuarios}
+          dados={dadosFiltrados}
+          onEditar={handleEditar}
+          onExcluir={handleExcluir}
+          exibirExaminar={false}
+        />
+
+        <ModalFormulario<Usuario>
+          open={open}
+          onClose={() => setOpen(false)}
+          onSalvar={handleSalvar}
+          colunas={colunasUsuarios}
+          dados={dados}
+          setDados={setDados}
+          modoEdicao={modoEdicao}
+        />
+
+        <FiltroAvancado
+          open={openFiltros}
+          onClose={() => setOpenFiltros(false)}
+          filters={filtrosAvancadosConfig}
+          values={filtrosAvancados}
+          onChange={setFiltrosAvancados}
+          onApply={() => setOpenFiltros(false)}
+          onClear={() => setFiltrosAvancados({})}
+        />
+
+        <ExportarRelatorioDialog
+          open={openExportar}
+          onClose={() => setOpenExportar(false)}
+          colunas={colunasUsuarios.map((c) => c.titulo)}
+          dados={dadosFiltrados}
+          mapeamentoCampos={mapeamentoCampos}
+        />
       </Box>
-
-      <TabelaGenerica<Usuario>
-        colunas={colunasUsuarios}
-        dados={dadosFiltrados}
-        onEditar={handleEditar}
-        onExcluir={handleExcluir}
-        exibirExaminar={false}
-      />
-
-      <ModalFormulario<Usuario>
-        open={open}
-        onClose={() => setOpen(false)}
-        onSalvar={handleSalvar}
-        colunas={colunasUsuarios}
-        dados={dados}
-        setDados={setDados}
-        modoEdicao={modoEdicao}
-      />
-
-      <FiltroAvancado
-        open={openFiltros}
-        onClose={() => setOpenFiltros(false)}
-        filters={filtrosAvancadosConfig}
-        values={filtrosAvancados}
-        onChange={setFiltrosAvancados}
-        onApply={() => setOpenFiltros(false)}
-        onClear={() => setFiltrosAvancados({})}
-      />
-    </Box>
+    </motion.div>
   );
 }

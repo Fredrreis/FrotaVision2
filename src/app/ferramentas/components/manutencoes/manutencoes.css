@@ -43,21 +43,25 @@
   flex-grow: 1;
 }
 
-.botao-cadastrar {
+/* Botões principais */
+.botao-cadastrar, .botao-filtrar{
   background-color: #1B3562 !important;
   color: white !important;
   font-weight: 600 !important;
   padding: 0.5rem 1rem !important;
   text-transform: none !important;
   border-radius: 0.3rem !important;
-  max-width: 25% !important;
+  white-space: nowrap !important;
+
 }
 
-.botao-filtrar {
-  background-color: #1B3562 !important;
-  color: white !important;
-  font-weight: 600 !important;
-  padding: 0.5rem 1rem !important;
+.botao-cadastrar{
+  min-width: 12rem !important;  /* 👈 largura confortável */
+  max-width: 100% !important;
+}
+
+.botao-exportar{
+  background-color: black !important;
   text-transform: none !important;
   border-radius: 0.3rem !important;
 }
@@ -89,9 +93,11 @@
       font-size: 0.8rem !important;
   }
 
-  .botao-cadastrar {
-      max-width: 100% !important;
-      text-align: center !important;
+  .botao-cadastrar,
+  .botao-exportar {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
   }
 
   .search-filtros-container {

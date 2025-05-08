@@ -1,17 +1,10 @@
 import jsPDF from "jspdf";
 
-export function exportarPdf(colunas: string[], dados: Record<string, any>[]) {
-  const mapeamentoCampos: Record<string, string> = {
-    Placa: "placa",
-    Nome: "nome",
-    "Tipo Caminhão": "tipo",
-    Chassi: "chassi",
-    Descrição: "descricao",
-    Km: "km",
-    Ano: "ano",
-    Data: "data",
-  };
-
+export function exportarPdf(
+  colunas: string[],
+  dados: Record<string, any>[],
+  mapeamentoCampos: Record<string, string>
+) {
   const campos = colunas.map((col) => ({
     label: col,
     key: mapeamentoCampos[col],
@@ -20,16 +13,15 @@ export function exportarPdf(colunas: string[], dados: Record<string, any>[]) {
   const doc = new jsPDF();
   let y = 15;
   const margemLabel = 10;
-  const margemValor = 60; // maior espaçamento horizontal entre label e valor
+  const margemValor = 90;
 
   dados.forEach((item, index) => {
     campos.forEach(({ label, key }) => {
       doc.setFont("helvetica", "bold");
       doc.text(`${label}:`, margemLabel, y);
       doc.setFont("helvetica", "normal");
-      const valor = String(item[key] ?? "");
-      doc.text(valor, margemValor, y);
-      y += 8; // linha mais espaçada
+      doc.text(String(item[key] ?? ""), margemValor, y);
+      y += 8;
     });
 
     y += 5;

@@ -1,24 +1,15 @@
-import {
-  Document,
-  Packer,
-  Paragraph,
-  TextRun,
-} from "docx";
+import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
 
-export async function exportarDocx(colunas: string[], dados: Record<string, any>[]) {
-  const mapeamentoCampos: Record<string, string> = {
-    Placa: "placa",
-    Nome: "nome",
-    "Tipo Caminhão": "tipo",
-    Chassi: "chassi",
-    Descrição: "descricao",
-    Km: "km",
-    Ano: "ano",
-    Data: "data",
-  };
-
-  const campos = colunas.map((col) => ({ label: col, key: mapeamentoCampos[col] }));
+export async function exportarDocx(
+  colunas: string[],
+  dados: Record<string, any>[],
+  mapeamentoCampos: Record<string, string>
+) {
+  const campos = colunas.map((col) => ({
+    label: col,
+    key: mapeamentoCampos[col],
+  }));
 
   const paragraphs: Paragraph[] = [];
 

@@ -1,4 +1,3 @@
-// components/ExportarRelatorioDialog.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { exportarDocx } from "./templates/export-docx-file";
 import { exportarPdf } from "./templates/export-pdf-file";
@@ -17,16 +16,17 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import SnackBarCustomizada from "../snackbar/snackbar";
-import FormatIndentIncreaseIcon from '@mui/icons-material/FormatIndentIncrease';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import ArticleIcon from '@mui/icons-material/Article';
+import FormatIndentIncreaseIcon from "@mui/icons-material/FormatIndentIncrease";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import ArticleIcon from "@mui/icons-material/Article";
 import "./export-relatorio.css";
 
-interface ExportarRelatorioDialogProps {
+interface Props {
   open: boolean;
   onClose: () => void;
   colunas: string[];
   dados: Record<string, any>[];
+  mapeamentoCampos: Record<string, string>;
 }
 
 export default function ExportarRelatorioDialog({
@@ -34,7 +34,8 @@ export default function ExportarRelatorioDialog({
   onClose,
   colunas,
   dados,
-}: ExportarRelatorioDialogProps) {
+  mapeamentoCampos,
+}: Props) {
   const [formato, setFormato] = useState("pdf");
   const [colunasSelecionadas, setColunasSelecionadas] =
     useState<string[]>(colunas);
@@ -57,22 +58,15 @@ export default function ExportarRelatorioDialog({
       const isDropdown = !!document
         .querySelector(".MuiPopover-root")
         ?.contains(target);
-      if (!insidePopup && !isDropdown) {
-        requestClose();
-      }
+      if (!insidePopup && !isDropdown) requestClose();
     };
-    if (visible || closing) {
+    if (visible || closing)
       document.addEventListener("mousedown", handleMouseDown);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleMouseDown);
-    };
+    return () => document.removeEventListener("mousedown", handleMouseDown);
   }, [visible, closing]);
 
   useEffect(() => {
-    if (formato !== "csv") {
-      setColunasSelecionadas(colunas);
-    }
+    if (formato !== "csv") setColunasSelecionadas(colunas);
   }, [formato, colunas]);
 
   const requestClose = () => {
@@ -85,9 +79,11 @@ export default function ExportarRelatorioDialog({
   };
 
   const handleExportar = async () => {
-    if (formato === "pdf") exportarPdf(colunas, dados);
-    else if (formato === "csv") exportarCsv(colunasSelecionadas, dados);
-    else if (formato === "docx") await exportarDocx(colunas, dados);
+    if (formato === "pdf") exportarPdf(colunas, dados, mapeamentoCampos);
+    else if (formato === "csv")
+      exportarCsv(colunasSelecionadas, dados, mapeamentoCampos);
+    else if (formato === "docx")
+      await exportarDocx(colunas, dados, mapeamentoCampos);
 
     setSnackbarOpen(true);
     setTimeout(() => setSnackbarOpen(false), 3000);
@@ -131,16 +127,22 @@ export default function ExportarRelatorioDialog({
             size="small"
             className="filtro-input"
           >
-            <MenuItem value="pdf"><PictureAsPdfIcon className="dropdown-icons" /> Pdf</MenuItem>
-            <MenuItem value="csv"><FormatIndentIncreaseIcon className="dropdown-icons" /> Csv</MenuItem>
-            <MenuItem value="docx"><ArticleIcon className="dropdown-icons" /> Docx</MenuItem>
+            <MenuItem value="pdf">
+              <PictureAsPdfIcon className="dropdown-icons" /> Pdf
+            </MenuItem>
+            <MenuItem value="csv">
+              <FormatIndentIncreaseIcon className="dropdown-icons" /> Csv
+            </MenuItem>
+            <MenuItem value="docx">
+              <ArticleIcon className="dropdown-icons" /> Docx
+            </MenuItem>
           </TextField>
         </Box>
 
         {formato === "csv" && (
           <Box className="exportar-colunas">
             <Typography className="exportar-label">
-              Selecione as colunas para o relatório:
+              Selecione as colunas:
             </Typography>
             <FormGroup>
               {colunas.map((col) => (

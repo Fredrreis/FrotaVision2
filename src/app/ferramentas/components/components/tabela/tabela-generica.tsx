@@ -68,8 +68,8 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
     }
 
     return order === "asc"
-      ? String(valorA).localeCompare(String(valorB))
-      : String(valorB).localeCompare(String(valorA));
+      ? String(valorA ?? "").localeCompare(String(valorB ?? ""))
+      : String(valorB ?? "").localeCompare(String(valorA ?? ""));
   });
 
   const handleOpenModal = (item: T) => {
@@ -125,24 +125,29 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
                 key={index}
                 className={index % 2 === 0 ? "linha-par" : ""}
               >
-                {colunas.map(({ chave }) => (
-                  <TableCell key={String(chave)}>
-                    {String(item[chave]).length > MAX_CHAR ? (
-                      <Tooltip title={String(item[chave])} arrow>
-                        <span>{truncateText(String(item[chave]))}</span>
-                      </Tooltip>
-                    ) : (
-                      <span>{String(item[chave])}</span>
-                    )}
-                    {chave === "nome" &&
-                      (item as T & { manutencaoProxima?: boolean })
-                        .manutencaoProxima && (
-                        <Tooltip title="Manutenção Pendente" arrow>
-                          <NotificationImportantIcon className="icone-alerta" />
+                {colunas.map(({ chave }) => {
+                  const valor = item[chave] ?? "—";
+                  const texto = String(valor);
+
+                  return (
+                    <TableCell key={String(chave)}>
+                      {texto.length > MAX_CHAR ? (
+                        <Tooltip title={texto} arrow>
+                          <span>{truncateText(texto)}</span>
                         </Tooltip>
+                      ) : (
+                        <span>{texto}</span>
                       )}
-                  </TableCell>
-                ))}
+                      {chave === "nome" &&
+                        (item as T & { manutencaoProxima?: boolean })
+                          .manutencaoProxima && (
+                          <Tooltip title="Manutenção Pendente" arrow>
+                            <NotificationImportantIcon className="icone-alerta" />
+                          </Tooltip>
+                        )}
+                    </TableCell>
+                  );
+                })}
                 <TableCell>
                   {exibirExaminar && (
                     <Tooltip title="Examinar" arrow>

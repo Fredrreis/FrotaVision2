@@ -9,9 +9,11 @@ export class ApiGateway {
     this.axiosInstance = axios.create({
       baseURL: this.baseUrl,
       headers: {
+        Accept: "application/json", // força parse como JSON
         "Content-Type": "application/json",
       },
     });
+    
   }
 
   async get<T = any>(endPoint: string, params: any = {}): Promise<T> {
