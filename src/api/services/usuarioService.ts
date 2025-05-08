@@ -10,6 +10,10 @@ export interface Usuario {
 
 const api = new ApiGateway();
 
-export const listarUsuarios = async (): Promise<Usuario[]> => {
-  return await api.get<Usuario[]>('/Usuario/Listar');
+export const listarUsuarios = async (signal?: AbortSignal): Promise<Usuario[]> => {
+  return await api.get<Usuario[]>('/Usuario/Listar', {}, signal);
+};
+
+export const deletarUsuario = async (id: number): Promise<void> => {
+  await api.delete(`/Usuario/Deletar/${id}`);
 };

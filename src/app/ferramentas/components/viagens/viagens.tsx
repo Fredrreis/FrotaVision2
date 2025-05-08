@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   listarViagens,
+  deletarViagem,
   Viagem as ViagemAPI,
 } from "@/api/services/viagemService";
 import TabelaGenerica from "../components/tabela/tabela-generica";
@@ -22,9 +23,11 @@ import FiltroAvancado from "../components/filtro/filtro-avancado";
 import Carregamento from "../../../components/carregamento/carregamento";
 import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
 import { motion } from "framer-motion";
+import CustomSnackbar from "../components/snackbar/snackbar";
 import "./viagens.css";
 
 interface Viagem {
+  id: number;
   veiculo: string;
   motorista: string;
   origem: string;
@@ -72,7 +75,12 @@ export default function Viagens() {
   const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
     {}
   );
-  const isMounted = useRef(true);
+
+  const [snackbarAberto, setSnackbarAberto] = useState(false);
+  const [snackbarMensagem, setSnackbarMensagem] = useState("");
+  const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
+    "primary"
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -99,20 +107,19 @@ export default function Viagens() {
     };
   }, []);
 
-  const viagensData: Viagem[] = dadosApi.map((v) => {
-    return {
-      veiculo: v.apelido_veiculo || "—",
-      motorista: v.nome_motorista || "—",
-      origem: "Origem Temporária",
-      destino: "Destino Temporária",
-      dataSaida: formatarDataISOcomHora(v.data_inicio),
-      dataRetorno: formatarDataISOcomHora(v.data_fim),
-      dataSaidaOriginal: v.data_inicio,
-      dataRetornoOriginal: v.data_fim,
-      kmPercorrido: v.quilometragem_viagem ?? 0,
-      descricao: "Descrição temporária",
-    };
-  });
+  const viagensData: Viagem[] = dadosApi.map((v) => ({
+    id: v.id_viagem,
+    veiculo: v.apelido_veiculo || "—",
+    motorista: v.nome_motorista || "—",
+    origem: "Origem Temporária",
+    destino: "Destino Temporária",
+    dataSaida: formatarDataISOcomHora(v.data_inicio),
+    dataRetorno: formatarDataISOcomHora(v.data_fim),
+    dataSaidaOriginal: v.data_inicio,
+    dataRetornoOriginal: v.data_fim,
+    kmPercorrido: v.quilometragem_viagem ?? 0,
+    descricao: "Descrição temporária",
+  }));
 
   const dadosFiltrados = viagensData.filter((viagem) => {
     const matchesSearch =
@@ -178,8 +185,19 @@ export default function Viagens() {
     setOpen(true);
   };
 
-  const handleExcluir = (item: Viagem) => {
-    console.log("Excluindo item:", item);
+  const handleExcluir = async (item: Viagem) => {
+    try {
+      await deletarViagem(item.id);
+      setDadosApi((prev) => prev.filter((v) => v.id_viagem !== item.id));
+      setSnackbarMensagem("Viagem excluída com sucesso!");
+      setSnackbarCor("primary");
+      setSnackbarAberto(true);
+    } catch (err) {
+      console.error("Erro ao excluir viagem:", err);
+      setSnackbarMensagem("Erro ao excluir viagem. Tente novamente.");
+      setSnackbarCor("light");
+      setSnackbarAberto(true);
+    }
   };
 
   const handleCadastrar = () => {
@@ -294,6 +312,13 @@ export default function Viagens() {
           colunas={colunasViagens.map((c) => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
+        />
+
+        <CustomSnackbar
+          open={snackbarAberto}
+          onClose={() => setSnackbarAberto(false)}
+          message={snackbarMensagem}
+          color={snackbarCor}
         />
       </Box>
     </motion.div>

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AxiosInstance } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 export class ApiGateway {
   private readonly baseUrl = "https://frotavisionapi.onrender.com/api";
@@ -9,35 +9,39 @@ export class ApiGateway {
     this.axiosInstance = axios.create({
       baseURL: this.baseUrl,
       headers: {
-        Accept: "application/json", // força parse como JSON
+        Accept: "application/json",
         "Content-Type": "application/json",
       },
     });
-    
   }
 
-  async get<T = any>(endPoint: string, params: any = {}): Promise<T> {
-    const response = await this.axiosInstance.get<T>(endPoint, { params });
+  async get<T = any>(endPoint: string, params: any = {}, signal?: AbortSignal): Promise<T> {
+    const config: AxiosRequestConfig = { params, signal };
+    const response = await this.axiosInstance.get<T>(endPoint, config);
     return response.data;
   }
 
-  async post<T = any>(endPoint: string, data: any): Promise<T> {
-    const response = await this.axiosInstance.post<T>(endPoint, data);
+  async post<T = any>(endPoint: string, data: any, signal?: AbortSignal): Promise<T> {
+    const config: AxiosRequestConfig = { signal };
+    const response = await this.axiosInstance.post<T>(endPoint, data, config);
     return response.data;
   }
 
-  async put<T = any>(endPoint: string, data: any): Promise<T> {
-    const response = await this.axiosInstance.put<T>(endPoint, data);
+  async put<T = any>(endPoint: string, data: any, signal?: AbortSignal): Promise<T> {
+    const config: AxiosRequestConfig = { signal };
+    const response = await this.axiosInstance.put<T>(endPoint, data, config);
     return response.data;
   }
 
-  async delete<T = any>(endPoint: string): Promise<T> {
-    const response = await this.axiosInstance.delete<T>(endPoint);
+  async delete<T = any>(endPoint: string, signal?: AbortSignal): Promise<T> {
+    const config: AxiosRequestConfig = { signal };
+    const response = await this.axiosInstance.delete<T>(endPoint, config);
     return response.data;
   }
 
-  async patch<T = any>(endPoint: string, data: any): Promise<T> {
-    const response = await this.axiosInstance.patch<T>(endPoint, data);
+  async patch<T = any>(endPoint: string, data: any, signal?: AbortSignal): Promise<T> {
+    const config: AxiosRequestConfig = { signal };
+    const response = await this.axiosInstance.patch<T>(endPoint, data, config);
     return response.data;
   }
 }

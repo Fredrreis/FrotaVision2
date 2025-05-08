@@ -15,6 +15,10 @@ export interface Viagem {
 
 const api = new ApiGateway();
 
-export const listarViagens = async (): Promise<Viagem[]> => {
-  return await api.get<Viagem[]>('/Viagem/ListarDetalhado');
+export const listarViagens = async (signal?: AbortSignal): Promise<Viagem[]> => {
+  return await api.get<Viagem[]>('/Viagem/ListarDetalhado', {}, signal);
+};
+
+export const deletarViagem = async (id: number): Promise<void> => {
+  await api.delete(`/Viagem/Deletar/${id}`);
 };

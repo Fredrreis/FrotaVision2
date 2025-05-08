@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import {
   listarManutencaoRealizada,
+  deletarManutencaoRealizada,
   ManutencaoRealizada,
 } from "@/api/services/manutencaoRealizadaService";
 import TabelaGenerica from "../components/tabela/tabela-generica";
@@ -20,11 +21,13 @@ import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import FiltroAvancado from "../components/filtro/filtro-avancado";
 import Carregamento from "../../../components/carregamento/carregamento";
+import CustomSnackbar from "../components/snackbar/snackbar";
 import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
-import "./manutencoes.css";
 import { motion } from "framer-motion";
+import "./manutencoes.css";
 
 interface Manutencao {
+  id: number;
   veiculo: string;
   tipoVeiculo: string;
   nome: string;
@@ -50,7 +53,6 @@ const colunasManutencoes = [
   { chave: "tipo", titulo: "Tipo", ordenavel: false },
 ];
 
-// 👇 Mapeamento genérico para exportação
 const mapeamentoCampos = {
   Veículo: "veiculo",
   "Tipo Caminhão": "tipoVeiculo",
@@ -74,6 +76,12 @@ export default function Manutencoes() {
   const [openExportar, setOpenExportar] = useState(false);
   const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
     {}
+  );
+
+  const [snackbarAberto, setSnackbarAberto] = useState(false);
+  const [snackbarMensagem, setSnackbarMensagem] = useState("");
+  const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
+    "primary"
   );
 
   useEffect(() => {
@@ -102,6 +110,7 @@ export default function Manutencoes() {
   }, []);
 
   const manutencoesData: Manutencao[] = dadosApi.map((m) => ({
+    id: m.id_manutencao_realizada,
     veiculo: m.apelido || "Desconhecido",
     tipoVeiculo: "Tipo Caminhão",
     nome: m.nome || "—",
@@ -116,10 +125,8 @@ export default function Manutencoes() {
 
   const dadosFiltrados = manutencoesData.filter((m) => {
     const matchSearch =
-      (m.veiculo?.toString().toLowerCase() ?? "").includes(
-        search.toLowerCase()
-      ) ||
-      (m.nome?.toString().toLowerCase() ?? "").includes(search.toLowerCase());
+      (m.veiculo?.toLowerCase() ?? "").includes(search.toLowerCase()) ||
+      (m.nome?.toLowerCase() ?? "").includes(search.toLowerCase());
 
     const matchTipoVeiculo = filtrosAvancados.tipoVeiculo
       ? m.tipoVeiculo === filtrosAvancados.tipoVeiculo
@@ -169,11 +176,7 @@ export default function Manutencoes() {
       type: "select" as const,
       options: tiposVeiculo,
     },
-    {
-      name: "data",
-      label: "Data",
-      type: "data" as const,
-    },
+    { name: "data", label: "Data", type: "data" as const },
     {
       name: "tipo",
       label: "Tipo Manutenção",
@@ -209,8 +212,21 @@ export default function Manutencoes() {
     setOpen(true);
   };
 
-  const handleExcluir = (item: Manutencao) => {
-    console.log("Excluindo item:", item);
+  const handleExcluir = async (item: Manutencao) => {
+    try {
+      await deletarManutencaoRealizada(item.id);
+      setDadosApi((prev) =>
+        prev.filter((m) => m.id_manutencao_realizada !== item.id)
+      );
+      setSnackbarMensagem("Manutenção excluída com sucesso!");
+      setSnackbarCor("primary");
+      setSnackbarAberto(true);
+    } catch (err) {
+      console.error("Erro ao excluir manutenção:", err);
+      setSnackbarMensagem("Erro ao excluir manutenção. Tente novamente.");
+      setSnackbarCor("light");
+      setSnackbarAberto(true);
+    }
   };
 
   const handleCadastrar = () => {
@@ -326,6 +342,13 @@ export default function Manutencoes() {
           colunas={colunasManutencoes.map((c) => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
+        />
+
+        <CustomSnackbar
+          open={snackbarAberto}
+          onClose={() => setSnackbarAberto(false)}
+          message={snackbarMensagem}
+          color={snackbarCor}
         />
       </Box>
     </motion.div>

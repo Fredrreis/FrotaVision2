@@ -2,11 +2,13 @@
 import { useEffect, useState } from "react";
 import {
   listarVeiculos,
+  deletarVeiculo,
   Veiculo as VeiculoAPI,
 } from "@/api/services/veiculoService";
 import TabelaGenerica from "../components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
+import CustomSnackbar from "../components/snackbar/snackbar";
 import {
   Box,
   Typography,
@@ -21,10 +23,11 @@ import IosShareIcon from "@mui/icons-material/IosShare";
 import FiltroAvancado from "../components/filtro/filtro-avancado";
 import Carregamento from "../../../components/carregamento/carregamento";
 import { formatarDataISOcomHora, compareDateISO } from "@/utils/data";
-import "./veiculos.css";
 import { motion } from "framer-motion";
+import "./veiculos.css";
 
 interface Veiculo {
+  id: number;
   placa: string;
   nome: string;
   tipo: string;
@@ -48,7 +51,6 @@ const colunasVeiculos = [
   { chave: "data", titulo: "Data", ordenavel: true },
 ];
 
-// Mapeamento de colunas visíveis -> campos internos
 const mapeamentoCampos = {
   Placa: "placa",
   Nome: "nome",
@@ -71,6 +73,12 @@ export default function Veiculos() {
   const [openExportar, setOpenExportar] = useState(false);
   const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
     {}
+  );
+
+  const [snackbarAberto, setSnackbarAberto] = useState(false);
+  const [snackbarMensagem, setSnackbarMensagem] = useState("");
+  const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
+    "primary"
   );
 
   useEffect(() => {
@@ -102,6 +110,7 @@ export default function Veiculos() {
     .map((v) => {
       const dataOriginal = v.data_cadastro || "";
       return {
+        id: v.id_veiculo,
         placa: v.placa || "—",
         nome: v.apelido || "—",
         tipo: String(v.tipo) || "—",
@@ -159,8 +168,19 @@ export default function Veiculos() {
     setOpen(true);
   };
 
-  const handleExcluir = (item: Veiculo) => {
-    console.log("Excluindo item:", item);
+  const handleExcluir = async (item: Veiculo) => {
+    try {
+      await deletarVeiculo(item.id);
+      setDadosApi((prev) => prev.filter((v) => v.id_veiculo !== item.id));
+      setSnackbarMensagem("Veículo excluído com sucesso!");
+      setSnackbarCor("primary");
+      setSnackbarAberto(true);
+    } catch (err) {
+      console.error("Erro ao excluir veículo:", err);
+      setSnackbarMensagem("Erro ao excluir veículo. Tente novamente.");
+      setSnackbarCor("light");
+      setSnackbarAberto(true);
+    }
   };
 
   const handleCadastrar = () => {
@@ -273,6 +293,13 @@ export default function Veiculos() {
           colunas={colunasVeiculos.map((c) => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
+        />
+
+        <CustomSnackbar
+          open={snackbarAberto}
+          onClose={() => setSnackbarAberto(false)}
+          message={snackbarMensagem}
+          color={snackbarCor}
         />
       </Box>
     </motion.div>

@@ -10,6 +10,12 @@ export interface Motorista {
 
 const api = new ApiGateway();
 
-export const listarMotorista = async (): Promise<Motorista[]> => {
-  return await api.get<Motorista[]>('/Motorista/Listar');
+export const listarMotorista = async (
+  signal?: AbortSignal
+): Promise<Motorista[]> => {
+  return await api.get<Motorista[]>('/Motorista/Listar', {}, signal);
+};
+
+export const deletarMotorista = async (id: number): Promise<void> => {
+  await api.delete(`/Motorista/Deletar/${id}`);
 };

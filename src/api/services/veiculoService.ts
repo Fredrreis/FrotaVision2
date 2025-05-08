@@ -17,6 +17,12 @@ export interface Veiculo {
 
 const api = new ApiGateway();
 
-export const listarVeiculos = async (): Promise<Veiculo[]> => {
-  return await api.get<Veiculo[]>('/Veiculo/Listar');
+export const listarVeiculos = async (
+  signal?: AbortSignal
+): Promise<Veiculo[]> => {
+  return await api.get<Veiculo[]>('/Veiculo/Listar', {}, signal);
+};
+
+export const deletarVeiculo = async (id: number): Promise<void> => {
+  await api.delete(`/Veiculo/Deletar/${id}`);
 };

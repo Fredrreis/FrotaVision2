@@ -2,11 +2,13 @@
 import { useEffect, useState } from "react";
 import {
   listarMotorista,
+  deletarMotorista,
   Motorista as MotoristaAPI,
 } from "@/api/services/motoristaService";
 import TabelaGenerica from "../components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
+import CustomSnackbar from "../components/snackbar/snackbar";
 import {
   Box,
   Typography,
@@ -25,12 +27,13 @@ import { motion } from "framer-motion";
 import "./motoristas.css";
 
 interface Motorista {
+  id: number;
   nome: string;
   dataCadastro: string;
   dataOriginal: string;
   caminhaoDirigido: string;
   ultimaViagem: string;
-  [key: string]: string;
+  [key: string]: string | number;
 }
 
 const colunasMotoristas = [
@@ -64,6 +67,12 @@ export default function Motoristas() {
     {}
   );
 
+  const [snackbarAberto, setSnackbarAberto] = useState(false);
+  const [snackbarMensagem, setSnackbarMensagem] = useState("");
+  const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
+    "primary"
+  );
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -92,6 +101,7 @@ export default function Motoristas() {
   const motoristasData: Motorista[] = dadosApi.map((m) => {
     const dataOriginal = m.data_cadastro || "";
     return {
+      id: m.id_motorista,
       nome: m.nome || "—",
       dataCadastro: formatarDataISOcomHora(dataOriginal),
       dataOriginal,
@@ -140,12 +150,24 @@ export default function Motoristas() {
     setOpen(true);
   };
 
-  const handleExcluir = (item: Motorista) => {
-    console.log("Excluindo item:", item);
+  const handleExcluir = async (item: Motorista) => {
+    try {
+      await deletarMotorista(item.id);
+      setDadosApi((prev) => prev.filter((m) => m.id_motorista !== item.id));
+      setSnackbarMensagem("Motorista excluído com sucesso!");
+      setSnackbarCor("primary");
+      setSnackbarAberto(true);
+    } catch (err) {
+      console.error("Erro ao excluir motorista:", err);
+      setSnackbarMensagem("Erro ao excluir motorista. Tente novamente.");
+      setSnackbarCor("light");
+      setSnackbarAberto(true);
+    }
   };
 
   const handleCadastrar = () => {
     setDados({
+      id: 0,
       nome: "",
       dataCadastro: "",
       dataOriginal: "",
@@ -260,6 +282,13 @@ export default function Motoristas() {
           colunas={colunasMotoristas.map((c) => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
+        />
+
+        <CustomSnackbar
+          open={snackbarAberto}
+          onClose={() => setSnackbarAberto(false)}
+          message={snackbarMensagem}
+          color={snackbarCor}
         />
       </Box>
     </motion.div>

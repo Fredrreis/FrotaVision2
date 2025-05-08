@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   listarUsuarios,
+  deletarUsuario,
   Usuario as UsuarioAPI,
 } from "@/api/services/usuarioService";
 import TabelaGenerica from "../components/tabela/tabela-generica";
@@ -20,6 +21,7 @@ import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import FiltroAvancado from "../components/filtro/filtro-avancado";
 import Carregamento from "../../../components/carregamento/carregamento";
+import CustomSnackbar from "../components/snackbar/snackbar";
 import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
 import { motion } from "framer-motion";
 import "./usuarios.css";
@@ -58,6 +60,12 @@ export default function Usuarios() {
   const [openExportar, setOpenExportar] = useState(false);
   const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
     {}
+  );
+
+  const [snackbarAberto, setSnackbarAberto] = useState(false);
+  const [snackbarMensagem, setSnackbarMensagem] = useState("");
+  const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
+    "primary"
   );
 
   const isMounted = useRef(true);
@@ -133,8 +141,33 @@ export default function Usuarios() {
     setOpen(true);
   };
 
-  const handleExcluir = (item: Usuario) => {
-    console.log("Excluindo item:", item);
+  const handleExcluir = async (item: Usuario) => {
+    try {
+      const usuarioCorrespondente = dadosApi.find(
+        (u) =>
+          u.nome_usuario === item.nome &&
+          u.email === item.email &&
+          formatarDataISOcomHora(u.data_cadastro) === item.data
+      );
+
+      if (!usuarioCorrespondente) {
+        throw new Error("Usuário não encontrado na lista original.");
+      }
+
+      await deletarUsuario(usuarioCorrespondente.id_usuario);
+      setDadosApi((prev) =>
+        prev.filter((u) => u.id_usuario !== usuarioCorrespondente.id_usuario)
+      );
+
+      setSnackbarMensagem("Usuário excluído com sucesso!");
+      setSnackbarCor("primary");
+      setSnackbarAberto(true);
+    } catch (err) {
+      console.error("Erro ao excluir usuário:", err);
+      setSnackbarMensagem("Erro ao excluir usuário. Tente novamente.");
+      setSnackbarCor("light");
+      setSnackbarAberto(true);
+    }
   };
 
   const handleCadastrar = () => {
@@ -250,6 +283,13 @@ export default function Usuarios() {
           colunas={colunasUsuarios.map((c) => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
+        />
+
+        <CustomSnackbar
+          open={snackbarAberto}
+          onClose={() => setSnackbarAberto(false)}
+          message={snackbarMensagem}
+          color={snackbarCor}
         />
       </Box>
     </motion.div>

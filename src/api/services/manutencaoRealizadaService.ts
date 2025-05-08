@@ -2,7 +2,10 @@ import { ApiGateway } from '../api';
 
 export interface ManutencaoRealizada {
   id_manutencao_realizada: number;
+  id_veiculo: number;
+  id_manutencao: number;
   apelido: string;
+  descricao: string;
   //tipo do caminhão
   quilometragem_ultima_manutencao: number;
   horasMotorManutencao: number;
@@ -15,6 +18,19 @@ export interface ManutencaoRealizada {
 
 const api = new ApiGateway();
 
-export const listarManutencaoRealizada = async (): Promise<ManutencaoRealizada[]> => {
-  return await api.get<ManutencaoRealizada[]>('/ManutencaoRealizada/ListarDetalhado');
+export const listarManutencaoRealizada = async (
+  signal?: AbortSignal
+): Promise<ManutencaoRealizada[]> => {
+  return await api.get<ManutencaoRealizada[]>(
+    '/ManutencaoRealizada/ListarDetalhado',
+    {},
+    signal
+  );
+};
+
+export const deletarManutencaoRealizada = async (
+  id: number,
+  signal?: AbortSignal
+): Promise<void> => {
+  await api.delete<void>(`/ManutencaoRealizada/Deletar/${id}`, signal);
 };
