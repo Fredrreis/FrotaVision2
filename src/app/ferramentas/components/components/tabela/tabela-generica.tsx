@@ -22,6 +22,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
+import VisualizarVeiculo from "../visualizar-veiculo/visualizar-veiculo";
 import "./tabela-generica.css";
 
 interface TabelaProps<T extends Record<string, unknown>> {
@@ -30,6 +31,7 @@ interface TabelaProps<T extends Record<string, unknown>> {
   onEditar: (item: T) => void;
   onExcluir?: (item: T) => void;
   exibirExaminar?: boolean;
+  onExaminar?: (item: T) => void;
 }
 
 const MAX_CHAR = 20;
@@ -44,11 +46,15 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
   onEditar,
   onExcluir,
   exibirExaminar = false,
+  onExaminar,
 }: TabelaProps<T>) {
   const [orderBy, setOrderBy] = useState<keyof T | null>(null);
   const [order, setOrder] = useState<"asc" | "desc" | null>(null);
   const [openModal, setOpenModal] = useState(false);
   const [itemSelecionado, setItemSelecionado] = useState<T | null>(null);
+
+  const [openVisualizar, setOpenVisualizar] = useState(false);
+  const [itemVisualizar, setItemVisualizar] = useState<T | null>(null);
 
   const handleSort = (coluna: keyof T, ordenavel: boolean) => {
     if (!ordenavel) return;
@@ -150,8 +156,15 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
                 })}
                 <TableCell>
                   {exibirExaminar && (
-                    <Tooltip title="Examinar" arrow>
-                      <VisibilityIcon className="icone-acao examinar" />
+                    <Tooltip title="Visualizar" arrow>
+                      <VisibilityIcon
+                        className="icone-acao examinar"
+                        onClick={() => {
+                          setItemVisualizar(item);
+                          setOpenVisualizar(true);
+                          onExaminar?.(item);
+                        }}
+                      />
                     </Tooltip>
                   )}
                   <Tooltip title="Editar" arrow>
@@ -209,6 +222,40 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
           </DialogActions>
         </DialogContent>
       </Dialog>
+
+      {itemVisualizar && (
+        <VisualizarVeiculo
+          open={openVisualizar}
+          onClose={() => {
+            setOpenVisualizar(false);
+            setItemVisualizar(null);
+          }}
+          veiculo={{
+            placa: String(itemVisualizar["placa"]),
+            chassi: String(itemVisualizar["chassi"]),
+            ano: Number(itemVisualizar["ano"]),
+            km: Number(itemVisualizar["km"]),
+            dataCadastro: String(itemVisualizar["data"]),
+            motorista: "Marcos D’avila", // mock
+            descricao: String(itemVisualizar["descricao"]),
+            manutencao: {
+              total: 1,
+              ultima: "Freio",
+              dataUltima: "10/04/2024",
+            },
+            preventiva: {
+              total: 1,
+              pendente: "Troca de Pneus",
+              dataNotificacao: "10/11/2024",
+            },
+            viagens: {
+              total: 12,
+              ultima: "São João Del Rey(MG) - Ribeirão das Neves(MG)",
+              dataUltima: "07/11/2024",
+            },
+          }}
+        />
+      )}
     </>
   );
 }

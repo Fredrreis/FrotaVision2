@@ -8,7 +8,7 @@ import {
 import TabelaGenerica from "../components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
-import CustomSnackbar from "../components/snackbar/snackbar";
+import CustomSnackbar from "../../../components/snackbar/snackbar";
 import {
   Box,
   Typography,

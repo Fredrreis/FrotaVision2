@@ -23,7 +23,7 @@ import FiltroAvancado from "../components/filtro/filtro-avancado";
 import Carregamento from "../../../components/carregamento/carregamento";
 import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
 import { motion } from "framer-motion";
-import CustomSnackbar from "../components/snackbar/snackbar";
+import CustomSnackbar from "../../../components/snackbar/snackbar";
 import "./viagens.css";
 
 interface Viagem {

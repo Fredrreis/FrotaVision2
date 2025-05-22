@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import IosShareIcon from "@mui/icons-material/IosShare";
-import SnackBarCustomizada from "../snackbar/snackbar";
+import SnackBarCustomizada from "../../../../components/snackbar/snackbar";
 import FormatIndentIncreaseIcon from "@mui/icons-material/FormatIndentIncrease";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ArticleIcon from "@mui/icons-material/Article";

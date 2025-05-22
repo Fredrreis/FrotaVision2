@@ -1,0 +1,71 @@
+.modal-container {
+  border-radius: 0.40rem !important;
+}
+
+.modal-titulo-visualizar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0.40rem !important;
+}
+
+.icone-seta {
+  font-size: 1.3rem;
+  color: #000000;
+}
+
+.modal-close-button {
+  background: none !important;
+  padding: 0.3rem !important;
+}
+
+.modal-formulario-visualizar {
+  padding: 2rem 3rem 2rem 3rem !important;
+}
+
+.grid-infos {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 600px) {
+  .grid-infos {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1rem;
+  }
+}
+
+.descricao {
+  margin-bottom: 1.5rem;
+}
+
+.divider {
+  margin: 1rem 0 1rem 0 !important;
+  font-size: 0.875rem !important;
+  color: gray !important;
+}
+
+.card-info {
+  border-radius: 0.4rem !important;
+  padding: 1rem !important;
+  margin-bottom: 1rem !important;
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+}
+
+.card-info.azul {
+  background-color: #dfeaff;
+  border-left: 5px solid #1b3562;
+}
+
+.card-info.vermelho {
+  background-color: #fddcdc;
+  border-left: 5px solid #a30d11;
+}
+
+.card-info.verde {
+  background-color: #defbe0;
+  border-left: 5px solid #168821;
+}

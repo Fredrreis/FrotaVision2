@@ -18,6 +18,12 @@ export interface ManutencaoRealizada {
 
 const api = new ApiGateway();
 
+export const cadastrarManutencaoRealizada = async (
+  manutencao: ManutencaoRealizada
+): Promise<void> => {
+  await api.post('/ManutencaoRealizada/Cadastrar', manutencao);
+};
+
 export const listarManutencaoRealizada = async (
   signal?: AbortSignal
 ): Promise<ManutencaoRealizada[]> => {

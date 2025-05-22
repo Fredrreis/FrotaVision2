@@ -8,7 +8,7 @@ import {
 import TabelaGenerica from "../components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
-import CustomSnackbar from "../components/snackbar/snackbar";
+import CustomSnackbar from "../../../components/snackbar/snackbar";
 import {
   Box,
   Typography,
@@ -194,6 +194,10 @@ export default function Veiculos() {
     setOpen(false);
   };
 
+  const handleVisualizar = (item: Veiculo) => {
+    console.log("Visualizar veículo:", item);
+  };
+
   if (carregando) {
     return <Carregamento animationUrl="/lotties/carregamento.json" />;
   }
@@ -264,7 +268,8 @@ export default function Veiculos() {
           dados={dadosFiltrados}
           onEditar={handleEditar}
           onExcluir={handleExcluir}
-          exibirExaminar={false}
+          exibirExaminar={true}
+          onExaminar={handleVisualizar}
         />
 
         <ModalFormulario<Veiculo>

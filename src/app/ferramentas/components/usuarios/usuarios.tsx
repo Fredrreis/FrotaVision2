@@ -21,7 +21,7 @@ import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import FiltroAvancado from "../components/filtro/filtro-avancado";
 import Carregamento from "../../../components/carregamento/carregamento";
-import CustomSnackbar from "../components/snackbar/snackbar";
+import CustomSnackbar from "../../../components/snackbar/snackbar";
 import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
 import { motion } from "framer-motion";
 import "./usuarios.css";
