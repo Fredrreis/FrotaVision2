@@ -184,7 +184,12 @@ export default function Motoristas() {
   };
 
   if (carregando) {
-    return <Carregamento animationUrl="/lotties/carregamento.json" />;
+    return (
+      <Carregamento
+        animationUrl="/lotties/carregamento.json"
+        mensagem="Carregando Motoristas..."
+      />
+    );
   }
 
   return (

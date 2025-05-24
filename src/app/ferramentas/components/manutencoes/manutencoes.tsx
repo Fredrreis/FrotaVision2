@@ -244,7 +244,12 @@ export default function Manutencoes() {
   };
 
   if (carregando) {
-    return <Carregamento animationUrl="/lotties/carregamento.json" />;
+    return (
+      <Carregamento
+        animationUrl="/lotties/carregamento.json"
+        mensagem="Carregando Manutenções..."
+      />
+    );
   }
 
   return (

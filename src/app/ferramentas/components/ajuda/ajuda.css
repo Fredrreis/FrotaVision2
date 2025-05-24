@@ -1,0 +1,35 @@
+.ajuda-container {
+  padding: 2rem;
+  background-color: inherit;
+}
+
+.ajuda-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.ajuda-title {
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.icon-title {
+  margin-right: 0.5rem !important;
+  font-size: 1.7rem !important;
+}
+
+.ajuda-lista {
+  margin-top: 1rem;
+}
+
+.ajuda-lista ul {
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ajuda-lista li {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}

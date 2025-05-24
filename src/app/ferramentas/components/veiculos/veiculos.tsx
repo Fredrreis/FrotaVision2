@@ -17,8 +17,8 @@ import {
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import TimelineIcon from "@mui/icons-material/Timeline";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import FiltroAvancado from "../components/filtro/filtro-avancado";
 import Carregamento from "../../../components/carregamento/carregamento";
@@ -199,8 +199,14 @@ export default function Veiculos() {
   };
 
   if (carregando) {
-    return <Carregamento animationUrl="/lotties/carregamento.json" />;
+    return (
+      <Carregamento
+        animationUrl="/lotties/carregamento.json"
+        mensagem="Carregando Veículos..."
+      />
+    );
   }
+  
 
   return (
     <motion.div
@@ -212,7 +218,7 @@ export default function Veiculos() {
       <Box className="veiculos-container">
         <Box className="veiculos-header">
           <Typography variant="h6" className="veiculos-title">
-            <TimelineIcon className="icon-title" /> VEÍCULOS
+            <LocalShippingIcon className="icon-title" /> VEÍCULOS
           </Typography>
         </Box>
 

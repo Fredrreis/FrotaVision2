@@ -185,7 +185,12 @@ export default function Usuarios() {
   };
 
   if (carregando) {
-    return <Carregamento animationUrl="/lotties/carregamento.json" />;
+    return (
+      <Carregamento
+        animationUrl="/lotties/carregamento.json"
+        mensagem="Carregando Usuários..."
+      />
+    );
   }
 
   return (

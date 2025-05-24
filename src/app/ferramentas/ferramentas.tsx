@@ -11,6 +11,7 @@ import Motoristas from "./components/motoristas/motoristas";
 import Manutencoes from "./components/manutencoes/manutencoes";
 import Viagens from "./components/viagens/viagens";
 import Usuarios from "./components/usuarios/usuarios";
+import Ajuda from "./components/ajuda/ajuda";
 
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -53,6 +54,9 @@ export const Ferramentas: React.FC = () => {
         break;
       case "NOTIFICAÇÕES":
         componente = <Notificacoes />;
+        break;
+      case "AJUDA":
+        componente = <Ajuda />;
         break;
       default:
     }
