@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   listarMotorista,
   deletarMotorista,
+  cadastrarMotorista,
   Motorista as MotoristaAPI,
 } from "@/api/services/motoristaService";
 import TabelaGenerica from "../components/tabela/tabela-generica";
@@ -178,9 +179,46 @@ export default function Motoristas() {
     setOpen(true);
   };
 
-  const handleSalvar = () => {
-    console.log(modoEdicao ? "Salvando edição:" : "Cadastrando novo:", dados);
-    setOpen(false);
+  const handleSalvar = async () => {
+    try {
+      if (!dados?.nome) {
+        alert("Nome é obrigatório");
+        return;
+      }
+
+      const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+      const cnpj = user?.cnpj;
+      if (!cnpj) {
+        alert("Erro: CNPJ não encontrado na sessão.");
+        return;
+      }
+
+      const payload = {
+        id_motorista: 0,
+        nome: dados.nome,
+        data_cadastro: new Date().toISOString(),
+        cnpj,
+        habilitado: true,
+      };
+
+      await cadastrarMotorista(payload);
+
+      setSnackbarMensagem("Motorista cadastrado com sucesso!");
+      setSnackbarCor("primary");
+      setSnackbarAberto(true);
+      setOpen(false);
+      setCarregando(true);
+
+      const res = await listarMotorista();
+      setDadosApi(res);
+    } catch (err) {
+      console.error("Erro ao cadastrar motorista:", err);
+      setSnackbarMensagem("Erro ao cadastrar motorista.");
+      setSnackbarCor("light");
+      setSnackbarAberto(true);
+    } finally {
+      setCarregando(false);
+    }
   };
 
   if (carregando) {

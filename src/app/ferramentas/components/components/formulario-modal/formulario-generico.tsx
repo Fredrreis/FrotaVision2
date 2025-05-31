@@ -15,9 +15,10 @@ import "./formulario-generico.css";
 interface Coluna {
   chave: string;
   titulo: string;
-  tipo?: "texto" | "selecao" | "area";
+  tipo?: "texto" | "selecao" | "area" | "custom";
   opcoes?: string[];
   desativado?: boolean;
+  componente?: React.ReactNode; // para campos tipo custom
 }
 
 interface ModalProps<T extends Record<string, unknown>> {
@@ -28,6 +29,8 @@ interface ModalProps<T extends Record<string, unknown>> {
   dados: T | null;
   setDados: (novosDados: T) => void;
   modoEdicao: boolean;
+  children?: React.ReactNode;
+  ocultarCabecalho?: boolean;
 }
 
 export default function ModalFormulario<T extends Record<string, unknown>>({
@@ -38,6 +41,8 @@ export default function ModalFormulario<T extends Record<string, unknown>>({
   dados,
   setDados,
   modoEdicao,
+  children,
+  ocultarCabecalho = false,
 }: ModalProps<T>) {
   useEffect(() => {
     if (!dados) {
@@ -59,25 +64,41 @@ export default function ModalFormulario<T extends Record<string, unknown>>({
       classes={{ paper: "modal-container" }}
     >
       <DialogContent className="modal-formulario">
-        <Box className="modal-titulo">
-          <ArrowForwardIcon className="icone-seta" />
-          <Typography variant="h6" fontWeight={600} fontSize={"1.1rem"}>
-            {modoEdicao ? "EDIÇÃO" : "CADASTRAR"}
-          </Typography>
-        </Box>
-        <Typography
-          variant="body2"
-          sx={{ marginBottom: "1.5rem", color: "black" }}
-        >
-          {modoEdicao
-            ? "Por gentileza modifique como desejar as informações abaixo:"
-            : "Preencha o(s) campo(s) para cadastrar um novo item:"}
-        </Typography>
+        {children}
+
+        {!ocultarCabecalho && (
+          <>
+            <Box className="modal-titulo">
+              <ArrowForwardIcon className="icone-seta" />
+              <Typography variant="h6" fontWeight={600} fontSize={"1.1rem"}>
+                {modoEdicao ? "EDIÇÃO" : "CADASTRAR"}
+              </Typography>
+            </Box>
+
+            <Typography
+              variant="body2"
+              sx={{ marginBottom: "1.5rem", color: "black" }}
+            >
+              {modoEdicao
+                ? "Por gentileza modifique como desejar as informações abaixo:"
+                : "Preencha o(s) campo(s) para cadastrar um novo item:"}
+            </Typography>
+          </>
+        )}
 
         {colunas.map(
-          ({ chave, titulo, tipo = "texto", opcoes, desativado }) => (
+          ({
+            chave,
+            titulo,
+            tipo = "texto",
+            opcoes,
+            desativado,
+            componente,
+          }) => (
             <Box key={chave} className="modal-form-group">
-              {tipo === "selecao" ? (
+              {tipo === "custom" && componente ? (
+                componente
+              ) : tipo === "selecao" ? (
                 <TextField
                   select
                   label={titulo}

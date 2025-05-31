@@ -1,0 +1,48 @@
+.usuario-dropdown-container {
+  width: 240px;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: white;
+}
+
+.usuario-dropdown-header {
+  text-align: center;
+}
+
+.usuario-avatar {
+  width: 56px !important;
+  height: 56px !important;
+  margin: 0 auto !important;
+  color: #646464!important;
+}
+
+.usuario-nome {
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  color: black !important;
+}
+
+.usuario-email {
+  font-size: 0.75rem !important;
+  color: #666 !important;
+}
+
+.button-configuracoes,
+.button-sair {
+  background-color: transparent !important;
+  color: #646464 !important;
+  justify-content: flex-start !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  transition: color 0.3s ease-in-out;
+}
+
+.button-configuracoes {
+  margin-bottom: 0.5rem !important;
+}
+
+.button-configuracoes:hover,
+.button-sair:hover {
+  background-color: rgba(27, 53, 98, 0.05) !important;
+}

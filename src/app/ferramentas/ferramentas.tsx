@@ -18,10 +18,13 @@ import { AnimatePresence, motion } from "framer-motion";
 export const Ferramentas: React.FC = () => {
   const [paginaAtiva, setPaginaAtiva] = useState("NOTIFICAÇÕES");
   const [isMobile, setIsMobile] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(true);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setMenuVisible(true); // garante menuDrawer visível no mobile
     };
 
     handleResize();
@@ -78,7 +81,11 @@ export const Ferramentas: React.FC = () => {
 
   return (
     <Box className={`ferramentas-container ${isMobile ? "mobile" : ""}`}>
-      <MenuFerramentas onMenuClick={handleMenuClick} />
+      <MenuFerramentas
+        onMenuClick={handleMenuClick}
+        visible={menuVisible}
+        onToggleMenu={() => setMenuVisible((prev) => !prev)}
+      />
       <Box className="conteudo-principal">{renderizarConteudo()}</Box>
     </Box>
   );

@@ -24,6 +24,14 @@
   margin-top: 1rem;
 }
 
+.passo-a-passo-container {
+  transition: all 0.2s ease;
+}
+
+.passo-a-passo-container.Mui-expanded {
+  border-radius: 0.35rem !important;
+}
+
 .ajuda-lista ul {
   padding-left: 1rem;
   margin-bottom: 1rem;
@@ -32,4 +40,10 @@
 .ajuda-lista li {
   margin-bottom: 0.5rem;
   font-size: 1rem;
+}
+
+.ajuda-contato {
+  margin-top: 2rem;
+  background-color: #f4f6f8;
+  border-radius: 0.5rem;
 }

@@ -52,6 +52,11 @@
     font-weight: 600 !important;
 }
 
+.sucesso-register-icon{
+    color: #838383 !important;
+    margin-right: 0.2rem !important;
+}
+
 .register-title {
     font-weight: 600 !important;
     align-self: flex-start;
@@ -156,8 +161,12 @@
         font-size: 0.8rem !important;
     }
 
-    .register-divider{
+    .register-divider, .register-step {
         font-size: 0.8rem !important;
+    }
+
+    .sucesso-register-icon {
+        font-size: 1rem !important;
     }
 
     .register-social-buttons {

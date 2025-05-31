@@ -1,26 +1,20 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { motion } from "framer-motion";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Divider,
-  Toolbar,
-} from "@mui/material";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Box, Typography, Toolbar, Button } from "@mui/material";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import Passo1 from "./components/passos/passo-1";
+import Passo2 from "./components/passos/passo-2";
+import Passo3 from "./components/passos/passo-3";
+import TelaSucesso from "./components/register-sucesso/register-sucesso";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
 import LogoFrotaVision from "../../img/FrotaVisionLogo.png";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ArrowBackwardsIcon from "@mui/icons-material/ArrowBack";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-
 import "./register.css";
-import GoogleIcon from "../../img/google.png";
-import MicrosoftIcon from "../../img/microsoft.png";
+import { cadastrarEmpresa } from "@/api/services/empresaService";
+import { cadastrarUsuario } from "../../../api/services/usuarioService";
 
 export default function Register() {
   return (
@@ -33,28 +27,10 @@ export default function Register() {
 function RegisterContent() {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
 
-  const searchParams = useSearchParams();
   const planoCodificado = searchParams.get("plano");
-
-  let planoSelecionado = {
-    nome: null,
-    preco: null,
-    dispositivos: null,
-    usuarios: null,
-    veiculos: null,
-    relatorio: null,
-    recomendado: false,
-  };
-
-  if (planoCodificado) {
-    try {
-      planoSelecionado = JSON.parse(decodeURIComponent(planoCodificado));
-    } catch (error) {
-      console.error("Erro ao decodificar os parâmetros do plano:", error);
-    }
-  }
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -64,15 +40,35 @@ function RegisterContent() {
     cnpj: "",
   });
 
+  const [planoSelecionado, setPlanoSelecionado] = useState<null | {
+    nome: string;
+    preco: string;
+    dispositivos: string;
+    usuarios: string;
+    veiculos: string;
+    relatorio: string;
+    recomendado: boolean;
+  }>(null);
+
   useEffect(() => {
     if (session?.user?.email) {
-      setFormData((prevData) => ({
-        ...prevData,
-        email: session?.user?.email ?? "",
+      setFormData((prev) => ({
+        ...prev,
+        email: session.user?.email ?? "",
       }));
       setStep(2);
     }
   }, [session]);
+
+  useEffect(() => {
+    if (planoCodificado) {
+      try {
+        setPlanoSelecionado(JSON.parse(decodeURIComponent(planoCodificado)));
+      } catch (error) {
+        console.error("Erro ao decodificar o plano:", error);
+      }
+    }
+  }, [planoCodificado]);
 
   useEffect(() => {
     const handleRouteChange = (url: string) => {
@@ -96,27 +92,101 @@ function RegisterContent() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const nextStep = () => setStep(step + 1);
-  const prevStep = () => setStep(step - 1);
+  const nextStep = () => setStep((s) => s + 1);
+  const prevStep = () => setStep((s) => s - 1);
 
   const handleRegister = async () => {
-    alert("Cadastro concluído!");
-    if (session) {
-      await signOut({ redirect: false });
+    try {
+      const planoNome = planoSelecionado?.nome?.toUpperCase() ?? "";
+      let idPlano = 0;
+
+      switch (planoNome) {
+        case "PADRÃO":
+          idPlano = 1;
+          break;
+        case "PREMIUM":
+          idPlano = 2;
+          break;
+        case "PREMIUM PLUS":
+          idPlano = 3;
+          break;
+        default:
+          idPlano = 0;
+      }
+
+      const empresaPayload = {
+        cnpj: formData.cnpj,
+        nome_social: formData.empresa,
+        data_cadastro: new Date().toISOString(),
+        id_plano: idPlano,
+        habilitado: true,
+      };
+      await cadastrarEmpresa(empresaPayload);
+
+      const usuarioPayload = {
+        id_usuario: 0,
+        email: formData.email,
+        senha: formData.password,
+        nome_usuario: formData.empresa,
+        data_cadastro: new Date().toISOString(),
+        cnpj: formData.cnpj,
+        permissoes_usuario: 1,
+        habilitado: true,
+      };
+      await cadastrarUsuario(usuarioPayload);
+
+      if (session) await signOut({ redirect: false });
+      setStep(4); // vai para TelaSucesso
+    } catch (error) {
+      console.error("Erro ao cadastrar:", error);
+      alert("Erro ao realizar cadastro. Verifique os dados e tente novamente.");
     }
-    router.push("/");
   };
 
   const handleGoogleSignIn = async () => {
     try {
       const result = await signIn("google", { redirect: false });
-      if (!result?.error) {
-        // Sessão será atualizada automaticamente
-      } else {
+      if (result?.error) {
         alert("Erro ao fazer login com o Google.");
       }
     } catch (error) {
-      console.error("Erro ao autenticar com o Google:", error);
+      console.error("Erro no login Google:", error);
+    }
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <Passo1
+            formData={formData}
+            handleChange={handleChange}
+            nextStep={nextStep}
+            handleGoogleSignIn={handleGoogleSignIn}
+          />
+        );
+      case 2:
+        return (
+          <Passo2
+            formData={formData}
+            handleChange={handleChange}
+            nextStep={nextStep}
+            prevStep={prevStep}
+          />
+        );
+      case 3:
+        return (
+          <Passo3
+            formData={formData}
+            plano={planoSelecionado}
+            handleRegister={handleRegister}
+            prevStep={prevStep}
+          />
+        );
+      case 4:
+        return <TelaSucesso />;
+      default:
+        return null;
     }
   };
 
@@ -147,178 +217,31 @@ function RegisterContent() {
 
       <Box className="register-form">
         <Typography className="register-step" variant="body2">
-          PASSO {step} DE 3
+          {step <= 3 ? (
+            `PASSO ${step} DE 3`
+          ) : (
+            <>
+              <DoneAllIcon
+                sx={{ color: "#838383", mr: 1 }}
+                className="sucesso-register-icon"
+              />
+              Cadastro Finalizado
+            </>
+          )}
         </Typography>
 
-        {step === 1 && (
-          <>
-            <Typography variant="h5" className="register-title">
-              Criar Conta
-            </Typography>
-            <Typography variant="body2" className="register-instructions">
-              Primeiramente vamos definir o e-mail e senha
-            </Typography>
-            <TextField
-              name="email"
-              label="E-mail"
-              variant="outlined"
-              fullWidth
-              value={formData.email}
-              onChange={handleChange}
-              sx={{ marginBottom: 2 }}
-            />
-            <TextField
-              name="password"
-              label="Senha"
-              type="password"
-              variant="outlined"
-              fullWidth
-              value={formData.password}
-              onChange={handleChange}
-              sx={{ marginBottom: 2 }}
-            />
-            <Button
-              variant="contained"
-              fullWidth
-              className="register-button"
-              endIcon={<ArrowForwardIcon />}
-              onClick={nextStep}
-            >
-              CONTINUAR
-            </Button>
-            <Divider className="register-divider">ou</Divider>
-            <Box className="register-social-buttons">
-              <Button
-                variant="outlined"
-                className="register-social-button"
-                onClick={handleGoogleSignIn}
-              >
-                <Image
-                  src={GoogleIcon}
-                  alt="Google Icon"
-                  width={20}
-                  height={20}
-                />
-                Sign in com Google
-              </Button>
-              <Button
-                variant="outlined"
-                className="register-social-button"
-                disabled
-              >
-                <Image
-                  src={MicrosoftIcon}
-                  alt="Microsoft Icon"
-                  width={20}
-                  height={20}
-                />
-                Sign in com Microsoft
-              </Button>
-            </Box>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            <Typography variant="h5" className="register-title">
-              Dados da Empresa
-            </Typography>
-            <Typography variant="body2" className="register-instructions">
-              Agora vamos preencher os dados empresariais
-            </Typography>
-            <TextField
-              name="empresa"
-              label="Nome da Empresa"
-              variant="outlined"
-              fullWidth
-              value={formData.empresa}
-              onChange={handleChange}
-              sx={{ marginBottom: 2 }}
-            />
-            <TextField
-              name="cnpj"
-              label="CNPJ"
-              variant="outlined"
-              fullWidth
-              value={formData.cnpj}
-              onChange={handleChange}
-              sx={{ marginBottom: 2 }}
-            />
-            <Button
-              variant="contained"
-              fullWidth
-              className="register-button"
-              endIcon={<ArrowForwardIcon />}
-              onClick={nextStep}
-            >
-              CONTINUAR
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              className="register-button-back"
-              endIcon={<ArrowBackwardsIcon />}
-              onClick={prevStep}
-            >
-              VOLTAR
-            </Button>
-          </>
-        )}
-
-        {step === 3 && (
-          <>
-            <CheckCircleIcon className="register-check-circle-icon" />
-            <Typography variant="h5" className="register-title">
-              Confirme seus dados
-            </Typography>
-            <Typography variant="body2" className="register-instructions">
-              Verifique o plano selecionado e confira as credenciais
-            </Typography>
-            <Box className="register-plano-selecionado">
-              <Typography variant="body2" sx={{ fontSize: "1rem" }}>
-                <strong>Plano {planoSelecionado.nome}</strong>
-              </Typography>
-              <Typography variant="body2" sx={{ fontSize: "0.875rem" }}>
-                <strong>{planoSelecionado.preco}</strong>/mês
-              </Typography>
-              <Typography variant="body2" sx={{ fontSize: "0.875rem" }}>
-                {planoSelecionado.dispositivos} - {planoSelecionado.usuarios} -{" "}
-                {planoSelecionado.veiculos} - Relatório:{" "}
-                {planoSelecionado.relatorio}
-              </Typography>
-            </Box>
-            <Typography
-              variant="body2"
-              className="register-campo"
-              sx={{ marginTop: "2vh" }}
-            >
-              <strong>E-mail:</strong> {formData.email}
-            </Typography>
-            <Typography variant="body2" className="register-campo">
-              <strong>Empresa:</strong> {formData.empresa}
-            </Typography>
-            <Typography variant="body2" className="register-campo">
-              <strong>CNPJ:</strong> {formData.cnpj}
-            </Typography>
-            <Button
-              variant="contained"
-              className="register-button"
-              fullWidth
-              onClick={handleRegister}
-            >
-              CONCLUIR ASSINATURA
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              className="register-button-back"
-              endIcon={<ArrowBackwardsIcon />}
-              onClick={prevStep}
-            >
-              VOLTAR
-            </Button>
-          </>
-        )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.3 }}
+            style={{ width: "100%" }}
+          >
+            {renderStep()}
+          </motion.div>
+        </AnimatePresence>
       </Box>
     </motion.div>
   );

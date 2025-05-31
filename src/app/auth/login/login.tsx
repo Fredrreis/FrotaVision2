@@ -10,6 +10,7 @@ import GoogleIcon from "../../img/google.png";
 import MicrosoftIcon from "../../img/microsoft.png";
 import LogoFrotaVisionV2 from "../../img/FrotaVisionLogoV2.png";
 import "./login.css";
+import { loginUsuario } from "../../../api/services/usuarioService";
 
 export default function Login() {
   const router = useRouter();
@@ -17,13 +18,25 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   const handleManualLogin = async () => {
-    router.push(`/ferramentas`);
+    try {
+      const response = await loginUsuario(email, password);
 
-    // if (result?.ok) {
-    //   alert("Login com e-mail e senha bem-sucedido!");
-    // } else {
-    //   alert("E-mail ou senha inválidos");
-    // }
+      sessionStorage.setItem(
+        "user",
+        JSON.stringify({
+          nome: response.nome,
+          cnpj: response.cnpj,
+          permissao: response.permissao,
+          email,
+        })
+      );
+
+      alert(response.message);
+      router.push("/ferramentas");
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      alert("E-mail ou senha inválidos.");
+    }
   };
 
   const handleGoogleLogin = () => {

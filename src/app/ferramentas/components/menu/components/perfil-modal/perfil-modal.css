@@ -1,0 +1,32 @@
+.perfil-container {
+  text-align: center;
+  margin: 1.5rem 0 0.8rem 0;
+}
+
+.perfil-avatar {
+  width: 64px !important;
+  height: 64px !important;
+  color: #444 !important;
+  margin-bottom: 0.8rem !important;
+}
+
+/* Reduz o espaço entre o checkbox e os campos de senha */
+.perfil-campo-senha {
+  margin-top: 0.5rem !important;
+}
+
+
+.perfil-editar-senha-checkbox {
+  font-size: 0.85rem !important;
+  color: #000000 !important;
+  margin-bottom: 0 !important;
+}
+
+.perfil-editar-senha-checkbox .MuiTypography-root {
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+}
+
+.perfil-editar-senha-checkbox .MuiSvgIcon-root {
+  font-size: 1.1rem !important;
+}

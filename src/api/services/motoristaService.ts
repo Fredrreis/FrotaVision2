@@ -10,6 +10,17 @@ export interface Motorista {
 
 const api = new ApiGateway();
 
+export const cadastrarMotorista = async (motorista: {
+  id_motorista: number;
+  nome: string;
+  data_cadastro: string;
+  cnpj: string;
+  habilitado: boolean;
+}): Promise<void> => {
+  const api = new ApiGateway();
+  await api.post("/Motorista/Cadastrar", motorista);
+};
+
 export const listarMotorista = async (
   signal?: AbortSignal
 ): Promise<Motorista[]> => {

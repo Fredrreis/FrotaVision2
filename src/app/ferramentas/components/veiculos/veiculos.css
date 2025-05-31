@@ -45,7 +45,7 @@
 /* Container de botões */
 .botoes-container {
   display: flex;
-  min-width: 20rem;        /* 👈 garante espaço para os botões */
+  min-width: 20rem;
   justify-content: space-between;
 }
 
@@ -62,7 +62,7 @@
 }
 
 .botao-cadastrar{
-  min-width: 12rem !important;  /* 👈 largura confortável */
+  min-width: 12rem !important;
   max-width: 100% !important;
 }
 

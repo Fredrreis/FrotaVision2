@@ -1,195 +1,285 @@
 .menu-container {
-    width: 15.6rem;
-    min-width: 15.6rem;
-    min-height: 100vh;
-    height: auto;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0.2vw 0 0.5vw rgba(0, 0, 0, 0.1);
+  width: 15.6rem;
+  min-width: 15.6rem;
+  min-height: 100vh;
+  height: auto;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0.2vw 0 0.5vw rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, left 0.3s ease-in-out;
+  position: relative;
+  z-index: 100;
+}
+
+.menu-container.slide-out {
+  position: absolute;
+  transform: translateX(-100%);
+  left: 0;
 }
 
 .menu-header {
-    background-color: #1B3562;
-    padding: 0.5vh; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+  background-color: #1B3562;
+  padding: 0.5vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .menu-logo {
-    width: 10rem;
-    height: auto;
+  width: 9rem;
+  height: auto;
+  margin: 0 auto;
 }
 
 .menu-icons-header {
-    display: flex;
-    gap: 1vw;
+  display: flex;
+  gap: 1vw;
+  margin-left: auto;
 }
 
 .avatar-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 768px) {
-    .avatar-icon {
-        display: none !important;
-    }
+  .avatar-icon {
+    display: none !important;
+  }
+}
+
+.menu-hamburguer {
+  color: white;
+  margin-left: auto;
 }
 
 .menu-lateral {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .user-info {
-    text-align: center;
-    padding: 2vh 0;
-    background-color: white;
+  display: flex !important;
+  background-color: #e7e7e7 !important;
+  cursor: pointer !important;
+  padding: 0.5rem !important;
+  align-items: center !important;
+  border-radius: 0.45rem !important;
+  justify-content: center !important;
 }
 
-.user-empresa { 
-    font-weight: 600 !important;
-    color: #1B3562;
-    margin-bottom: 0.5vh;
+.user-info:hover {
+  background-color: rgba(27, 53, 98, 0.1) !important;
+}
+
+.user-empresa {
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  color: #1B3562;
+  margin-bottom: 0.5vh;
 }
 
 .user-avatar {
-    margin: 1rem auto !important;
+  color: #646464 !important;
+  margin-right: 0.5rem !important;
 }
 
 .user-name {
-    font-weight: 600 !important;
-    margin-top: 0.5vh;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  color: black !important;
+}
+
+.user-dropdown-icon {
+  margin-left: 0.2rem !important;
+  font-size: 0.9rem !important;
 }
 
 .user-role {
-    background-color: #e0e0e0;
-    color: black;
-    padding: 0.3rem 1.2rem;
-    border-radius: 1rem !important;
-    display: inline-block !important;
-    margin-top: 0.5vh !important;
+  background-color: #e0e0e0;
+  color: black;
+  padding: 0.3rem 1.2rem;
+  border-radius: 1rem !important;
+  font-size: 0.75rem !important;
+  display: inline-block !important;
+  margin-top: 0.5vh !important;
 }
 
 .menu-list {
-    padding-top: 1vh !important;
+  padding-top: 1vh !important;
 }
 
 .menu-item {
-    padding: 1rem 2.4rem !important;
-    display: flex !important;
-    align-items: center !important;
-    transition: background 0.3s ease-in-out, color 0.3s ease-in-out !important;
-    position: relative;
-    cursor: pointer;
+  padding: 1rem 2.4rem !important;
+  display: flex !important;
+  align-items: center !important;
+  transition: background 0.3s ease-in-out, color 0.3s ease-in-out !important;
+  position: relative;
+  cursor: pointer;
 }
 
 .menu-item.active {
-    color: #1B3562 !important;
-    font-weight: 600 !important;
-    background-color: rgba(27, 53, 98, 0.1) !important;
+  color: #1B3562 !important;
+  font-weight: 600 !important;
+  background-color: rgba(27, 53, 98, 0.1) !important;
+  border-radius: 0.45rem !important;
 }
 
 .menu-item.active::before {
-    content: "" !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 5px !important;
-    height: 100% !important;
-    background-color: #1B3562 !important;
-    transition: width 0.3s ease-in-out;
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 5px !important;
+  height: 100% !important;
+  background-color: #1B3562 !important;
+  transition: width 0.3s ease-in-out;
 }
 
 .menu-item:hover {
-    background-color: rgba(27, 53, 98, 0.05) !important;
+  background-color: rgba(27, 53, 98, 0.05) !important;
 }
 
 .menu-icon {
-    color: #646464 !important;
-    min-width: 1.8rem !important;
-    transition: color 0.3s ease-in-out;
+  color: #646464 !important;
+  min-width: 1.1rem !important;
+  margin-right: 0.5rem;
+  transition: color 0.3s ease-in-out;
+}
+
+.menu-icon svg {
+  font-size: 1.2rem !important;
 }
 
 .menu-item.active .menu-icon {
-    color: #1B3562 !important;
+  color: #1B3562 !important;
 }
 
 .menu-text {
-    color: #646464 !important;
-    font-size: 0.9rem !important;
-    font-weight: 500 !important;
-    transition: color 0.3s ease-in-out;
+  color: #646464 !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  transition: color 0.3s ease-in-out;
 }
 
 .menu-item.active .menu-text {
-    color: #1B3562 !important;
-    font-weight: 600 !important;
+  color: #1B3562 !important;
+  font-weight: 600 !important;
+}
+
+/* Botão flutuante para reabrir menu */
+.menu-float-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2.2rem !important;
+  height: 2.2rem !important;
+  border-radius: 0.45rem !important;
+  position: fixed !important;
+  top: 1rem !important;
+  left: 1rem !important;
+  z-index: 1500 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+  background-color: #1B3562 !important;
+  color: white !important;
+  cursor: pointer;
+}
+
+/* NOVO botão flutuante para esconder o menu */
+.menu-hide-floating {
+  position: absolute !important;
+  top: 1rem !important;
+  left: 14.5rem !important;
+  z-index: 2000 !important;
+  background-color: white !important;
+  border-radius: 50% !important;
+  padding: 0.3rem !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s ease-in-out !important;
 }
 
 @media (max-width: 768px) {
-    .menu-container {
-        width: 100vw;
-        min-height: auto;
-        height: auto;
-    }
+  .menu-hide-floating {
+    display: none !important;
+  }
+}
 
-    .menu-header {
-        width: 100%;
-        justify-content: space-between;
-        padding: 1vh 10% !important;
-    }
+/* MOBILE OVERRIDES */
+@media (max-width: 768px) {
+  .menu-container {
+    width: 100vw;
+    min-height: auto;
+    height: auto;
+    position: relative;
+    transform: none !important;
+  }
 
-    .menu-logo {
-        width: 8rem !important;
-    }
+  .menu-header {
+    width: 100%;
+    justify-content: space-between;
+    padding: 1vh 10% !important;
+  }
 
-    .menu-icons-header {
-        display: flex !important;
-    }
+  .menu-logo {
+    width: 7rem !important;
+    margin: 0 !important;
+  }
 
-    .menu-lateral {
-        display: none;
-    }
+  .menu-icons-header {
+    display: flex !important;
+  }
 
-    .drawer-menu {
-        width: 70vw;
-    }
+  .menu-lateral {
+    display: none;
+  }
 
-    .menu-item {
-        padding: 2vh 6vw !important;
-    }
+  .drawer-menu {
+    width: 70vw;
+  }
 
-    .menu-icon {
-        margin-right: 0.5rem;
-    }
+  .menu-item {
+    padding: 2vh 6vw !important;
+  }
 
-    .menu-text {
-        font-size: 0.8rem !important;
-    }
+  .menu-icon {
+    margin-right: 0.5rem;
+  }
 
-    .user-info-menu {
-        text-align: center;
-        padding: 2vh;
-    }
+  .menu-text {
+    font-size: 0.8rem !important;
+  }
 
-    .user-info-menu .user-avatar {
-        width: 5rem;
-        height: 5rem;
-    }
+  .menu-icon svg {
+    font-size: 1.1rem !important;
+  }
 
-    .user-info-menu .user-name, 
-    .user-info-menu .user-empresa {
-        font-size: 0.9rem !important;
-    }
+  .user-info-menu {
+    text-align: center;
+    padding: 2vh;
+  }
 
-    .user-info-menu .user-role {
-        font-size: 0.8rem !important;
-        padding: 0.5vh 2vw;
-    }
+  .user-info-menu .user-avatar {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .user-info-menu .user-name,
+  .user-info-menu .user-empresa {
+    font-size: 0.9rem !important;
+  }
+
+  .user-info-menu .user-role {
+    font-size: 0.8rem !important;
+    padding: 0.5vh 2vw;
+  }
+
+  .menu-float-toggle,
+  .menu-hide-toggle,
+  .menu-hide-floating {
+    display: none !important;
+  }
 }
