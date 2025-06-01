@@ -1,47 +1,114 @@
 "use client";
 
-import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Divider } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import GoogleIcon from "../../img/google.png";
 import MicrosoftIcon from "../../img/microsoft.png";
 import LogoFrotaVisionV2 from "../../img/FrotaVisionLogoV2.png";
+import { step1Schema } from "@/utils/validations";
+import useToggleSenha from "@/app/components/toggle-senha/toggle-senha";
+import CustomSnackbar from "@/app/components/snackbar/snackbar";
+import Carregamento from "@/app/components/carregamento/carregamento";
 import "./login.css";
-import { loginUsuario } from "../../../api/services/usuarioService";
+
+interface LoginFormInputs {
+  email: string;
+  password: string;
+}
 
 export default function Login() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { mostrarSenha, adornment } = useToggleSenha();
 
-  const handleManualLogin = async () => {
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const [openError, setOpenError] = useState(false);
+  const [loadingPainel, setLoadingPainel] = useState(false);
+  const [mensagemCarregamento, setMensagemCarregamento] = useState(
+    "Bem-vindo de volta!"
+  );
+  const [loadingLogin, setLoadingLogin] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormInputs>({
+    resolver: yupResolver(step1Schema),
+  });
+
+  const onSubmit = async (data: LoginFormInputs) => {
+    setLoadingLogin(true);
+
     try {
-      const response = await loginUsuario(email, password);
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
 
-      sessionStorage.setItem(
-        "user",
-        JSON.stringify({
-          nome: response.nome,
-          cnpj: response.cnpj,
-          permissao: response.permissao,
-          email,
-        })
-      );
+      if (result?.ok) {
+        setOpenSuccess(true);
 
-      alert(response.message);
-      router.push("/ferramentas");
+        setTimeout(() => {
+          setLoadingPainel(true);
+        }, 1000);
+
+        setTimeout(() => {
+          router.push("/ferramentas");
+        }, 2500);
+      } else {
+        setOpenError(true);
+      }
     } catch (error) {
       console.error("Erro ao fazer login:", error);
-      alert("E-mail ou senha inválidos.");
+      setOpenError(true);
+    } finally {
+      setLoadingLogin(false);
     }
   };
 
   const handleGoogleLogin = () => {
     signIn("google");
   };
+
+  useEffect(() => {
+    if (loadingPainel) {
+      const timeout = setTimeout(() => {
+        setMensagemCarregamento("Carregando o painel de ferramentas...");
+      }, 1200);
+      return () => clearTimeout(timeout);
+    }
+  }, [loadingPainel]);
+
+  if (loadingPainel) {
+    return (
+      <>
+        <Carregamento
+          animationUrl="/lotties/carregamento.json"
+          mensagem={mensagemCarregamento}
+        />
+        <CustomSnackbar
+          open={openSuccess}
+          onClose={() => setOpenSuccess(false)}
+          message="Login realizado com sucesso!"
+          color="primary"
+        />
+      </>
+    );
+  }
 
   return (
     <motion.div
@@ -61,14 +128,19 @@ export default function Login() {
           Coloque suas credenciais para ter acesso à conta
         </Typography>
 
-        <Box className="login-inputs">
+        <Box
+          className="login-inputs"
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <TextField
             id="email"
             variant="outlined"
             fullWidth
             label="E-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            {...register("email")}
+            error={!!errors.email}
+            helperText={errors.email?.message}
           />
 
           <TextField
@@ -76,9 +148,11 @@ export default function Login() {
             variant="outlined"
             fullWidth
             label="Senha"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type={mostrarSenha ? "text" : "password"}
+            {...register("password")}
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            InputProps={{ endAdornment: adornment }}
           />
 
           <Typography variant="body2" className="forgot-password">
@@ -89,9 +163,21 @@ export default function Login() {
             variant="contained"
             fullWidth
             className="login-button"
-            onClick={handleManualLogin}
+            type="submit"
+            disabled={loadingLogin}
           >
-            ENTRAR
+            {loadingLogin ? (
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                width="100%"
+              >
+                <CircularProgress size={24} color="inherit" />
+              </Box>
+            ) : (
+              "ENTRAR"
+            )}
           </Button>
 
           <Divider className="login-divider">ou</Divider>
@@ -130,6 +216,20 @@ export default function Login() {
           </Typography>
         </Box>
       </Box>
+
+      <CustomSnackbar
+        open={openSuccess}
+        onClose={() => setOpenSuccess(false)}
+        message="Login realizado com sucesso!"
+        color="primary"
+      />
+
+      <CustomSnackbar
+        open={openError}
+        onClose={() => setOpenError(false)}
+        message="E-mail ou senha inválidos."
+        color="error"
+      />
     </motion.div>
   );
 }

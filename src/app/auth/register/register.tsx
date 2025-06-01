@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Box, Typography, Toolbar, Button } from "@mui/material";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -12,9 +12,10 @@ import Passo3 from "./components/passos/passo-3";
 import TelaSucesso from "./components/register-sucesso/register-sucesso";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import LogoFrotaVision from "../../img/FrotaVisionLogo.png";
-import "./register.css";
 import { cadastrarEmpresa } from "@/api/services/empresaService";
 import { cadastrarUsuario } from "../../../api/services/usuarioService";
+import CustomSnackbar from "@/app/components/snackbar/snackbar";
+import "./register.css";
 
 export default function Register() {
   return (
@@ -33,6 +34,7 @@ function RegisterContent() {
   const planoCodificado = searchParams.get("plano");
 
   const [step, setStep] = useState(1);
+  const [erroCadastro, setErroCadastro] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -51,14 +53,14 @@ function RegisterContent() {
   }>(null);
 
   useEffect(() => {
-    if (session?.user?.email) {
+    if (step === 1 && session?.user?.email) {
       setFormData((prev) => ({
         ...prev,
-        email: session.user?.email ?? "",
+        email: session.user.email,
       }));
       setStep(2);
     }
-  }, [session]);
+  }, [step, session]);
 
   useEffect(() => {
     if (planoCodificado) {
@@ -136,10 +138,10 @@ function RegisterContent() {
       await cadastrarUsuario(usuarioPayload);
 
       if (session) await signOut({ redirect: false });
-      setStep(4); // vai para TelaSucesso
+      setStep(4); // vai para a tela de sucesso, mas login só quando clicar no botão
     } catch (error) {
       console.error("Erro ao cadastrar:", error);
-      alert("Erro ao realizar cadastro. Verifique os dados e tente novamente.");
+      setErroCadastro(true);
     }
   };
 
@@ -184,7 +186,9 @@ function RegisterContent() {
           />
         );
       case 4:
-        return <TelaSucesso />;
+        return (
+          <TelaSucesso email={formData.email} password={formData.password} />
+        );
       default:
         return null;
     }
@@ -230,19 +234,24 @@ function RegisterContent() {
           )}
         </Typography>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            transition={{ duration: 0.3 }}
-            style={{ width: "100%" }}
-          >
-            {renderStep()}
-          </motion.div>
-        </AnimatePresence>
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -30 }}
+          transition={{ duration: 0.3 }}
+          style={{ width: "100%" }}
+        >
+          {renderStep()}
+        </motion.div>
       </Box>
+
+      <CustomSnackbar
+        open={erroCadastro}
+        onClose={() => setErroCadastro(false)}
+        message="Erro ao realizar cadastro. Verifique os dados e tente novamente."
+        color="error"
+      />
     </motion.div>
   );
 }

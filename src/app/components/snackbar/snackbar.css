@@ -15,3 +15,10 @@
     border: 1px solid #ccc !important;
   }
   
+  .custom-snackbar-error {
+  background-color: #A30D11 !important;
+  color: white !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+}

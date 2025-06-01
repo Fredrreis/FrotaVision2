@@ -1,22 +1,34 @@
-import { Snackbar, Fade, Box } from '@mui/material';
-import DoneIcon from '@mui/icons-material/Done';
-import './snackbar.css';
+import { Snackbar, Fade, Box } from "@mui/material";
+import DoneIcon from "@mui/icons-material/Done";
+import CloseIcon from "@mui/icons-material/Close";
+import "./snackbar.css";
 
 interface CustomSnackbarProps {
   open: boolean;
   onClose: () => void;
   message: string;
-  color?: 'primary' | 'light';
+  color?: "primary" | "light" | "error";
 }
 
 export default function CustomSnackbar({
   open,
   onClose,
   message,
-  color = 'primary',
+  color = "primary",
 }: CustomSnackbarProps) {
   const className =
-    color === 'primary' ? 'custom-snackbar-primary' : 'custom-snackbar-light';
+    color === "primary"
+      ? "custom-snackbar-primary"
+      : color === "light"
+      ? "custom-snackbar-light"
+      : "custom-snackbar-error";
+
+  const icon =
+    color === "error" ? (
+      <CloseIcon fontSize="small" />
+    ) : (
+      <DoneIcon fontSize="small" />
+    );
 
   return (
     <Snackbar
@@ -24,7 +36,7 @@ export default function CustomSnackbar({
       onClose={onClose}
       autoHideDuration={5000}
       slots={{ transition: Fade }}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       slotProps={{
         content: {
           className,
@@ -32,7 +44,7 @@ export default function CustomSnackbar({
       }}
       message={
         <Box display="flex" alignItems="center" gap={1}>
-          <DoneIcon fontSize="small" />
+          {icon}
           <span>{message}</span>
         </Box>
       }

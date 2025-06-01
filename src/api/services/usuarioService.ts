@@ -34,8 +34,9 @@ export const cadastrarUsuario = async (usuario: Usuario): Promise<void> => {
   await api.post('/Usuario/Cadastrar', usuario);
 };
 
-export const loginUsuario = async (login: string, senha: string): Promise<LoginResponse> => {
-  const endpoint = `/Usuario/login/${login},${senha}`;
-  return await api.post<LoginResponse>(endpoint, {});
+export const loginUsuario = async (
+  email: string,
+  password: string
+): Promise<LoginResponse> => {
+  return await api.post<LoginResponse>("/Usuario/login", { email, password });
 };
-

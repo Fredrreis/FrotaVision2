@@ -3,21 +3,32 @@
 import { Box, Typography, Button } from "@mui/material";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 import Lottie from "lottie-react";
 import CelebrationIcon from "@mui/icons-material/Celebration";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import sucessoAnimation from "../../../../../../public/lotties/sucesso.json";
 import Carregamento from "@/app/components/carregamento/carregamento";
 import "./register-sucesso.css";
-import { useState } from "react";
 
-export default function TelaSucesso() {
+interface TelaSucessoProps {
+  email: string;
+  password: string;
+}
+
+export default function TelaSucesso({ email, password }: TelaSucessoProps) {
   const router = useRouter();
   const [carregando, setCarregando] = useState(false);
 
-  const handleRedirect = () => {
+  const handleRedirect = async () => {
     setCarregando(true);
-    setTimeout(() => router.push("/ferramentas"), 2000); // tempo da animação
+    await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
+    router.replace("/ferramentas");
   };
 
   return carregando ? (

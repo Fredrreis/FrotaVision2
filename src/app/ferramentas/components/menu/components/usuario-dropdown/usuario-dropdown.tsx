@@ -12,6 +12,7 @@ import {
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { useSession } from "next-auth/react";
 import "./usuario-dropdown.css";
 
 interface Props {
@@ -27,6 +28,8 @@ export default function UsuarioDropdown({
   onClose,
   onOpenSettings,
 }: Props) {
+  const { data: session, status } = useSession();
+
   if (!anchorEl) return null;
 
   return (
@@ -53,9 +56,11 @@ export default function UsuarioDropdown({
               <Box>
                 <Box className="usuario-dropdown-header">
                   <AccountCircleIcon className="usuario-avatar" />
-                  <Typography className="usuario-nome">Paulo Franco</Typography>
+                  <Typography className="usuario-nome">
+                    {session?.user?.nome || "Sem nome"}
+                  </Typography>
                   <Typography className="usuario-email">
-                    paulo.franco@email.com
+                    {session?.user?.email || "Sem e-mail"}
                   </Typography>
                 </Box>
 

@@ -1,4 +1,3 @@
-// src/components/carregamento/carregamento.tsx
 import Lottie from "lottie-react";
 import { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
@@ -43,7 +42,7 @@ export default function Carregamento({
         style={{ width: largura, height: altura }}
       />
       {mensagem && (
-        <Typography variant="subtitle1" style={{color: "#444" }}>
+        <Typography variant="subtitle1" style={{ color: "#444" }}>
           {mensagem}
         </Typography>
       )}

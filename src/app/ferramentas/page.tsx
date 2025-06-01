@@ -1,14 +1,15 @@
-"use client";
-
-import React from "react";
+// src/app/ferramentas/page.tsx
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 import { Ferramentas } from "./ferramentas";
 
-const FerramentasPage: React.FC = () => {
-  return (
-    <div>
-      <Ferramentas />
-    </div>
-  );
-};
+export default async function FerramentasPage() {
+  const session = await getServerSession(authOptions);
 
-export default FerramentasPage;
+  if (!session) {
+    redirect("auth/login");
+  }
+
+  return <Ferramentas />;
+}
