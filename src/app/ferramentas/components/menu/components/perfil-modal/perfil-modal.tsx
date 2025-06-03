@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Box, Checkbox, FormControlLabel } from "@mui/material";
 import ModalFormulario from "../../../components/formulario-modal/formulario-generico";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -22,9 +23,11 @@ interface PerfilModalProps {
 }
 
 export default function PerfilModal({ open, onClose }: PerfilModalProps) {
+  const { data: session } = useSession();
+
   const [dados, setDados] = useState<PerfilDados>({
-    nome: "Paulo Franco",
-    email: "paulo.franco@email.com",
+    nome: session?.user?.nome || "Sem nome",
+    email: session?.user?.email || "Sem email",
     empresa: "EMPRESA 1",
     cargo: "Admin",
   });

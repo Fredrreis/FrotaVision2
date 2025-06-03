@@ -23,44 +23,12 @@
   gap: 1rem;
 }
 
-.search-input {
-  max-width: 30% !important;
-}
-
-.search-input input {
-  width: 100% !important;
-}
-
-.search-filtros-container {
+.botoes-container {
   display: flex;
   align-items: center;
   gap: 1rem;
-  flex-grow: 1;
+  min-width: fit-content;
 }
-
-/* Botão de Cadastro */
-/* Botões principais */
-.botao-cadastrar, .botao-filtrar{
-  background-color: #1B3562 !important;
-  color: white !important;
-  font-weight: 600 !important;
-  padding: 0.5rem 1rem !important;
-  text-transform: none !important;
-  border-radius: 0.3rem !important;
-  white-space: nowrap !important;
-
-}
-
-.botao-cadastrar{
-  min-width: 12rem !important;  /* 👈 largura confortável */
-  max-width: 100% !important;
-}
-
-.botao-exportar{
-  background-color: black !important;
-  text-transform: none !important;
-  border-radius: 0.3rem !important;
-}  
 
 @media (max-width: 768px) {
   .viagens-filtros {
@@ -77,28 +45,9 @@
     font-size: 1.1rem !important;
   }
 
-  .search-input {
-    max-width: 100% !important;
-  }
-
-  .search-icon {
-    font-size: 1.1rem !important;
-  }
-
-  .search-input input {
-    font-size: 0.8rem !important;
-  }
-
-  .botao-cadastrar,
-  .botao-exportar {
-    width: 100% !important;
-    max-width: 100% !important;
-    justify-content: center !important;
-  }
-
-  .search-filtros-container {
-    flex-direction: column;
-    align-items: stretch;
+  .botoes-container {
     width: 100%;
+    flex-direction: column;
+    gap: 1rem;
   }
 }

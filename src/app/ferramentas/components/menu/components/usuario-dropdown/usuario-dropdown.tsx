@@ -12,7 +12,7 @@ import {
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import "./usuario-dropdown.css";
 
 interface Props {
@@ -28,7 +28,7 @@ export default function UsuarioDropdown({
   onClose,
   onOpenSettings,
 }: Props) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   if (!anchorEl) return null;
 
@@ -81,7 +81,10 @@ export default function UsuarioDropdown({
                   fullWidth
                   startIcon={<LogoutIcon />}
                   className="button-sair"
-                  onClick={() => alert("Logout")}
+                  onClick={() => {
+                    onClose();
+                    signOut({ callbackUrl: "/auth/login" });
+                  }}
                 >
                   SAIR
                 </Button>

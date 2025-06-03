@@ -3,7 +3,6 @@
   background-color: inherit;
 }
 
-/* Título */
 .veiculos-header {
   display: flex;
   align-items: center;
@@ -16,7 +15,6 @@
   align-items: center !important;
 }
 
-/* Filtros */
 .veiculos-filtros {
   display: flex;
   align-items: center;
@@ -25,54 +23,13 @@
   gap: 1rem;
 }
 
-/* Campo de Busca */
-.search-input {
-  max-width: 30% !important;
-}
-
-.search-input input {
-  width: 100% !important;
-}
-
-/* Agrupamento dos campos de busca e filtros */
-.search-filtros-container {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-grow: 1;
-}
-
-/* Container de botões */
 .botoes-container {
   display: flex;
   min-width: 20rem;
   justify-content: space-between;
 }
 
-/* Botões principais */
-.botao-cadastrar, .botao-filtrar{
-  background-color: #1B3562 !important;
-  color: white !important;
-  font-weight: 600 !important;
-  padding: 0.5rem 1rem !important;
-  text-transform: none !important;
-  border-radius: 0.3rem !important;
-  white-space: nowrap !important;
-
-}
-
-.botao-cadastrar{
-  min-width: 12rem !important;
-  max-width: 100% !important;
-}
-
-.botao-exportar{
-  background-color: black !important;
-  text-transform: none !important;
-  border-radius: 0.3rem !important;
-}
-
-/* Filtro de Manutenção */
+/* Filtro de Manutenção específico da tela */
 .filtro-manutencao {
   display: inline-block;
   align-items: center;
@@ -104,17 +61,11 @@
   font-size: 0.875rem !important;
 }
 
-/* Responsivo */
 @media (max-width: 768px) {
   .veiculos-filtros {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
-  }
-
-  .filtro-manutencao {
-    flex-direction: column;
-    align-items: flex-start;
   }
 
   .veiculos-container {
@@ -125,31 +76,10 @@
     font-size: 1.1rem !important;
   }
 
-  .search-input {
-    max-width: 100% !important;
-  }
-
-  .search-icon {
-    font-size: 1.1rem !important;
-  }
-
-  .search-input input {
-    font-size: 0.8rem !important;
-  }
-
-  .filtro-label {
-    font-size: 0.8rem !important;
-  }
-
-  .radio-text {
-    font-size: 0.8rem !important;
-  }
-
-  .botao-cadastrar,
-  .botao-exportar {
-    width: 100% !important;
-    max-width: 100% !important;
-    justify-content: center !important;
+  .botoes-container {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
   }
 
   .filtro-manutencao {
@@ -158,14 +88,8 @@
     gap: 0.5rem !important;
   }
 
-  .search-filtros-container {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-  }
-
-  .botoes-container {
-    flex-direction: column;
-    width: 100%;
+  .filtro-label,
+  .radio-text {
+    font-size: 0.8rem !important;
   }
 }

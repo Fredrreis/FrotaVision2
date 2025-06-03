@@ -1,0 +1,23 @@
+.carregamento-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
+
+.carregamento-texto {
+  color: #444;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .carregamento-lottie {
+    width: 150px !important;
+    height: 150px !important;
+  }
+
+  .carregamento-texto {
+    font-size: 0.875rem !important;
+  }
+}

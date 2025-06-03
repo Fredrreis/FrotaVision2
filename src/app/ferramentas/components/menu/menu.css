@@ -182,7 +182,7 @@
   position: fixed !important;
   top: 1rem !important;
   left: 1rem !important;
-  z-index: 1500 !important;
+  z-index: 1200 !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
   background-color: #1B3562 !important;
   color: white !important;
@@ -194,7 +194,7 @@
   position: absolute !important;
   top: 1rem !important;
   left: 14.5rem !important;
-  z-index: 2000 !important;
+  z-index: 1200 !important; /* abaixo do backdrop do modal */
   background-color: white !important;
   border-radius: 50% !important;
   padding: 0.3rem !important;

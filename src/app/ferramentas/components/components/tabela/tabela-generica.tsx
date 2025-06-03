@@ -22,7 +22,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
-import VisualizarVeiculo from "../visualizar-veiculo/visualizar-veiculo";
+import VisualizarVeiculo from "../../veiculos/components/visualizar-veiculo/visualizar-veiculo";
 import "./tabela-generica.css";
 
 interface TabelaProps<T extends Record<string, unknown>> {

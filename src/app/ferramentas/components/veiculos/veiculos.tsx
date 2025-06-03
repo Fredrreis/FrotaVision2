@@ -1,3 +1,4 @@
+// veiculos.tsx
 "use client";
 import { useEffect, useState } from "react";
 import {
@@ -5,9 +6,10 @@ import {
   deletarVeiculo,
   Veiculo as VeiculoAPI,
 } from "@/api/services/veiculoService";
-import TabelaGenerica from "../components/tabela/tabela-generica";
+import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
+import FiltroAvancado from "../components/filtro/filtro-avancado";
 import CustomSnackbar from "../../../components/snackbar/snackbar";
 import {
   Box,
@@ -20,10 +22,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import IosShareIcon from "@mui/icons-material/IosShare";
-import FiltroAvancado from "../components/filtro/filtro-avancado";
 import Carregamento from "../../../components/carregamento/carregamento";
 import { formatarDataISOcomHora, compareDateISO } from "@/utils/data";
 import { motion } from "framer-motion";
+import "../styles/shared-styles.css";
 import "./veiculos.css";
 
 interface Veiculo {
@@ -71,6 +73,7 @@ export default function Veiculos() {
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
   const [openExportar, setOpenExportar] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
     {}
   );
@@ -83,27 +86,15 @@ export default function Veiculos() {
 
   useEffect(() => {
     const controller = new AbortController();
-
     listarVeiculos()
       .then((res) => {
-        if (!controller.signal.aborted) {
-          setDadosApi(res);
-        }
+        if (!controller.signal.aborted) setDadosApi(res);
       })
-      .catch((err) => {
-        if (!controller.signal.aborted) {
-          console.error("Erro:", err);
-        }
-      })
+      .catch((err) => console.error("Erro:", err))
       .finally(() => {
-        if (!controller.signal.aborted) {
-          setCarregando(false);
-        }
+        if (!controller.signal.aborted) setCarregando(false);
       });
-
-    return () => {
-      controller.abort(); // cancela requisição
-    };
+    return () => controller.abort();
   }, []);
 
   const dadosFiltrados: Veiculo[] = dadosApi
@@ -206,7 +197,6 @@ export default function Veiculos() {
       />
     );
   }
-  
 
   return (
     <motion.div
@@ -243,9 +233,12 @@ export default function Veiculos() {
               variant="outlined"
               className="botao-filtrar"
               endIcon={<FilterAltOutlinedIcon />}
-              onClick={() => setOpenFiltros(true)}
+              onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+                setOpenFiltros(true);
+              }}
             >
-              Filtros Avançados
+              <span className="button-text">Filtros Avançados</span>
             </Button>
           </Box>
 
@@ -257,12 +250,14 @@ export default function Veiculos() {
             >
               Cadastrar Veículo
             </Button>
-
             <Button
               variant="contained"
               className="botao-exportar"
               startIcon={<IosShareIcon />}
-              onClick={() => setOpenExportar(true)}
+              onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+                setOpenExportar(true);
+              }}
             >
               Exportar
             </Button>
@@ -296,6 +291,7 @@ export default function Veiculos() {
           onChange={setFiltrosAvancados}
           onApply={() => setOpenFiltros(false)}
           onClear={() => setFiltrosAvancados({})}
+          anchorEl={anchorEl}
         />
 
         <ExportarRelatorioDialog
@@ -304,6 +300,7 @@ export default function Veiculos() {
           colunas={colunasVeiculos.map((c) => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
+          anchorEl={anchorEl}
         />
 
         <CustomSnackbar

@@ -1,24 +1,29 @@
-import { useState } from "react";
 import {
   Box,
   Typography,
-  Collapse,
-  IconButton,
-  Card,
-  CardContent,
   Button,
+  Paper,
+  useTheme,
+  Divider,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import CircleIcon from "@mui/icons-material/Circle";
+import {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineOppositeContent,
+} from "@mui/lab";
 import WarningIcon from "@mui/icons-material/Warning";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import NewReleasesIcon from "@mui/icons-material/NewReleases";
+import { useEffect, useState } from "react";
 import "./notificacoes.css";
 
 interface Notificacao {
   id: number;
-  nova: boolean;
   data: string;
   caminhão: string;
   tipo: string;
@@ -28,10 +33,9 @@ interface Notificacao {
   atual: string;
 }
 
-const notificacoesIniciais: Notificacao[] = [
+const notificacoesOriginais: Notificacao[] = [
   {
     id: 1,
-    nova: true,
     data: "2024-04-10",
     caminhão: "Caminhão 1",
     tipo: "Betoneira",
@@ -42,7 +46,6 @@ const notificacoesIniciais: Notificacao[] = [
   },
   {
     id: 2,
-    nova: false,
     data: "2024-03-20",
     caminhão: "Caminhão 2",
     tipo: "Basculante",
@@ -53,7 +56,6 @@ const notificacoesIniciais: Notificacao[] = [
   },
   {
     id: 3,
-    nova: true,
     data: "2024-04-09",
     caminhão: "Caminhão 5",
     tipo: "Prancha",
@@ -66,21 +68,27 @@ const notificacoesIniciais: Notificacao[] = [
 ];
 
 export default function Notificacoes() {
-  const [notificacoes, setNotificacoes] = useState<Notificacao[]>(
-    [...notificacoesIniciais].sort(
-      (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
-    )
-  );
-  const [abertas, setAbertas] = useState<number[]>([]);
+  const theme = useTheme();
+  const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
+  const [vistas, setVistas] = useState<number[]>([]);
 
-  const toggleExpand = (id: number) => {
-    setAbertas((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+  useEffect(() => {
+    const vistasSalvas = localStorage.getItem("notificacoesVistas");
+    const idsVistos = vistasSalvas ? JSON.parse(vistasSalvas) : [];
+
+    setVistas(idsVistos);
+
+    const ordenadas = [...notificacoesOriginais].sort(
+      (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
     );
-    setNotificacoes((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, nova: false } : n))
-    );
-  };
+
+    setNotificacoes(ordenadas);
+  }, []);
+
+  useEffect(() => {
+    const todosIds = notificacoesOriginais.map((n) => n.id);
+    localStorage.setItem("notificacoesVistas", JSON.stringify(todosIds));
+  }, []);
 
   return (
     <Box className="notificacoes-container">
@@ -88,127 +96,111 @@ export default function Notificacoes() {
         <NotificationsIcon className="icon-title" /> NOTIFICAÇÕES
       </Typography>
 
-      <Box className="notificacoes-lista">
-        {notificacoes.map((n) => {
+      <Timeline className="notificacoes-timeline">
+        {notificacoes.map((n, i) => {
           const isUrgente = parseInt(n.atual) > parseInt(n.vidaUtil);
-          const isExpandida = abertas.includes(n.id);
+          const isNova = !vistas.includes(n.id);
 
           return (
-            <Card
-              key={n.id}
-              className={`notificacao-card ${
-                isUrgente ? "urgente" : n.nova ? "nova" : ""
-              } ${isExpandida ? "expandida" : ""}`}
-            >
-              <CardContent className="notificacao-header">
-                <Box>
-                  {n.nova && (
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="#1B3562"
-                    >
-                      NOVA
-                    </Typography>
+            <TimelineItem key={n.id} className="timeline-item">
+              <TimelineOppositeContent className="timeline-date">
+                {new Date(n.data).toLocaleDateString()}
+              </TimelineOppositeContent>
+
+              <TimelineSeparator className="timeline-separator">
+                <TimelineDot
+                  className="timeline-dot"
+                  sx={{
+                    backgroundColor: isUrgente
+                      ? "#A30D11"
+                      : isNova
+                      ? "#1e70ff"
+                      : "#1B3561",
+                  }}
+                >
+                  {isUrgente ? (
+                    <WarningIcon fontSize="small" style={{ color: "#fff" }} />
+                  ) : isNova ? (
+                    <NewReleasesIcon
+                      fontSize="small"
+                      style={{ color: "#fff" }}
+                    />
+                  ) : (
+                    <NotificationsIcon
+                      fontSize="small"
+                      style={{ color: "#fff" }}
+                    />
                   )}
-                  {isUrgente && (
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="#a91a1a"
-                    >
-                      URGENTE
-                    </Typography>
-                  )}
-                  <Typography variant="body2" className="notificacao-caminhao">
-                    <Box component="span" fontWeight={600}>
-                      {n.caminhão}
-                    </Box>{" "}
-                    - {n.peça}
+                </TimelineDot>
+
+                {i < notificacoes.length - 1 && (
+                  <TimelineConnector className="timeline-connector" />
+                )}
+              </TimelineSeparator>
+
+              <TimelineContent className="timeline-content">
+                <Paper elevation={3} className="notificacao-card">
+                  <Typography variant="subtitle2" fontWeight={600}>
+                    {n.caminhão} - {n.peça}
                   </Typography>
-                </Box>
 
-                <Box display="flex" alignItems="center" gap={1}>
-                  {n.nova && (
-                    <CircleIcon
-                      className="icone-pulsando"
-                      sx={{ color: "#1B3562", fontSize: 20 }}
-                      titleAccess="Nova notificação"
-                    />
-                  )}
-                  {isUrgente && (
-                    <WarningIcon
-                      sx={{ color: "#a91a1a", fontSize: 20 }}
-                      titleAccess="Manutenção urgente"
-                    />
-                  )}
-                  <IconButton onClick={() => toggleExpand(n.id)}>
-                    {isExpandida ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                  </IconButton>
-                </Box>
-              </CardContent>
+                  <Divider className="divider" />
 
-              <Collapse in={isExpandida}>
-                <Box className="notificacao-detalhes">
-                  <Typography
-                    variant="body2"
-                    gutterBottom
-                    sx={{ color: "#555" }}
-                  >
+                  <Typography variant="body2">
                     <Box component="span" fontWeight={600}>
                       Tipo Caminhão:
                     </Box>{" "}
                     {n.tipo}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    gutterBottom
-                    sx={{ color: "#555" }}
-                  >
+
+                  <Typography variant="body2" mt={0.7}>
                     <Box component="span" fontWeight={600}>
                       Descrição:
                     </Box>{" "}
                     {n.descricao}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    gutterBottom
-                    sx={{ color: "#555" }}
-                  >
+
+                  <Typography variant="body2" mt={0.7}>
                     <Box component="span" fontWeight={600}>
-                      Quilometragem de Vida Útil:
+                      Vida útil:
                     </Box>{" "}
                     {n.vidaUtil}
                   </Typography>
+
                   <Typography
+                    mt={0.7}
                     variant="body2"
-                    gutterBottom
-                    className={
-                      isUrgente
-                        ? "destacar-quilometragem"
-                        : "quilometragem-padrao"
-                    }
+                    className={isUrgente ? "texto-urgente" : ""}
                   >
                     <Box component="span" fontWeight={600}>
-                      Quilometragem Atual:
+                      Atual:
                     </Box>{" "}
                     {n.atual}
                   </Typography>
 
-                  <Box className="notificacao-acao">
+                  <Box className="notificacao-botao-container">
                     <Button
                       endIcon={<ArrowForwardIcon />}
-                      className="botao-ver-caminhao"
+                      size="small"
+                      className="notificacao-botao"
+                      sx={{
+                        color: isUrgente
+                          ? "#A30D11"
+                          : isNova
+                          ? "#1e70ff"
+                          : "#1B3561",
+                        fontWeight: 600,
+                      }}
                     >
                       Verificar caminhão
                     </Button>
                   </Box>
-                </Box>
-              </Collapse>
-            </Card>
+                </Paper>
+              </TimelineContent>
+            </TimelineItem>
           );
         })}
-      </Box>
+      </Timeline>
     </Box>
   );
 }

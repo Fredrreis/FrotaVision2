@@ -1,0 +1,79 @@
+.search-filtros-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.search-input {
+  max-width: 30rem;
+  width: 100% !important;
+  flex: 1;
+}
+
+.search-input input {
+  width: 100% !important;
+}
+
+.botao-cadastrar,
+.botao-filtrar {
+  background-color: #1B3562 !important;
+  color: white !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 1rem !important;
+  text-transform: none !important;
+  border-radius: 0.3rem !important;
+  white-space: nowrap !important;
+}
+
+.botao-exportar {
+  background-color: black !important;
+  color: white !important;
+  padding: 0.5rem 1rem !important;
+  text-transform: none !important;
+  border-radius: 0.3rem !important;
+}
+
+@media (max-width: 768px) {
+  .search-filtros-container {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .search-input input,
+  .botao-cadastrar,
+  .botao-exportar,
+  .botao-filtrar {
+    font-size: 0.8rem !important;
+  }
+
+  .botao-cadastrar,
+  .botao-exportar {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .botao-filtrar {
+    min-width: 2.25rem !important;
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    padding: 0 !important;
+    border-radius: 0.375rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .botao-filtrar .MuiButton-endIcon {
+    margin: 0 !important;
+    font-size: 1.3rem !important;
+  }
+
+  .botao-filtrar span.button-text {
+    display: none !important;
+  }
+}

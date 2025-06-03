@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import {
   Box,
   Avatar,
@@ -57,6 +58,7 @@ export default function MenuFerramentas({
   const [perfilModalOpen, setPerfilModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const handleResize = () => {
@@ -76,10 +78,18 @@ export default function MenuFerramentas({
     setDropdownOpen((prev) => !prev);
   };
 
+  const handleToggleMenuAndCloseDropdown = () => {
+    setDropdownOpen(false); // Garante fechamento do dropdown
+    onToggleMenu(); // Alterna menu
+  };
+
   return (
     <>
       {!isMobile && visible && (
-        <IconButton onClick={onToggleMenu} className="menu-hide-floating">
+        <IconButton
+          onClick={handleToggleMenuAndCloseDropdown}
+          className="menu-hide-floating"
+        >
           <ArrowBackIcon sx={{ fontSize: "1.2rem" }} />
         </IconButton>
       )}
@@ -124,7 +134,7 @@ export default function MenuFerramentas({
                   sx={{ width: "2rem", height: "2rem" }}
                 />
                 <Typography className="user-name" variant="body1">
-                  Paulo Franco
+                  {session?.user?.nome || "Sem nome"}
                 </Typography>
                 <KeyboardArrowDownIcon className="user-dropdown-icon" />
               </Box>
@@ -202,7 +212,10 @@ export default function MenuFerramentas({
       </Drawer>
 
       {!isMobile && !visible && (
-        <IconButton onClick={onToggleMenu} className="menu-float-toggle">
+        <IconButton
+          onClick={handleToggleMenuAndCloseDropdown}
+          className="menu-float-toggle"
+        >
           <MenuIcon sx={{ fontSize: "1.2rem" }} />
         </IconButton>
       )}

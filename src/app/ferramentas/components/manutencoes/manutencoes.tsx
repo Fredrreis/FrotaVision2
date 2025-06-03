@@ -5,7 +5,7 @@ import {
   deletarManutencaoRealizada,
   ManutencaoRealizada,
 } from "@/api/services/manutencaoRealizadaService";
-import TabelaGenerica from "../components/tabela/tabela-generica";
+import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
 import {
@@ -24,6 +24,7 @@ import Carregamento from "../../../components/carregamento/carregamento";
 import CustomSnackbar from "../../../components/snackbar/snackbar";
 import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
 import { motion } from "framer-motion";
+import "../styles/shared-styles.css";
 import "./manutencoes.css";
 
 interface Manutencao {
@@ -74,10 +75,15 @@ export default function Manutencoes() {
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
   const [openExportar, setOpenExportar] = useState(false);
+  const [anchorElFiltro, setAnchorElFiltro] = useState<HTMLElement | null>(
+    null
+  );
+  const [anchorElExportar, setAnchorElExportar] = useState<HTMLElement | null>(
+    null
+  );
   const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
     {}
   );
-
   const [snackbarAberto, setSnackbarAberto] = useState(false);
   const [snackbarMensagem, setSnackbarMensagem] = useState("");
   const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
@@ -86,27 +92,13 @@ export default function Manutencoes() {
 
   useEffect(() => {
     const controller = new AbortController();
-
     listarManutencaoRealizada()
       .then((res) => {
-        if (!controller.signal.aborted) {
-          setDadosApi(res);
-        }
+        if (!controller.signal.aborted) setDadosApi(res);
       })
-      .catch((err) => {
-        if (!controller.signal.aborted) {
-          console.error("Erro:", err);
-        }
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) {
-          setCarregando(false);
-        }
-      });
-
-    return () => {
-      controller.abort(); // cancela requisição
-    };
+      .catch((err) => console.error("Erro:", err))
+      .finally(() => !controller.signal.aborted && setCarregando(false));
+    return () => controller.abort();
   }, []);
 
   const manutencoesData: Manutencao[] = dadosApi.map((m) => ({
@@ -127,29 +119,22 @@ export default function Manutencoes() {
     const matchSearch =
       (m.veiculo?.toLowerCase() ?? "").includes(search.toLowerCase()) ||
       (m.nome?.toLowerCase() ?? "").includes(search.toLowerCase());
-
     const matchTipoVeiculo = filtrosAvancados.tipoVeiculo
       ? m.tipoVeiculo === filtrosAvancados.tipoVeiculo
       : true;
-
     const matchData = filtrosAvancados.data
       ? compareDateISO(m.dataOriginal as string, filtrosAvancados.data)
       : true;
-
     const matchHorasMotor = filtrosAvancados.horasMotor
       ? m.horasMotor <= Number(filtrosAvancados.horasMotor)
       : true;
-
     const matchCusto = filtrosAvancados.custo
       ? parseFloat(m.custo.replace(",", ".")) <= filtrosAvancados.custo
       : true;
-
     const matchTipo = filtrosAvancados.tipo
       ? m.tipo === filtrosAvancados.tipo
       : true;
-
     const matchKm = filtrosAvancados.km ? m.km <= filtrosAvancados.km : true;
-
     return (
       matchSearch &&
       matchTipoVeiculo &&
@@ -197,50 +182,13 @@ export default function Manutencoes() {
       min: 0,
       max: maxCusto,
     },
-    {
-      name: "km",
-      label: "Km",
-      type: "range" as const,
-      min: 0,
-      max: maxKm,
-    },
+    { name: "km", label: "Km", type: "range" as const, min: 0, max: maxKm },
   ];
-
-  const handleEditar = (item: Manutencao) => {
-    setDados(item);
-    setModoEdicao(true);
-    setOpen(true);
-  };
-
-  const handleExcluir = async (item: Manutencao) => {
-    try {
-      await deletarManutencaoRealizada(item.id);
-      setDadosApi((prev) =>
-        prev.filter((m) => m.id_manutencao_realizada !== item.id)
-      );
-      setSnackbarMensagem("Manutenção excluída com sucesso!");
-      setSnackbarCor("primary");
-      setSnackbarAberto(true);
-    } catch (err) {
-      console.error("Erro ao excluir manutenção:", err);
-      setSnackbarMensagem("Erro ao excluir manutenção. Tente novamente.");
-      setSnackbarCor("light");
-      setSnackbarAberto(true);
-    }
-  };
 
   const handleCadastrar = () => {
     setDados({} as Manutencao);
     setModoEdicao(false);
     setOpen(true);
-  };
-
-  const handleSalvar = () => {
-    console.log(
-      modoEdicao ? "Salvando edição:" : "Cadastrando nova manutenção:",
-      dados
-    );
-    setOpen(false);
   };
 
   if (carregando) {
@@ -287,9 +235,12 @@ export default function Manutencoes() {
               variant="outlined"
               className="botao-filtrar"
               endIcon={<FilterAltOutlinedIcon />}
-              onClick={() => setOpenFiltros(true)}
+              onClick={(e) => {
+                setAnchorElFiltro(e.currentTarget);
+                setOpenFiltros(true);
+              }}
             >
-              Filtros Avançados
+              <span className="button-text">Filtros Avançados</span>
             </Button>
           </Box>
 
@@ -306,7 +257,10 @@ export default function Manutencoes() {
               variant="contained"
               className="botao-exportar"
               startIcon={<IosShareIcon />}
-              onClick={() => setOpenExportar(true)}
+              onClick={(e) => {
+                setAnchorElExportar(e.currentTarget);
+                setOpenExportar(true);
+              }}
             >
               Exportar
             </Button>
@@ -316,15 +270,35 @@ export default function Manutencoes() {
         <TabelaGenerica<Manutencao>
           colunas={colunasManutencoes}
           dados={dadosFiltrados}
-          onEditar={handleEditar}
-          onExcluir={handleExcluir}
+          onEditar={(item) => {
+            setDados(item);
+            setModoEdicao(true);
+            setOpen(true);
+          }}
+          onExcluir={async (item) => {
+            try {
+              await deletarManutencaoRealizada(item.id);
+              setDadosApi((prev) =>
+                prev.filter((m) => m.id_manutencao_realizada !== item.id)
+              );
+              setSnackbarMensagem("Manutenção excluída com sucesso!");
+              setSnackbarCor("primary");
+              setSnackbarAberto(true);
+            } catch (err) {
+              setSnackbarMensagem(
+                "Erro ao excluir manutenção. Tente novamente."
+              );
+              setSnackbarCor("light");
+              setSnackbarAberto(true);
+            }
+          }}
           exibirExaminar={false}
         />
 
         <ModalFormulario<Manutencao>
           open={open}
           onClose={() => setOpen(false)}
-          onSalvar={handleSalvar}
+          onSalvar={() => setOpen(false)}
           colunas={colunasManutencoes}
           dados={dados}
           setDados={setDados}
@@ -334,6 +308,7 @@ export default function Manutencoes() {
         <FiltroAvancado
           open={openFiltros}
           onClose={() => setOpenFiltros(false)}
+          anchorEl={anchorElFiltro}
           filters={filtrosAvancadosConfig}
           values={filtrosAvancados}
           onChange={setFiltrosAvancados}
@@ -344,6 +319,7 @@ export default function Manutencoes() {
         <ExportarRelatorioDialog
           open={openExportar}
           onClose={() => setOpenExportar(false)}
+          anchorEl={anchorElExportar}
           colunas={colunasManutencoes.map((c) => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}

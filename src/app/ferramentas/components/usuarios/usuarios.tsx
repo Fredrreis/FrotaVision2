@@ -5,7 +5,7 @@ import {
   deletarUsuario,
   Usuario as UsuarioAPI,
 } from "@/api/services/usuarioService";
-import TabelaGenerica from "../components/tabela/tabela-generica";
+import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
 import {
@@ -24,6 +24,7 @@ import Carregamento from "../../../components/carregamento/carregamento";
 import CustomSnackbar from "../../../components/snackbar/snackbar";
 import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
 import { motion } from "framer-motion";
+import "../styles/shared-styles.css";
 import "./usuarios.css";
 
 interface Usuario {
@@ -61,6 +62,10 @@ export default function Usuarios() {
   const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
     {}
   );
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [anchorElExportar, setAnchorElExportar] = useState<HTMLElement | null>(
+    null
+  );
 
   const [snackbarAberto, setSnackbarAberto] = useState(false);
   const [snackbarMensagem, setSnackbarMensagem] = useState("");
@@ -91,7 +96,7 @@ export default function Usuarios() {
       });
 
     return () => {
-      controller.abort(); // cancela requisição
+      controller.abort();
     };
   }, []);
 
@@ -228,9 +233,12 @@ export default function Usuarios() {
               variant="outlined"
               className="botao-filtrar"
               endIcon={<FilterAltOutlinedIcon />}
-              onClick={() => setOpenFiltros(true)}
+              onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+                setOpenFiltros(true);
+              }}
             >
-              Filtros Avançados
+              <span className="button-text">Filtros Avançados</span>
             </Button>
           </Box>
 
@@ -247,7 +255,10 @@ export default function Usuarios() {
               variant="contained"
               className="botao-exportar"
               startIcon={<IosShareIcon />}
-              onClick={() => setOpenExportar(true)}
+              onClick={(e) => {
+                setAnchorElExportar(e.currentTarget);
+                setOpenExportar(true);
+              }}
             >
               Exportar
             </Button>
@@ -280,6 +291,7 @@ export default function Usuarios() {
           onChange={setFiltrosAvancados}
           onApply={() => setOpenFiltros(false)}
           onClear={() => setFiltrosAvancados({})}
+          anchorEl={anchorEl}
         />
 
         <ExportarRelatorioDialog
@@ -288,6 +300,7 @@ export default function Usuarios() {
           colunas={colunasUsuarios.map((c) => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
+          anchorEl={anchorElExportar}
         />
 
         <CustomSnackbar

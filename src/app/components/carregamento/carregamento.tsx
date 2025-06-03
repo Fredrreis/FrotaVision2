@@ -1,6 +1,7 @@
 import Lottie from "lottie-react";
 import { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
+import "./carregamento.css";
 
 interface CarregamentoProps {
   animationUrl: string;
@@ -27,22 +28,15 @@ export default function Carregamento({
   if (!animacao) return null;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "50vh",
-      }}
-    >
+    <div className="carregamento-container">
       <Lottie
         animationData={animacao}
         loop
+        className="carregamento-lottie"
         style={{ width: largura, height: altura }}
       />
       {mensagem && (
-        <Typography variant="subtitle1" style={{ color: "#444" }}>
+        <Typography variant="subtitle1" className="carregamento-texto">
           {mensagem}
         </Typography>
       )}

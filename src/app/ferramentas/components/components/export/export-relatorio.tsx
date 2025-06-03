@@ -19,6 +19,7 @@ import SnackBarCustomizada from "../../../../components/snackbar/snackbar";
 import FormatIndentIncreaseIcon from "@mui/icons-material/FormatIndentIncrease";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ArticleIcon from "@mui/icons-material/Article";
+import GenericPopper from "@/app/components/popper/popper-generico";
 import "./export-relatorio.css";
 
 interface Props {
@@ -27,6 +28,7 @@ interface Props {
   colunas: string[];
   dados: Record<string, any>[];
   mapeamentoCampos: Record<string, string>;
+  anchorEl: HTMLElement | null;
 }
 
 export default function ExportarRelatorioDialog({
@@ -35,47 +37,26 @@ export default function ExportarRelatorioDialog({
   colunas,
   dados,
   mapeamentoCampos,
+  anchorEl,
 }: Props) {
   const [formato, setFormato] = useState("pdf");
   const [colunasSelecionadas, setColunasSelecionadas] =
     useState<string[]>(colunas);
-  const [visible, setVisible] = useState(false);
-  const [closing, setClosing] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open) {
-      setVisible(true);
       setSnackbarOpen(false);
     }
   }, [open]);
-
-  useEffect(() => {
-    const handleMouseDown = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      const insidePopup = ref.current?.contains(target);
-      const isDropdown = !!document
-        .querySelector(".MuiPopover-root")
-        ?.contains(target);
-      if (!insidePopup && !isDropdown) requestClose();
-    };
-    if (visible || closing)
-      document.addEventListener("mousedown", handleMouseDown);
-    return () => document.removeEventListener("mousedown", handleMouseDown);
-  }, [visible, closing]);
 
   useEffect(() => {
     if (formato !== "csv") setColunasSelecionadas(colunas);
   }, [formato, colunas]);
 
   const requestClose = () => {
-    setClosing(true);
-    setTimeout(() => {
-      setClosing(false);
-      setVisible(false);
-      onClose();
-    }, 100);
+    onClose();
   };
 
   const handleExportar = async () => {
@@ -99,97 +80,92 @@ export default function ExportarRelatorioDialog({
   const isExportDisabled =
     formato === "csv" && colunasSelecionadas.length === 0;
 
-  if (!visible && !closing) return null;
-
   return (
     <>
-      <Box
-        ref={ref}
-        className={`exportar-popup ${
-          closing ? "slide-up-out" : "animated-slide-down"
-        }`}
-      >
-        <Box className="exportar-header">
-          <IosShareIcon className="exportar-icon" />
-          <IconButton onClick={requestClose} size="small">
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </Box>
-
-        <Box className="exportar-form-group">
-          <TextField
-            select
-            label="Formato"
-            value={formato}
-            onChange={(e) => setFormato(e.target.value)}
-            fullWidth
-            variant="outlined"
-            size="small"
-            className="filtro-input"
-          >
-            <MenuItem value="pdf">
-              <PictureAsPdfIcon className="dropdown-icons" /> Pdf
-            </MenuItem>
-            <MenuItem value="csv">
-              <FormatIndentIncreaseIcon className="dropdown-icons" /> Csv
-            </MenuItem>
-            <MenuItem value="docx">
-              <ArticleIcon className="dropdown-icons" /> Docx
-            </MenuItem>
-          </TextField>
-        </Box>
-
-        {formato === "csv" && (
-          <Box className="exportar-colunas">
-            <Typography className="exportar-label">
-              Selecione as colunas:
-            </Typography>
-            <FormGroup>
-              {colunas.map((col) => (
-                <FormControlLabel
-                  key={col}
-                  control={
-                    <Checkbox
-                      size="small"
-                      checked={colunasSelecionadas.includes(col)}
-                      onChange={() =>
-                        setColunasSelecionadas((prev) =>
-                          prev.includes(col)
-                            ? prev.filter((c) => c !== col)
-                            : [...prev, col]
-                        )
-                      }
-                    />
-                  }
-                  label={col}
-                  className="exportar-checkbox"
-                />
-              ))}
-            </FormGroup>
+      <GenericPopper open={open} anchorEl={anchorEl}>
+        <Box ref={ref} className="exportar-popup animated-slide-down">
+          <Box className="exportar-header">
+            <IosShareIcon className="exportar-icon" />
+            <IconButton onClick={requestClose} size="small">
+              <CloseIcon fontSize="small" />
+            </IconButton>
           </Box>
-        )}
 
-        <Box className="exportar-actions">
-          {formato === "csv" && (
-            <Button
-              onClick={handleToggleAll}
-              className="exportar-toggle"
+          <Box className="exportar-form-group">
+            <TextField
+              select
+              label="Formato"
+              value={formato}
+              onChange={(e) => setFormato(e.target.value)}
+              fullWidth
               variant="outlined"
               size="small"
+              className="filtro-input"
             >
-              Marcar/Desmarcar Tudo
-            </Button>
+              <MenuItem value="pdf">
+                <PictureAsPdfIcon className="dropdown-icons" /> Pdf
+              </MenuItem>
+              <MenuItem value="csv">
+                <FormatIndentIncreaseIcon className="dropdown-icons" /> Csv
+              </MenuItem>
+              <MenuItem value="docx">
+                <ArticleIcon className="dropdown-icons" /> Docx
+              </MenuItem>
+            </TextField>
+          </Box>
+
+          {formato === "csv" && (
+            <Box className="exportar-colunas">
+              <Typography className="exportar-label">
+                Selecione as colunas:
+              </Typography>
+              <FormGroup>
+                {colunas.map((col) => (
+                  <FormControlLabel
+                    key={col}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={colunasSelecionadas.includes(col)}
+                        onChange={() =>
+                          setColunasSelecionadas((prev) =>
+                            prev.includes(col)
+                              ? prev.filter((c) => c !== col)
+                              : [...prev, col]
+                          )
+                        }
+                      />
+                    }
+                    label={col}
+                    className="exportar-checkbox"
+                  />
+                ))}
+              </FormGroup>
+            </Box>
           )}
-          <Button
-            onClick={handleExportar}
-            className="exportar-aplicar"
-            variant="contained"
-            disabled={isExportDisabled}
-          >
-            Baixar
-          </Button>
+
+          <Box className="exportar-actions">
+            {formato === "csv" && (
+              <Button
+                onClick={handleToggleAll}
+                className="exportar-toggle"
+                variant="outlined"
+                size="small"
+              >
+                Marcar/Desmarcar Tudo
+              </Button>
+            )}
+            <Button
+              onClick={handleExportar}
+              className="exportar-aplicar"
+              variant="contained"
+              disabled={isExportDisabled}
+            >
+              Baixar
+            </Button>
+          </Box>
         </Box>
-      </Box>
+      </GenericPopper>
 
       <SnackBarCustomizada
         open={snackbarOpen}

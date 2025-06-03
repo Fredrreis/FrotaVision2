@@ -1,10 +1,6 @@
 .exportar-popup {
-  position: absolute;
-  top: 20%;
-  left: 77%;
   width: 20rem;
   background-color: white;
-  z-index: 30;
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.15);
   border-radius: 0.5rem;
   padding: 1rem 1.5rem 1.5rem 1.5rem;
@@ -12,7 +8,6 @@
   transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
-/* Animações */
 .animated-slide-down {
   animation: slideDown 0.2s ease-in-out;
 }
@@ -43,7 +38,6 @@
   }
 }
 
-/* Header do popup */
 .exportar-header {
   display: flex;
   justify-content: space-between;
@@ -56,28 +50,25 @@
   color: #000;
 }
 
-.dropdown-icons{
+.dropdown-icons {
   margin-right: 0.5rem !important;
-  font-size: 1.2rem !important
+  font-size: 1.2rem !important;
 }
 
-/* Campo de seleção */
 .exportar-form-group {
   flex: 1 1 100%;
   display: flex;
   flex-direction: column;
 }
 
-
-/* Label do grupo de checkboxes */
 .exportar-label {
   font-size: 0.7rem !important;
   color: #000;
   margin-bottom: 0.5rem;
 }
 
-/* Botão Baixar */
-.exportar-aplicar, .exportar-toggle {
+.exportar-aplicar,
+.exportar-toggle {
   color: white !important;
   background-color: black !important;
   border-radius: 0.4rem !important;
@@ -88,7 +79,7 @@
   padding: 0.3rem 0.9rem !important;
 }
 
-.exportar-toggle{
+.exportar-toggle {
   background-color: #ccc !important;
   color: black !important;
   border-color: #ccc !important;
@@ -100,8 +91,6 @@
   cursor: not-allowed !important;
 }
 
-/* Checkboxes */
-
 .exportar-colunas {
   margin-top: 1rem;
 }
@@ -110,7 +99,6 @@
   font-size: 0.7rem !important;
 }
 
-/* Alinhar ícone e texto no valor selecionado */
 .MuiSelect-select {
   display: flex !important;
   align-items: center !important;

@@ -1,14 +1,16 @@
+// motoristas.tsx
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   listarMotorista,
   deletarMotorista,
   cadastrarMotorista,
   Motorista as MotoristaAPI,
 } from "@/api/services/motoristaService";
-import TabelaGenerica from "../components/tabela/tabela-generica";
+import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
+import FiltroAvancado from "../components/filtro/filtro-avancado";
 import CustomSnackbar from "../../../components/snackbar/snackbar";
 import {
   Box,
@@ -21,10 +23,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import PeopleIcon from "@mui/icons-material/People";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import IosShareIcon from "@mui/icons-material/IosShare";
-import FiltroAvancado from "../components/filtro/filtro-avancado";
 import Carregamento from "../../../components/carregamento/carregamento";
 import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
 import { motion } from "framer-motion";
+import "../styles/shared-styles.css";
 import "./motoristas.css";
 
 interface Motorista {
@@ -64,6 +66,7 @@ export default function Motoristas() {
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
   const [openExportar, setOpenExportar] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
     {}
   );
@@ -76,27 +79,15 @@ export default function Motoristas() {
 
   useEffect(() => {
     const controller = new AbortController();
-
     listarMotorista()
       .then((res) => {
-        if (!controller.signal.aborted) {
-          setDadosApi(res);
-        }
+        if (!controller.signal.aborted) setDadosApi(res);
       })
-      .catch((err) => {
-        if (!controller.signal.aborted) {
-          console.error("Erro:", err);
-        }
-      })
+      .catch((err) => console.error("Erro:", err))
       .finally(() => {
-        if (!controller.signal.aborted) {
-          setCarregando(false);
-        }
+        if (!controller.signal.aborted) setCarregando(false);
       });
-
-    return () => {
-      controller.abort(); // cancela requisição
-    };
+    return () => controller.abort();
   }, []);
 
   const motoristasData: Motorista[] = dadosApi.map((m) => {
@@ -122,7 +113,6 @@ export default function Motoristas() {
     const matchUltima = filtrosAvancados.ultimaViagem
       ? m.ultimaViagem === filtrosAvancados.ultimaViagem
       : true;
-
     return matchSearch && matchCadastro && matchCaminhao && matchUltima;
   });
 
@@ -160,7 +150,7 @@ export default function Motoristas() {
       setSnackbarAberto(true);
     } catch (err) {
       console.error("Erro ao excluir motorista:", err);
-      setSnackbarMensagem("Erro ao excluir motorista. Tente novamente.");
+      setSnackbarMensagem("Erro ao excluir motorista.");
       setSnackbarCor("light");
       setSnackbarAberto(true);
     }
@@ -185,14 +175,12 @@ export default function Motoristas() {
         alert("Nome é obrigatório");
         return;
       }
-
       const user = JSON.parse(sessionStorage.getItem("user") || "{}");
       const cnpj = user?.cnpj;
       if (!cnpj) {
         alert("Erro: CNPJ não encontrado na sessão.");
         return;
       }
-
       const payload = {
         id_motorista: 0,
         nome: dados.nome,
@@ -200,15 +188,12 @@ export default function Motoristas() {
         cnpj,
         habilitado: true,
       };
-
       await cadastrarMotorista(payload);
-
       setSnackbarMensagem("Motorista cadastrado com sucesso!");
       setSnackbarCor("primary");
       setSnackbarAberto(true);
       setOpen(false);
       setCarregando(true);
-
       const res = await listarMotorista();
       setDadosApi(res);
     } catch (err) {
@@ -265,9 +250,12 @@ export default function Motoristas() {
               variant="outlined"
               className="botao-filtrar"
               endIcon={<FilterAltOutlinedIcon />}
-              onClick={() => setOpenFiltros(true)}
+              onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+                setOpenFiltros(true);
+              }}
             >
-              Filtros Avançados
+              <span className="button-text">Filtros Avançados</span>
             </Button>
           </Box>
 
@@ -279,12 +267,14 @@ export default function Motoristas() {
             >
               Cadastrar Motorista
             </Button>
-
             <Button
               variant="contained"
               className="botao-exportar"
               startIcon={<IosShareIcon />}
-              onClick={() => setOpenExportar(true)}
+              onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+                setOpenExportar(true);
+              }}
             >
               Exportar
             </Button>
@@ -317,6 +307,7 @@ export default function Motoristas() {
           onChange={setFiltrosAvancados}
           onApply={() => setOpenFiltros(false)}
           onClear={() => setFiltrosAvancados({})}
+          anchorEl={anchorEl}
         />
 
         <ExportarRelatorioDialog
@@ -325,6 +316,7 @@ export default function Motoristas() {
           colunas={colunasMotoristas.map((c) => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
+          anchorEl={anchorEl}
         />
 
         <CustomSnackbar
