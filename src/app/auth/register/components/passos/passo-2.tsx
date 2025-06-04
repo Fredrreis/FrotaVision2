@@ -6,6 +6,7 @@ import ArrowBackwardsIcon from "@mui/icons-material/ArrowBack";
 import { useState } from "react";
 import * as yup from "yup";
 import { step2Schema } from "@/utils/validations";
+import { formatarCNPJ } from "@/utils/format";
 
 interface Passo2Props {
   formData: {
@@ -17,14 +18,9 @@ interface Passo2Props {
   prevStep: () => void;
 }
 
-function aplicarMascaraCNPJ(valor: string) {
-  return valor
-    .replace(/\D/g, "")
-    .replace(/^(\d{2})(\d)/, "$1.$2")
-    .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
-    .replace(/\.(\d{3})(\d)/, ".$1/$2")
-    .replace(/(\d{4})(\d)/, "$1-$2")
-    .slice(0, 18);
+function limparMascaraCNPJ(valor: string) {
+  const cnpjLimpo = valor.replace(/\D/g, "").slice(0, 14); // limitando a 14 dígitos
+  return cnpjLimpo;
 }
 
 export default function Passo2({
@@ -34,7 +30,6 @@ export default function Passo2({
   prevStep,
 }: Passo2Props) {
   const [errors, setErrors] = useState<{ empresa?: string; cnpj?: string }>({});
-
   const handleValidation = async () => {
     try {
       await step2Schema.validate(formData, { abortEarly: false });
@@ -79,13 +74,13 @@ export default function Passo2({
         label="CNPJ"
         variant="outlined"
         fullWidth
-        value={formData.cnpj}
+        value={formatarCNPJ(formData.cnpj)}
         onChange={(e) => {
-          const valorFormatado = aplicarMascaraCNPJ(e.target.value);
+          const cnpjSemMascara = limparMascaraCNPJ(e.target.value);
           handleChange({
             target: {
               name: "cnpj",
-              value: valorFormatado,
+              value: cnpjSemMascara,
             },
           } as React.ChangeEvent<HTMLInputElement>);
         }}

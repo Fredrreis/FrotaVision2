@@ -5,6 +5,7 @@ import {
   deletarViagem,
   Viagem as ViagemAPI,
 } from "@/api/services/viagemService";
+import { useSession } from "next-auth/react";
 import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
@@ -65,6 +66,7 @@ const mapeamentoCampos = {
 };
 
 export default function Viagens() {
+  const { data: session } = useSession();
   const [dadosApi, setDadosApi] = useState<ViagemAPI[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [dados, setDados] = useState<Viagem | null>(null);
@@ -87,15 +89,32 @@ export default function Viagens() {
   const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
     "primary"
   );
-
   useEffect(() => {
     const controller = new AbortController();
-    listarViagens()
-      .then((res) => !controller.signal.aborted && setDadosApi(res))
-      .catch((err) => console.error("Erro:", err))
-      .finally(() => !controller.signal.aborted && setCarregando(false));
+
+    if (!session?.user?.cnpj) return;
+
+    listarViagens(session.user.cnpj, controller.signal)
+      .then((res) => {
+        if (!controller.signal.aborted) setDadosApi(res);
+      })
+      .catch((err) => {
+        if (
+          !(
+            err.name === "CanceledError" ||
+            err.code === "ERR_CANCELED" ||
+            err.message === "canceled"
+          )
+        ) {
+          console.error("Erro:", err);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setCarregando(false);
+      });
+
     return () => controller.abort();
-  }, []);
+  }, [session?.user?.cnpj]);
 
   const viagensData: Viagem[] = dadosApi.map((v) => ({
     id: v.id_viagem,

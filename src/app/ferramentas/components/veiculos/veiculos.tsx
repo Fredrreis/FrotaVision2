@@ -1,4 +1,3 @@
-// veiculos.tsx
 "use client";
 import { useEffect, useState } from "react";
 import {
@@ -6,6 +5,7 @@ import {
   deletarVeiculo,
   Veiculo as VeiculoAPI,
 } from "@/api/services/veiculoService";
+import { useSession } from "next-auth/react";
 import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
@@ -65,6 +65,7 @@ const mapeamentoCampos = {
 };
 
 export default function Veiculos() {
+  const { data: session } = useSession();
   const [dadosApi, setDadosApi] = useState<VeiculoAPI[]>([]);
   const [dados, setDados] = useState<Veiculo | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -86,16 +87,30 @@ export default function Veiculos() {
 
   useEffect(() => {
     const controller = new AbortController();
-    listarVeiculos()
+
+    if (!session?.user?.cnpj) return;
+
+    listarVeiculos(session.user.cnpj, controller.signal)
       .then((res) => {
         if (!controller.signal.aborted) setDadosApi(res);
       })
-      .catch((err) => console.error("Erro:", err))
+      .catch((err) => {
+        if (
+          !(
+            err.name === "CanceledError" ||
+            err.code === "ERR_CANCELED" ||
+            err.message === "canceled"
+          )
+        ) {
+          console.error("Erro:", err);
+        }
+      })
       .finally(() => {
         if (!controller.signal.aborted) setCarregando(false);
       });
+
     return () => controller.abort();
-  }, []);
+  }, [session?.user?.cnpj]);
 
   const dadosFiltrados: Veiculo[] = dadosApi
     .map((v) => {
@@ -181,7 +196,6 @@ export default function Veiculos() {
   };
 
   const handleSalvar = () => {
-    console.log(modoEdicao ? "Salvando edição:" : "Cadastrando novo:", dados);
     setOpen(false);
   };
 

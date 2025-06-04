@@ -6,7 +6,6 @@ export interface ManutencaoRealizada {
   id_manutencao: number;
   apelido: string;
   descricao: string;
-  //tipo do caminhão
   quilometragem_ultima_manutencao: number;
   horasMotorManutencao: number;
   data_manutencao: string;
@@ -25,10 +24,11 @@ export const cadastrarManutencaoRealizada = async (
 };
 
 export const listarManutencaoRealizada = async (
+  cnpj: string,
   signal?: AbortSignal
 ): Promise<ManutencaoRealizada[]> => {
   return await api.get<ManutencaoRealizada[]>(
-    '/ManutencaoRealizada/ListarDetalhado',
+    `/ManutencaoRealizada/Listar/${cnpj}`,
     {},
     signal
   );

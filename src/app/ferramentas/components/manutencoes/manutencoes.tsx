@@ -5,6 +5,7 @@ import {
   deletarManutencaoRealizada,
   ManutencaoRealizada,
 } from "@/api/services/manutencaoRealizadaService";
+import { useSession } from "next-auth/react";
 import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
@@ -67,6 +68,7 @@ const mapeamentoCampos = {
 };
 
 export default function Manutencoes() {
+  const { data: session } = useSession();
   const [dadosApi, setDadosApi] = useState<ManutencaoRealizada[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [dados, setDados] = useState<Manutencao | null>(null);
@@ -92,14 +94,30 @@ export default function Manutencoes() {
 
   useEffect(() => {
     const controller = new AbortController();
-    listarManutencaoRealizada()
+
+    if (!session?.user?.cnpj) return;
+
+    listarManutencaoRealizada(session.user.cnpj, controller.signal)
       .then((res) => {
         if (!controller.signal.aborted) setDadosApi(res);
       })
-      .catch((err) => console.error("Erro:", err))
-      .finally(() => !controller.signal.aborted && setCarregando(false));
+      .catch((err) => {
+        if (
+          !(
+            err.name === "CanceledError" ||
+            err.code === "ERR_CANCELED" ||
+            err.message === "canceled"
+          )
+        ) {
+          console.error("Erro:", err);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setCarregando(false);
+      });
+
     return () => controller.abort();
-  }, []);
+  }, [session?.user?.cnpj]);
 
   const manutencoesData: Manutencao[] = dadosApi.map((m) => ({
     id: m.id_manutencao_realizada,

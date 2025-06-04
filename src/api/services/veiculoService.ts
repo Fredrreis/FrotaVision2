@@ -1,4 +1,6 @@
-import { ApiGateway } from '../api';
+// src/api/services/veiculoService.ts
+
+import { ApiGateway } from "../api";
 
 export interface Veiculo {
   id_veiculo: number;
@@ -18,9 +20,10 @@ export interface Veiculo {
 const api = new ApiGateway();
 
 export const listarVeiculos = async (
+  cnpj: string,
   signal?: AbortSignal
 ): Promise<Veiculo[]> => {
-  return await api.get<Veiculo[]>('/Veiculo/Listar', {}, signal);
+  return await api.get<Veiculo[]>(`/Veiculo/Listar/${cnpj}`, {}, signal);
 };
 
 export const deletarVeiculo = async (id: number): Promise<void> => {

@@ -20,75 +20,73 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import { useEffect, useState } from "react";
+import { listarNotificacoes } from "@/api/services/notificacaoService";
+import { useSession } from "next-auth/react";
 import "./notificacoes.css";
 
-interface Notificacao {
+interface NotificacaoFormatada {
   id: number;
   data: string;
-  caminhão: string;
+  caminhao: string;
   tipo: string;
-  peça: string;
+  peca: string;
   descricao: string;
-  vidaUtil: string;
-  atual: string;
+  vidaUtil: number;
+  atual: number;
+  urgente: boolean;
 }
-
-const notificacoesOriginais: Notificacao[] = [
-  {
-    id: 1,
-    data: "2024-04-10",
-    caminhão: "Caminhão 1",
-    tipo: "Betoneira",
-    peça: "Bomba hidráulica",
-    descricao: "Substituição necessária devido a vazamento identificado.",
-    vidaUtil: "90km",
-    atual: "80km",
-  },
-  {
-    id: 2,
-    data: "2024-03-20",
-    caminhão: "Caminhão 2",
-    tipo: "Basculante",
-    peça: "Freio",
-    descricao: "Desgaste excessivo identificado nos discos de freio traseiros.",
-    vidaUtil: "150km",
-    atual: "160km",
-  },
-  {
-    id: 3,
-    data: "2024-04-09",
-    caminhão: "Caminhão 5",
-    tipo: "Prancha",
-    peça: "Pneu dianteiro esquerdo",
-    descricao:
-      "Pressão abaixo do recomendado. Verificar possibilidade de furo.",
-    vidaUtil: "100km",
-    atual: "95km",
-  },
-];
 
 export default function Notificacoes() {
   const theme = useTheme();
-  const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
+  const { data: session } = useSession();
+  const [notificacoes, setNotificacoes] = useState<NotificacaoFormatada[]>([]);
   const [vistas, setVistas] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const buscarNotificacoes = async () => {
+      try {
+        if (!session?.user?.cnpj) return;
+
+        const dados = await listarNotificacoes(session.user.cnpj);
+
+        // Transformar os dados da API no formato necessário para exibição
+        const notificacoesFormatadas: NotificacaoFormatada[] = dados.map(
+          (n) => ({
+            id: n.idManutencaoRealizada,
+            data: n.data_viagem,
+            caminhao: n.nomeVeiculo,
+            tipo: n.tipo_caminhao,
+            peca: n.nomeManutencao,
+            descricao: n.descricao_manutencao,
+            vidaUtil: n.quilometragemManutencao,
+            atual: n.quilometragemAtual,
+            urgente: n.urgente,
+          })
+        );
+
+        const ordenadas = notificacoesFormatadas.sort(
+          (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
+        );
+
+        setNotificacoes(ordenadas);
+      } catch (erro) {
+        console.error("Erro ao buscar notificações:", erro);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     const vistasSalvas = localStorage.getItem("notificacoesVistas");
     const idsVistos = vistasSalvas ? JSON.parse(vistasSalvas) : [];
-
     setVistas(idsVistos);
 
-    const ordenadas = [...notificacoesOriginais].sort(
-      (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
-    );
-
-    setNotificacoes(ordenadas);
-  }, []);
-
+    buscarNotificacoes();
+  }, [session?.user?.cnpj]);
   useEffect(() => {
-    const todosIds = notificacoesOriginais.map((n) => n.id);
+    const todosIds = notificacoes.map((n) => n.id);
     localStorage.setItem("notificacoesVistas", JSON.stringify(todosIds));
-  }, []);
+  }, [notificacoes]);
 
   return (
     <Box className="notificacoes-container">
@@ -97,12 +95,14 @@ export default function Notificacoes() {
       </Typography>
 
       <Timeline className="notificacoes-timeline">
+        {" "}
         {notificacoes.map((n, i) => {
-          const isUrgente = parseInt(n.atual) > parseInt(n.vidaUtil);
+          const isUrgente = n.urgente;
           const isNova = !vistas.includes(n.id);
-
+          // Garantindo que a key será única mesmo se algum campo for undefined/null
+          const uniqueKey = `notificacao-${n.id || i}-${Date.now()}-${i}`;
           return (
-            <TimelineItem key={n.id} className="timeline-item">
+            <TimelineItem key={uniqueKey} className="timeline-item">
               <TimelineOppositeContent className="timeline-date">
                 {new Date(n.data).toLocaleDateString()}
               </TimelineOppositeContent>
@@ -141,7 +141,7 @@ export default function Notificacoes() {
               <TimelineContent className="timeline-content">
                 <Paper elevation={3} className="notificacao-card">
                   <Typography variant="subtitle2" fontWeight={600}>
-                    {n.caminhão} - {n.peça}
+                    {n.caminhao} - {n.peca}
                   </Typography>
 
                   <Divider className="divider" />
@@ -164,7 +164,7 @@ export default function Notificacoes() {
                     <Box component="span" fontWeight={600}>
                       Vida útil:
                     </Box>{" "}
-                    {n.vidaUtil}
+                    {n.vidaUtil} km
                   </Typography>
 
                   <Typography
@@ -175,7 +175,7 @@ export default function Notificacoes() {
                     <Box component="span" fontWeight={600}>
                       Atual:
                     </Box>{" "}
-                    {n.atual}
+                    {n.atual} km
                   </Typography>
 
                   <Box className="notificacao-botao-container">

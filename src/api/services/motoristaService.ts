@@ -22,9 +22,10 @@ export const cadastrarMotorista = async (motorista: {
 };
 
 export const listarMotorista = async (
+  cnpj: string,
   signal?: AbortSignal
 ): Promise<Motorista[]> => {
-  return await api.get<Motorista[]>('/Motorista/Listar', {}, signal);
+  return await api.get<Motorista[]>(`/Motorista/Listar/${cnpj}`, {}, signal);
 };
 
 export const deletarMotorista = async (id: number): Promise<void> => {

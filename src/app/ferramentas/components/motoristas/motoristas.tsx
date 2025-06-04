@@ -1,4 +1,3 @@
-// motoristas.tsx
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -7,6 +6,7 @@ import {
   cadastrarMotorista,
   Motorista as MotoristaAPI,
 } from "@/api/services/motoristaService";
+import { useSession } from "next-auth/react";
 import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
@@ -58,6 +58,7 @@ const mapeamentoCampos = {
 };
 
 export default function Motoristas() {
+  const { data: session } = useSession();
   const [dadosApi, setDadosApi] = useState<MotoristaAPI[]>([]);
   const [dados, setDados] = useState<Motorista | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -79,16 +80,30 @@ export default function Motoristas() {
 
   useEffect(() => {
     const controller = new AbortController();
-    listarMotorista()
+
+    if (!session?.user?.cnpj) return;
+
+    listarMotorista(session.user.cnpj, controller.signal)
       .then((res) => {
         if (!controller.signal.aborted) setDadosApi(res);
       })
-      .catch((err) => console.error("Erro:", err))
+      .catch((err) => {
+        if (
+          !(
+            err.name === "CanceledError" ||
+            err.code === "ERR_CANCELED" ||
+            err.message === "canceled"
+          )
+        ) {
+          console.error("Erro:", err);
+        }
+      })
       .finally(() => {
         if (!controller.signal.aborted) setCarregando(false);
       });
+
     return () => controller.abort();
-  }, []);
+  }, [session?.user?.cnpj]);
 
   const motoristasData: Motorista[] = dadosApi.map((m) => {
     const dataOriginal = m.data_cadastro || "";
@@ -168,16 +183,13 @@ export default function Motoristas() {
     setModoEdicao(false);
     setOpen(true);
   };
-
   const handleSalvar = async () => {
     try {
       if (!dados?.nome) {
         alert("Nome é obrigatório");
         return;
       }
-      const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-      const cnpj = user?.cnpj;
-      if (!cnpj) {
+      if (!session?.user?.cnpj) {
         alert("Erro: CNPJ não encontrado na sessão.");
         return;
       }
@@ -185,7 +197,7 @@ export default function Motoristas() {
         id_motorista: 0,
         nome: dados.nome,
         data_cadastro: new Date().toISOString(),
-        cnpj,
+        cnpj: session.user.cnpj,
         habilitado: true,
       };
       await cadastrarMotorista(payload);
@@ -194,7 +206,7 @@ export default function Motoristas() {
       setSnackbarAberto(true);
       setOpen(false);
       setCarregando(true);
-      const res = await listarMotorista();
+      const res = await listarMotorista(session.user.cnpj);
       setDadosApi(res);
     } catch (err) {
       console.error("Erro ao cadastrar motorista:", err);

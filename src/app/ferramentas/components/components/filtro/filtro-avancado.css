@@ -68,22 +68,27 @@
   flex: 1 1 100%;
 }
 
-.filtro-input input {
+.filtro-popup .MuiInputLabel-root {
   font-size: 0.7rem !important;
 }
 
-.MuiSelect-select {
+.filtro-popup .MuiSelect-select {
   font-size: 0.7rem !important;
   padding-top: 1rem !important;
   display: flex;
   align-items: center;
 }
 
-.MuiInputLabel-root {
+.filtro-popup .MuiMenuItem-root {
   font-size: 0.7rem !important;
 }
 
-.MuiMenuItem-root {
+.filtro-popup .MuiSlider-valueLabel {
+  font-size: 0.7rem !important;
+  border-radius: 0.4rem !important;
+}
+
+.filtro-input input {
   font-size: 0.7rem !important;
 }
 
@@ -94,11 +99,6 @@
 .filtro-range-label {
   font-size: 0.7rem !important;
   color: #000;
-}
-
-.MuiSlider-valueLabel {
-  font-size: 0.7rem !important;
-  border-radius: 0.4rem !important;
 }
 
 .filtro-actions {

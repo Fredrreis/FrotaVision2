@@ -2,6 +2,7 @@ import { Button, Typography, Box, CircularProgress } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowBackwardsIcon from "@mui/icons-material/ArrowBack";
 import { useState } from "react";
+import { formatarCNPJ } from "@/utils/format";
 
 interface PlanoSelecionado {
   nome: string;
@@ -73,7 +74,7 @@ export default function Passo3({
         <strong>Empresa:</strong> {formData.empresa}
       </Typography>
       <Typography variant="body2" className="register-campo">
-        <strong>CNPJ:</strong> {formData.cnpj}
+        <strong>CNPJ:</strong> {formatarCNPJ(formData.cnpj)}
       </Typography>
 
       <Button

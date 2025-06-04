@@ -8,7 +8,7 @@ export default async function FerramentasPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("auth/login");
+    redirect("home");
   }
 
   return <Ferramentas />;

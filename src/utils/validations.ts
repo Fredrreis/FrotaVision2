@@ -12,7 +12,12 @@ export const passwordField = yup
 
 export const cnpjField = yup
   .string()
-  .matches(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, "CNPJ inválido")
+  .test("len", "CNPJ deve ter exatamente 14 dígitos", (val) => {
+    if (!val) return false;
+    
+    const cnpjLimpo = val.replace(/\D/g, "");
+    return cnpjLimpo.length === 14;
+  })
   .required("CNPJ obrigatório");
 
 export const requiredText = (label = "Campo") =>

@@ -5,6 +5,7 @@ import {
   deletarUsuario,
   Usuario as UsuarioAPI,
 } from "@/api/services/usuarioService";
+import { useSession } from "next-auth/react";
 import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
 import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
@@ -51,6 +52,7 @@ const mapeamentoCampos = {
 };
 
 export default function Usuarios() {
+  const { data: session } = useSession();
   const [dadosApi, setDadosApi] = useState<UsuarioAPI[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [dados, setDados] = useState<Usuario | null>(null);
@@ -74,18 +76,25 @@ export default function Usuarios() {
   );
 
   const isMounted = useRef(true);
-
   useEffect(() => {
     const controller = new AbortController();
 
-    listarUsuarios()
+    if (!session?.user?.cnpj) return;
+
+    listarUsuarios(session.user.cnpj, controller.signal)
       .then((res) => {
         if (!controller.signal.aborted) {
           setDadosApi(res);
         }
       })
       .catch((err) => {
-        if (!controller.signal.aborted) {
+        if (
+          !(
+            err.name === "CanceledError" ||
+            err.code === "ERR_CANCELED" ||
+            err.message === "canceled"
+          )
+        ) {
           console.error("Erro:", err);
         }
       })
@@ -98,7 +107,7 @@ export default function Usuarios() {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [session?.user?.cnpj]);
 
   const usuariosData: Usuario[] = dadosApi.map((u) => ({
     nome: u.nome_usuario || "—",

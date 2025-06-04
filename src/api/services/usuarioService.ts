@@ -22,9 +22,13 @@ export interface LoginResponse {
 
 const api = new ApiGateway();
 
-export const listarUsuarios = async (signal?: AbortSignal): Promise<Usuario[]> => {
-  return await api.get<Usuario[]>('/Usuario/Listar', {}, signal);
+export const listarUsuarios = async (
+  cnpj: string,
+  signal?: AbortSignal
+): Promise<Usuario[]> => {
+  return await api.get<Usuario[]>(`/Usuario/Listar/${cnpj}`, {}, signal);
 };
+
 
 export const deletarUsuario = async (id: number): Promise<void> => {
   await api.delete(`/Usuario/Deletar/${id}`);
