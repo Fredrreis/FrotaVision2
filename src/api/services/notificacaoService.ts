@@ -1,7 +1,7 @@
 import { ApiGateway } from '../api';
 
 export interface Notificacao {
-  data_viagem: string;
+  data_Manutencao: string;
   descricao_manutencao: string;
   idManutencaoRealizada: number;
   id_manutencao: number;
@@ -11,7 +11,7 @@ export interface Notificacao {
   quilometragemAtual: number;
   quilometragemManutencao: number;
   tipo_caminhao: string;
-  urgente: boolean;
+  urgencia: boolean;  // Alterado de urgente para urgencia
 }
 
 const api = new ApiGateway();
@@ -20,5 +20,5 @@ export const listarNotificacoes = async (
   cnpj: string,
   signal?: AbortSignal
 ): Promise<Notificacao[]> => {
-  return await api.get<Notificacao[]>(`/Notificacao/Notifacar/${cnpj}`, {}, signal);
+  return await api.get<Notificacao[]>(`/Notificacao/Notificar/${cnpj}`, {}, signal);
 };

@@ -2,11 +2,21 @@
   padding: 2rem !important;
 }
 
+.notificacoes-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.notificacoes-filtros {
+  margin-bottom: 2rem !important;
+}
+
 .notificacoes-title {
   font-weight: 600 !important;
   display: flex !important;
   align-items: center !important;
-  margin-bottom: 1.5rem !important;
   font-size: 1.25rem !important;
 }
 
@@ -43,10 +53,10 @@
 }
 
 .notificacao-card {
-  max-width: 75rem !important; /* 1200px → 75rem */
+  max-width: 75rem !important;
   width: 100% !important;
   padding: 1rem !important;
-  border-radius: 0.45rem !important; /* 10px */
+  border-radius: 0.45rem !important;
   background-color: #fff !important;
   transition: all 0.3s ease-in-out !important;
 }
@@ -61,7 +71,7 @@
 
 /* Exceção autorizada: linha vertical da timeline */
 .MuiTimelineConnector-root {
-  width: 0.125rem !important; /* 2px */
+  width: 0.125rem !important;
   background-color: rgba(0, 0, 0, 0.12) !important;
   flex-grow: 1 !important;
   margin: 0 auto !important;
@@ -96,10 +106,6 @@
     padding: 1rem !important;
   }
 
-  .notificacoes-title {
-    font-size: 1.1rem !important;
-  }
-
   .timeline-item {
     flex-direction: row !important;
     align-items: flex-start !important;
@@ -117,14 +123,6 @@
   .timeline-dot {
     margin-top: 0.25rem !important;
     margin-right: 0.5rem !important;
-  }
-
-  .MuiTimelineConnector-root {
-    display: block !important;
-    height: 100% !important;
-    width: 2px !important;
-    background-color: rgba(0, 0, 0, 0.12) !important;
-    margin: 0 auto !important;
   }
 
   .timeline-date {

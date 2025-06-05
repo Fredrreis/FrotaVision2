@@ -21,6 +21,7 @@ interface FilterField {
   options?: string[];
   min?: number;
   max?: number;
+  transform?: (value: any) => any;
 }
 
 interface AdvancedFilterProps {
@@ -44,32 +45,33 @@ export default function AdvancedFilter({
   onApply,
   anchorEl,
 }: AdvancedFilterProps) {
-  const [localValues, setLocalValues] = useState(values);
+  const [localValues, setLocalValues] = useState<Record<string, any>>(values);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarClearOpen, setSnackbarClearOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (open) {
-      setSnackbarOpen(false);
-      setSnackbarClearOpen(false);
-    }
-  }, [open]);
-
-  useEffect(() => {
     setLocalValues(values);
   }, [values]);
+
+  const handleChange = (name: string, value: any, filter?: FilterField) => {
+    setLocalValues((prev) => ({ ...prev, [name]: value }));
+  };
 
   const requestClose = () => {
     onClose();
   };
 
-  const handleChange = (name: string, value: any) => {
-    setLocalValues((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleApply = () => {
-    onChange(localValues);
+    const transformedValues = { ...localValues };
+    filters.forEach((filter) => {
+      if (filter.transform && transformedValues[filter.name]) {
+        transformedValues[filter.name] = filter.transform(
+          transformedValues[filter.name]
+        );
+      }
+    });
+    onChange(transformedValues);
     onApply();
     setSnackbarOpen(true);
     setTimeout(() => requestClose(), 300);
@@ -107,7 +109,9 @@ export default function AdvancedFilter({
                     label={filter.label}
                     name={filter.name}
                     value={localValues[filter.name] ?? ""}
-                    onChange={(e) => handleChange(filter.name, e.target.value)}
+                    onChange={(e) =>
+                      handleChange(filter.name, e.target.value, filter)
+                    }
                     fullWidth
                     variant="outlined"
                     size="small"
@@ -126,20 +130,25 @@ export default function AdvancedFilter({
                     </Typography>
                     <Slider
                       value={localValues[filter.name] ?? filter.max ?? 0}
-                      onChange={(_, value) => handleChange(filter.name, value)}
+                      onChange={(_, value) =>
+                        handleChange(filter.name, value, filter)
+                      }
                       min={filter.min}
                       max={filter.max}
                       className="filtro-range-slider"
                       valueLabelDisplay="on"
                       valueLabelFormat={(value) => {
-                        if (filter.name === "custo")
-                          return `R$ ${value.toFixed(2)}`;
+                        if (filter.name === "custo") return `R$ ${value.toFixed(2)}`;
                         if (filter.name === "km") return `${value} km`;
                         if (filter.name === "horasMotor") return `${value} h`;
                         return value;
                       }}
                     />
-                    <Box display="flex" justifyContent="space-between" mt={-1}>
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      mt={1}
+                    >
                       <Typography className="filtro-range-label">
                         {filter.min}
                       </Typography>
@@ -154,7 +163,9 @@ export default function AdvancedFilter({
                     name={filter.name}
                     type="date"
                     value={localValues[filter.name] ?? ""}
-                    onChange={(e) => handleChange(filter.name, e.target.value)}
+                    onChange={(e) =>
+                      handleChange(filter.name, e.target.value, filter)
+                    }
                     fullWidth
                     variant="outlined"
                     size="small"
@@ -167,7 +178,9 @@ export default function AdvancedFilter({
                     name={filter.name}
                     type={filter.type}
                     value={localValues[filter.name] ?? ""}
-                    onChange={(e) => handleChange(filter.name, e.target.value)}
+                    onChange={(e) =>
+                      handleChange(filter.name, e.target.value, filter)
+                    }
                     fullWidth
                     variant="outlined"
                     size="small"

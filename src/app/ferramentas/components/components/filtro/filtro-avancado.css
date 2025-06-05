@@ -1,20 +1,20 @@
 .filtro-popup {
   width: 20rem;
-  background-color: white;
-  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.15);
+  background-color: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   border-radius: 0.5rem;
-  padding: 1rem 1.5rem 1.5rem 1.5rem;
-  font-size: 0.7rem !important;
+  padding: 1rem 1.5rem 1.5rem;
   transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
   z-index: 1;
+  font-size: 0.7rem !important;
 }
 
 .animated-slide-down {
-  animation: slideDown 0.2s ease-in-out;
+  animation: 0.2s ease-in-out slideDown;
 }
 
 .slide-up-out {
-  animation: slideUp 0.2s ease-in-out;
+  animation: 0.2s ease-in-out slideUp;
 }
 
 @keyframes slideDown {

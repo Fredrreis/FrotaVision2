@@ -21,8 +21,21 @@ export default function GenericPopper({
       open={open}
       anchorEl={anchorEl}
       placement={placement}
-      disablePortal={false}
-      modifiers={[{ name: "offset", options: { offset: [0, 8] } }]}
+      modifiers={[
+        {
+          name: "offset",
+          options: {
+            offset: [0, 8],
+          },
+        },
+        {
+          name: "preventOverflow",
+          options: {
+            boundary: "viewport",
+            altBoundary: true,
+          },
+        },
+      ]}
       style={{ zIndex }}
     >
       {children}
