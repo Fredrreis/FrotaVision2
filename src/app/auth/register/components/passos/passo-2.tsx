@@ -5,7 +5,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackwardsIcon from "@mui/icons-material/ArrowBack";
 import { useState } from "react";
 import * as yup from "yup";
-import { step2Schema } from "@/utils/validations";
+import { step2Schema } from "@/utils/login-validation";
 import { formatarCNPJ } from "@/utils/format";
 
 interface Passo2Props {

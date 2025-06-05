@@ -7,7 +7,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import GoogleIcon from "../../../../img/google.png";
 import MicrosoftIcon from "../../../../img/microsoft.png";
 import SenhaForte from "../../../../components/senha-status/senha-status";
-import { step1Schema } from "@/utils/validations";
+import { step1Schema } from "@/utils/login-validation";
 import useToggleSenha from "@/app/components/toggle-senha/toggle-senha";
 
 interface Step1Props {

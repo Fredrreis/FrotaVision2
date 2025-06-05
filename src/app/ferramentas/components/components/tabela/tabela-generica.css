@@ -1,145 +1,98 @@
+/* tabela-generica.css */
+
 .tabela-generica {
-    width: 100%;
-    border-radius: 0.40rem !important;
-    table-layout: fixed;
+  width: 100%;
+  border-radius: 0.40rem !important;
+  table-layout: fixed;
 }
 
 .tabela-header {
-    background-color: white !important;
-    position: relative !important;
+  background-color: white !important;
+  position: relative !important;
 }
 
 .tabela-header::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 4px;
-    border-radius: 0.40rem !important;
-    box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.397);
-    z-index: 1;
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 4px;
+  border-radius: 0.40rem !important;
+  box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.397);
+  z-index: 1;
 }
 
 .tabela-header-cell {
-    padding: 1.1rem !important;
-    font-weight: 600 !important;
+  padding: 1.1rem !important;
+  font-weight: 600 !important;
 }
 
 .tabela-header-content {
-    display: flex !important;
-    align-items: center !important;
-    gap: 5px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
 }
 
 .sort-icon {
-    font-size: 1.2rem !important;
-    cursor: pointer;
-    color: black !important;
+  font-size: 1.2rem !important;
+  cursor: pointer;
+  color: black !important;
 }
 
 .sort-icon-inactive {
-    font-size: 1.2rem !important;
-    color: rgb(87, 87, 87);
-    opacity: 0.6;
+  font-size: 1.2rem !important;
+  color: rgb(87, 87, 87);
+  opacity: 0.6;
 }
 
 .linha-par {
-    background-color: #EEF4FF;
-}
-
-.nome-com-alerta {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  background-color: #eef4ff;
 }
 
 .icone-alerta {
-    font-size: 1.3rem !important;
-    color: #1B3562;
-    vertical-align: middle !important;
-    cursor: pointer !important;
+  font-size: 1.3rem !important;
+  color: #1b3562;
+  vertical-align: middle !important;
+  cursor: pointer !important;
 }
 
 /* Ícones de Ação */
 .icone-acao {
-    cursor: pointer;
-    margin: 0 0.3rem;
-    font-size: 1.3rem !important;
+  cursor: pointer;
+  margin: 0 0.3rem;
+  font-size: 1.3rem !important;
 }
 
-.editar, .excluir, .examinar {
-    color: #646464;
+.editar,
+.excluir,
+.examinar {
+  color: #646464;
 }
 
-.editar:hover, .examinar:hover {
-    color: #1B3562;
+.editar:hover,
+.examinar:hover {
+  color: #1b3562;
 }
 
 .excluir:hover {
-    color: #A30D11;
-}
-
-.modal-confirmacao .MuiPaper-root {
-    border-radius: 0.5rem !important;
-    padding: 1.1rem !important;
-    width: 100%;
-    max-width: 400px !important;
-}
-
-.modal-titulo {
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-    color: #000000 !important;
-    text-align: center;
-}
-
-.modal-texto {
-    text-align: center !important;
-    color: #000000 !important;
-    margin-top: 0.5rem;
-}
-
-/* Botões do Modal */
-.modal-acoes {
-    display: flex;
-    justify-content: space-between !important;
-    margin-top: 1.5rem !important;
-}
-
-.botao-cancelar {
-    background-color: #ccc !important;
-    color: black !important;
-    margin-bottom: 0 !important;
-    border-radius: 0.40rem !important;
-}
-
-.botao-excluir {
-    background-color: #000000 !important;
-    color: white !important;
-    margin-bottom: 0 !important;
-    border-radius: 0.4rem !important;
-}
-
-.botao-excluir:hover {
-    background-color: #8c0b0e !important;
+  color: #a30d11;
 }
 
 /* Responsividade */
 @media (max-width: 1024px) {
-    .tabela-generica {
-        overflow-x: auto;
-    }
+  .tabela-generica {
+    overflow-x: auto;
+  }
 
-    .tabela-header-cell {
-        font-size: 0.85rem;
-    }
+  .tabela-header-cell {
+    font-size: 0.85rem;
+  }
 }
 
 @media (max-width: 768px) {
-
-
-    .tabela-header-cell, .tabela-generica td {
-        font-size: 0.8rem !important;
-    }
+  .tabela-header-cell,
+  .tabela-generica td {
+    font-size: 0.8rem !important;
+  }
 }

@@ -34,7 +34,6 @@ interface Manutencao {
   tipoVeiculo: string;
   nome: string;
   km: number;
-  horasMotor: number;
   descricao: string;
   data: string;
   dataOriginal: string;
@@ -48,7 +47,6 @@ const colunasManutencoes = [
   { chave: "tipoVeiculo", titulo: "Tipo Caminhão", ordenavel: false },
   { chave: "nome", titulo: "Manutenção", ordenavel: false },
   { chave: "km", titulo: "Km da Manutenção", ordenavel: true },
-  { chave: "horasMotor", titulo: "Horas do Motor", ordenavel: true },
   { chave: "descricao", titulo: "Descrição", ordenavel: false },
   { chave: "data", titulo: "Data", ordenavel: true },
   { chave: "custo", titulo: "Custo", ordenavel: true },
@@ -60,7 +58,6 @@ const mapeamentoCampos = {
   "Tipo Caminhão": "tipoVeiculo",
   Manutenção: "nome",
   "Km da Manutenção": "km",
-  "Horas do Motor": "horasMotor",
   Descrição: "descricao",
   Data: "data",
   Custo: "custo",
@@ -100,6 +97,7 @@ export default function Manutencoes() {
     listarManutencaoRealizada(session.user.cnpj, controller.signal)
       .then((res) => {
         if (!controller.signal.aborted) setDadosApi(res);
+        console.log(res);
       })
       .catch((err) => {
         if (
@@ -122,10 +120,9 @@ export default function Manutencoes() {
   const manutencoesData: Manutencao[] = dadosApi.map((m) => ({
     id: m.id_manutencao_realizada,
     veiculo: m.apelido || "Desconhecido",
-    tipoVeiculo: "Tipo Caminhão",
-    nome: m.nome || "—",
+    tipoVeiculo: m.tipo || "—",
+    nome: m.manutenção || "—",
     km: m.quilometragem_ultima_manutencao ?? 0,
-    horasMotor: m.horasMotorManutencao ?? 0,
     descricao: m.descricaoManutencao || "—",
     data: formatarDataISOcomHora(m.data_manutencao),
     dataOriginal: m.data_manutencao,
@@ -143,9 +140,6 @@ export default function Manutencoes() {
     const matchData = filtrosAvancados.data
       ? compareDateISO(m.dataOriginal as string, filtrosAvancados.data)
       : true;
-    const matchHorasMotor = filtrosAvancados.horasMotor
-      ? m.horasMotor <= Number(filtrosAvancados.horasMotor)
-      : true;
     const matchCusto = filtrosAvancados.custo
       ? parseFloat(m.custo.replace(",", ".")) <= filtrosAvancados.custo
       : true;
@@ -156,7 +150,6 @@ export default function Manutencoes() {
     return (
       matchSearch &&
       matchTipoVeiculo &&
-      matchHorasMotor &&
       matchData &&
       matchCusto &&
       matchTipo &&
@@ -170,7 +163,6 @@ export default function Manutencoes() {
   const maxCusto = Math.max(
     ...manutencoesData.map((m) => parseFloat(m.custo.replace(",", ".")))
   );
-  const maxHorasMotor = Math.max(...manutencoesData.map((m) => m.horasMotor));
 
   const filtrosAvancadosConfig = [
     {
@@ -185,13 +177,6 @@ export default function Manutencoes() {
       label: "Tipo Manutenção",
       type: "select" as const,
       options: tiposManutencao,
-    },
-    {
-      name: "horasMotor",
-      label: "Horas do Motor",
-      type: "range" as const,
-      min: 0,
-      max: maxHorasMotor,
     },
     {
       name: "custo",

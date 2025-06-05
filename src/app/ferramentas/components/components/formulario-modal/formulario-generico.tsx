@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,29 +8,36 @@ import {
   MenuItem,
   Box,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import "./formulario-generico.css";
 
-interface Coluna {
+export interface OpcaoSelect {
+  label: string;
+  value: string;
+}
+
+export interface Coluna {
   chave: string;
   titulo: string;
   tipo?: "texto" | "selecao" | "area" | "custom";
-  opcoes?: string[];
+  opcoes?: string[] | OpcaoSelect[];
   desativado?: boolean;
-  componente?: React.ReactNode; // para campos tipo custom
+  componente?: React.ReactNode;
 }
 
 interface ModalProps<T extends Record<string, unknown>> {
   open: boolean;
   onClose: () => void;
-  onSalvar: () => void;
+  onSalvar: () => Promise<void>;
   colunas: Coluna[];
   dados: T | null;
   setDados: (novosDados: T) => void;
   modoEdicao: boolean;
   children?: React.ReactNode;
   ocultarCabecalho?: boolean;
+  titulo?: string;
 }
 
 export default function ModalFormulario<T extends Record<string, unknown>>({
@@ -43,7 +50,10 @@ export default function ModalFormulario<T extends Record<string, unknown>>({
   modoEdicao,
   children,
   ocultarCabecalho = false,
+  titulo,
 }: ModalProps<T>) {
+  const [loadingSalvar, setLoadingSalvar] = useState(false);
+
   useEffect(() => {
     if (!dados) {
       setDados({} as T);
@@ -53,6 +63,15 @@ export default function ModalFormulario<T extends Record<string, unknown>>({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!dados) return;
     setDados({ ...dados, [e.target.name]: e.target.value });
+  };
+
+  const handleSalvarComLoading = async () => {
+    setLoadingSalvar(true);
+    try {
+      await onSalvar();
+    } finally {
+      setLoadingSalvar(false);
+    }
   };
 
   return (
@@ -71,7 +90,7 @@ export default function ModalFormulario<T extends Record<string, unknown>>({
             <Box className="modal-titulo">
               <ArrowForwardIcon className="icone-seta" />
               <Typography variant="h6" fontWeight={600} fontSize={"1.1rem"}>
-                {modoEdicao ? "EDIÇÃO" : "CADASTRAR"}
+                {titulo || (modoEdicao ? "EDIÇÃO" : "CADASTRAR")}
               </Typography>
             </Box>
 
@@ -99,24 +118,54 @@ export default function ModalFormulario<T extends Record<string, unknown>>({
               {tipo === "custom" && componente ? (
                 componente
               ) : tipo === "selecao" ? (
-                <TextField
-                  select
-                  label={titulo}
-                  name={chave}
-                  value={dados?.[chave as keyof T] || ""}
-                  onChange={handleChange}
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  className="modal-input"
-                  disabled={desativado}
-                >
-                  {opcoes?.map((opcao) => (
-                    <MenuItem key={opcao} value={opcao}>
-                      {opcao}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                opcoes && opcoes.length > 0 ? (
+                  <TextField
+                    select
+                    label={titulo}
+                    name={chave}
+                    value={dados?.[chave as keyof T] || ""}
+                    onChange={handleChange}
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    className="modal-input"
+                    disabled={desativado}
+                  >
+                    {opcoes.map((opcao) =>
+                      typeof opcao === "string" ? (
+                        <MenuItem
+                          key={opcao}
+                          value={opcao}
+                          sx={{ fontSize: "0.85rem" }}
+                        >
+                          {opcao}
+                        </MenuItem>
+                      ) : (
+                        <MenuItem
+                          key={opcao.value}
+                          value={opcao.value}
+                          sx={{ fontSize: "0.85rem" }}
+                        >
+                          {opcao.label}
+                        </MenuItem>
+                      )
+                    )}
+                  </TextField>
+                ) : (
+                  <TextField
+                    select
+                    label={titulo}
+                    name={chave}
+                    value=""
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    className="modal-input"
+                    disabled
+                  >
+                    <MenuItem value="">Carregando opções...</MenuItem>
+                  </TextField>
+                )
               ) : (
                 <TextField
                   label={titulo}
@@ -142,11 +191,28 @@ export default function ModalFormulario<T extends Record<string, unknown>>({
           onClick={onClose}
           className="modal-cancelar"
           variant="contained"
+          disabled={loadingSalvar}
         >
           CANCELAR
         </Button>
-        <Button onClick={onSalvar} className="modal-editar" variant="contained">
-          SALVAR
+        <Button
+          onClick={handleSalvarComLoading}
+          className="modal-editar"
+          variant="contained"
+          disabled={loadingSalvar}
+        >
+          {loadingSalvar ? (
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              width="100%"
+            >
+              <CircularProgress size={20} color="inherit" />
+            </Box>
+          ) : (
+            "SALVAR"
+          )}
         </Button>
       </DialogActions>
     </Dialog>

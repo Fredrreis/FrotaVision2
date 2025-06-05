@@ -48,6 +48,7 @@ export default function AdvancedFilter({
   const [localValues, setLocalValues] = useState<Record<string, any>>(values);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarClearOpen, setSnackbarClearOpen] = useState(false);
+  const [resetSelectKey, setResetSelectKey] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,6 +83,8 @@ export default function AdvancedFilter({
     setLocalValues(cleared);
     onClear();
     setSnackbarClearOpen(true);
+    setResetSelectKey((prev) => prev + 1);
+    setTimeout(() => requestClose(), 300); // <- FECHA O POPPER TAMBÉM
   };
 
   return (
@@ -105,6 +108,7 @@ export default function AdvancedFilter({
               >
                 {filter.type === "select" ? (
                   <TextField
+                    key={`${filter.name}-${resetSelectKey}`}
                     select
                     label={filter.label}
                     name={filter.name}
@@ -116,6 +120,19 @@ export default function AdvancedFilter({
                     variant="outlined"
                     size="small"
                     className="filtro-input"
+                    SelectProps={{
+                      MenuProps: {
+                        PaperProps: {
+                          sx: {
+                            "& .MuiMenuItem-root": {
+                              fontSize: "0.7rem",
+                              minHeight: "1.5rem",
+                              paddingY: "0.2rem",
+                            },
+                          },
+                        },
+                      },
+                    }}
                   >
                     {filter.options?.map((option) => (
                       <MenuItem key={option} value={option}>
@@ -138,17 +155,14 @@ export default function AdvancedFilter({
                       className="filtro-range-slider"
                       valueLabelDisplay="on"
                       valueLabelFormat={(value) => {
-                        if (filter.name === "custo") return `R$ ${value.toFixed(2)}`;
+                        if (filter.name === "custo")
+                          return `R$ ${value.toFixed(2)}`;
                         if (filter.name === "km") return `${value} km`;
                         if (filter.name === "horasMotor") return `${value} h`;
                         return value;
                       }}
                     />
-                    <Box
-                      display="flex"
-                      justifyContent="space-between"
-                      mt={1}
-                    >
+                    <Box display="flex" justifyContent="space-between" mt={1}>
                       <Typography className="filtro-range-label">
                         {filter.min}
                       </Typography>

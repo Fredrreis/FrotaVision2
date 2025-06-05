@@ -1,27 +1,32 @@
+// src/services/motoristasService.ts
+
 import { ApiGateway } from '../api';
 
 export interface Motorista {
   id_motorista: number;
   nome: string;
   data_cadastro: string;
-  //ultimo caminhão dirigido
-  //data ultima viagem
+  ultimo_caminhao?: string;
+  data_ultima_viagem?: string;
 }
 
-const api = new ApiGateway();
-
-export const cadastrarMotorista = async (motorista: {
+export interface NovoMotorista {
   id_motorista: number;
   nome: string;
   data_cadastro: string;
   cnpj: string;
   habilitado: boolean;
-}): Promise<void> => {
-  const api = new ApiGateway();
+}
+
+const api = new ApiGateway();
+
+export const cadastrarMotorista = async (
+  motorista: NovoMotorista
+): Promise<void> => {
   await api.post("/Motorista/Cadastrar", motorista);
 };
 
-export const listarMotorista = async (
+export const listarMotoristas = async (
   cnpj: string,
   signal?: AbortSignal
 ): Promise<Motorista[]> => {

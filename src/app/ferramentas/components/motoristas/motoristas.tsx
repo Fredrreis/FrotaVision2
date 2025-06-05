@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {
-  listarMotorista,
+  listarMotoristas,
   deletarMotorista,
   cadastrarMotorista,
   Motorista as MotoristaAPI,
@@ -83,7 +83,7 @@ export default function Motoristas() {
 
     if (!session?.user?.cnpj) return;
 
-    listarMotorista(session.user.cnpj, controller.signal)
+    listarMotoristas(session.user.cnpj, controller.signal)
       .then((res) => {
         if (!controller.signal.aborted) setDadosApi(res);
       })
@@ -206,7 +206,7 @@ export default function Motoristas() {
       setSnackbarAberto(true);
       setOpen(false);
       setCarregando(true);
-      const res = await listarMotorista(session.user.cnpj);
+      const res = await listarMotoristas(session.user.cnpj);
       setDadosApi(res);
     } catch (err) {
       console.error("Erro ao cadastrar motorista:", err);

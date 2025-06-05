@@ -1,19 +1,38 @@
 .usuario-dropdown-container {
-  width: 240px;
+  max-width: max-content; /* Mantém o popper ajustado ao conteúdo */
+  min-width: 240px;
   border-radius: 0.5rem;
   padding: 1rem;
   background-color: white;
+  word-break: break-word;
 }
+
+.animated-slide-down {
+  animation: slideDown 0.2s ease-in-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 .usuario-dropdown-header {
   text-align: center;
 }
 
+
 .usuario-avatar {
   width: 56px !important;
   height: 56px !important;
   margin: 0 auto !important;
-  color: #646464!important;
+  color: #646464 !important;
 }
 
 .usuario-nome {
@@ -25,6 +44,9 @@
 .usuario-email {
   font-size: 0.75rem !important;
   color: #666 !important;
+  word-wrap: break-word;
+  display: inline-block;
+  max-width: 100%;
 }
 
 .button-configuracoes,

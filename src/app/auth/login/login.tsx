@@ -18,7 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import GoogleIcon from "../../img/google.png";
 import MicrosoftIcon from "../../img/microsoft.png";
 import LogoFrotaVisionV2 from "../../img/FrotaVisionLogoV2.png";
-import { step1Schema } from "@/utils/validations";
+import { step1Schema } from "@/utils/login-validation";
 import useToggleSenha from "@/app/components/toggle-senha/toggle-senha";
 import CustomSnackbar from "@/app/components/snackbar/snackbar";
 import Carregamento from "@/app/components/carregamento/carregamento";

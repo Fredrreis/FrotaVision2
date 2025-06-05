@@ -101,6 +101,19 @@ export default function ExportarRelatorioDialog({
               variant="outlined"
               size="small"
               className="filtro-input"
+              SelectProps={{
+                MenuProps: {
+                  PaperProps: {
+                    sx: {
+                      "& .MuiMenuItem-root": {
+                        fontSize: "0.7rem",
+                        minHeight: "1.5rem",
+                        paddingY: "0.2rem",
+                      },
+                    },
+                  },
+                },
+              }}
             >
               <MenuItem value="pdf">
                 <PictureAsPdfIcon className="dropdown-icons" /> Pdf

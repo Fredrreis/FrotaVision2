@@ -38,6 +38,20 @@
     border-radius: 0.40rem !important;
 }
 
+/* Ajusta o valor selecionado apenas dentro do formulário genérico */
+.modal-formulario .MuiSelect-select {
+  font-size: 0.85rem !important;
+  padding-top: 0.6rem !important;
+  padding-bottom: 0.6rem !important;
+}
+
+/* Ajusta as opções do menu suspenso apenas no contexto do modal */
+.modal-formulario .MuiMenuItem-root {
+  font-size: 0.85rem !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
 /* Botões */
 .modal-actions {
     padding: 0.5rem 2.5rem 2.5rem 2.5rem !important;

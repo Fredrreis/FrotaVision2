@@ -8,21 +8,14 @@ import {
   TableRow,
   Paper,
   Tooltip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
+  TablePagination,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
-import VisualizarVeiculo from "../../veiculos/components/visualizar-veiculo/visualizar-veiculo";
 import "./tabela-generica.css";
 
 interface TabelaProps<T extends Record<string, unknown>> {
@@ -36,6 +29,7 @@ interface TabelaProps<T extends Record<string, unknown>> {
 
 const MAX_CHAR = 20;
 
+/** Se um texto tiver mais de MAX_CHAR, truncamos e adicionamos "..." */
 const truncateText = (text: string) => {
   return text.length > MAX_CHAR ? text.substring(0, MAX_CHAR) + "..." : text;
 };
@@ -48,14 +42,15 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
   exibirExaminar = false,
   onExaminar,
 }: TabelaProps<T>) {
+  // Ordenação
   const [orderBy, setOrderBy] = useState<keyof T | null>(null);
   const [order, setOrder] = useState<"asc" | "desc" | null>(null);
-  const [openModal, setOpenModal] = useState(false);
-  const [itemSelecionado, setItemSelecionado] = useState<T | null>(null);
 
-  const [openVisualizar, setOpenVisualizar] = useState(false);
-  const [itemVisualizar, setItemVisualizar] = useState<T | null>(null);
+  // Paginação
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 11; // Definimos sempre 11 linhas por página
 
+  /** Ao clicar em um cabeçalho ordenável, alterna asc/desc */
   const handleSort = (coluna: keyof T, ordenavel: boolean) => {
     if (!ordenavel) return;
     const isAsc = orderBy === coluna && order === "asc";
@@ -63,9 +58,9 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
     setOrderBy(coluna);
   };
 
+  /** Ordena os dados conforme orderBy e order */
   const sortedDados = [...dados].sort((a, b) => {
     if (!orderBy) return 0;
-
     const valorA = a[orderBy];
     const valorB = b[orderBy];
 
@@ -78,34 +73,33 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
       : String(valorB ?? "").localeCompare(String(valorA ?? ""));
   });
 
-  const handleOpenModal = (item: T) => {
-    setItemSelecionado(item);
-    setOpenModal(true);
+  /** Extrai apenas as linhas da página atual */
+  const paginatedDados = sortedDados.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  /** Muda a página */
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setItemSelecionado(null);
-  };
-
-  const handleConfirmDelete = () => {
-    if (onExcluir && itemSelecionado) {
-      onExcluir(itemSelecionado);
-    }
-    handleCloseModal();
-  };
+  // Cálculo do total de páginas
+  const totalPages = Math.ceil(dados.length / rowsPerPage);
 
   return (
-    <>
-      <TableContainer component={Paper} className="tabela-generica">
+    <Paper className="tabela-geral-wrapper" elevation={2}>
+      <TableContainer className="tabela-generica">
         <Table>
           <TableHead className="tabela-header">
             <TableRow>
-              {colunas.map(({ chave, titulo, ordenavel }) => (
+              {colunas.map(({ chave, titulo, ordenavel }, idx) => (
                 <TableCell
                   key={String(chave)}
                   onClick={() => handleSort(chave, ordenavel)}
-                  className="tabela-header-cell"
+                  className={`tabela-header-cell ${
+                    idx === 0 ? "primeiro-header-cell" : ""
+                  } ${idx === colunas.length ? "ultimo-header-cell" : ""}`}
                 >
                   <div className="tabela-header-content">
                     {titulo}
@@ -122,14 +116,17 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
                   </div>
                 </TableCell>
               ))}
-              <TableCell className="tabela-header-cell">Ação</TableCell>
+              <TableCell className="tabela-header-cell ultimo-header-cell">
+                Ação
+              </TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {sortedDados.map((item, index) => (
+            {paginatedDados.map((item, rowIndex) => (
               <TableRow
-                key={index}
-                className={index % 2 === 0 ? "linha-par" : ""}
+                key={rowIndex + page * rowsPerPage}
+                className={rowIndex % 2 === 0 ? "linha-par" : ""}
               >
                 {colunas.map(({ chave }) => {
                   const valor = item[chave] ?? "—";
@@ -154,16 +151,13 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
                     </TableCell>
                   );
                 })}
+
                 <TableCell>
                   {exibirExaminar && (
                     <Tooltip title="Visualizar" arrow>
                       <VisibilityIcon
                         className="icone-acao examinar"
-                        onClick={() => {
-                          setItemVisualizar(item);
-                          setOpenVisualizar(true);
-                          onExaminar?.(item);
-                        }}
+                        onClick={() => onExaminar?.(item)}
                       />
                     </Tooltip>
                   )}
@@ -176,7 +170,7 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
                   <Tooltip title="Deletar" arrow>
                     <DeleteIcon
                       className="icone-acao excluir"
-                      onClick={() => handleOpenModal(item)}
+                      onClick={() => onExcluir?.(item)}
                     />
                   </Tooltip>
                 </TableCell>
@@ -186,76 +180,20 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
         </Table>
       </TableContainer>
 
-      <Dialog
-        open={openModal}
-        onClose={handleCloseModal}
-        className="modal-confirmacao"
-      >
-        <DialogTitle className="modal-titulo">
-          <ArrowForwardIcon />
-          CONFIRMAR EXCLUSÃO
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText className="modal-texto" variant="body2">
-            Tem certeza que deseja excluir o item{" "}
-            <strong>
-              {(itemSelecionado as T & { nome?: string })?.nome ||
-                "selecionado"}
-            </strong>
-            ?
-          </DialogContentText>
-          <DialogActions className="modal-acoes">
-            <Button
-              onClick={handleCloseModal}
-              className="botao-cancelar"
-              variant="contained"
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleConfirmDelete}
-              className="botao-excluir"
-              variant="contained"
-            >
-              Excluir
-            </Button>
-          </DialogActions>
-        </DialogContent>
-      </Dialog>
-
-      {itemVisualizar && (
-        <VisualizarVeiculo
-          open={openVisualizar}
-          onClose={() => {
-            setOpenVisualizar(false);
-            setItemVisualizar(null);
-          }}
-          veiculo={{
-            placa: String(itemVisualizar["placa"]),
-            chassi: String(itemVisualizar["chassi"]),
-            ano: Number(itemVisualizar["ano"]),
-            km: Number(itemVisualizar["km"]),
-            dataCadastro: String(itemVisualizar["data"]),
-            motorista: "Marcos D’avila", // mock
-            descricao: String(itemVisualizar["descricao"]),
-            manutencao: {
-              total: 1,
-              ultima: "Freio",
-              dataUltima: "10/04/2024",
-            },
-            preventiva: {
-              total: 1,
-              pendente: "Troca de Pneus",
-              dataNotificacao: "10/11/2024",
-            },
-            viagens: {
-              total: 12,
-              ultima: "São João Del Rey(MG) - Ribeirão das Neves(MG)",
-              dataUltima: "07/11/2024",
-            },
-          }}
+      {dados.length > rowsPerPage && (
+        <TablePagination
+          component="div"
+          count={dados.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={[]} // remove seletor de linhas por página
+          labelRowsPerPage={""} // esconde o texto "Rows per page"
+          labelDisplayedRows={({ page }) =>
+            `Página ${page + 1} de ${totalPages}`
+          }
         />
       )}
-    </>
+    </Paper>
   );
 }
