@@ -2,8 +2,11 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import {
   Box,
   Checkbox,
@@ -58,6 +61,110 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
   // Indica se o usuário clicou em "Editar senha"
   const [editarSenha, setEditarSenha] = useState(false);
 
+  // Schema dinâmico baseado no estado editarSenha
+  const schema = useMemo(() => {
+    return yup.object().shape({
+      nome: yup.string().required('Nome obrigatório'),
+      email: yup.string().email('E-mail inválido').required('E-mail obrigatório'),
+      novaSenha: editarSenha 
+        ? yup.string().min(6, 'Mínimo de 6 caracteres').required('Senha obrigatória')
+        : yup.string().notRequired(),
+      confirmarSenha: editarSenha
+        ? yup.string().oneOf([yup.ref('novaSenha')], 'As senhas devem ser iguais').required('Confirme a senha')
+        : yup.string().notRequired(),
+    });
+  }, [editarSenha]);
+
+  // Criar resolver com schema dinâmico
+  const resolver = useMemo(() => yupResolver(schema), [schema]);
+
+  // Hook de validação com react-hook-form
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    clearErrors,
+    trigger,
+    setValue,
+  } = useForm({
+    resolver,
+    mode: "onSubmit",
+    defaultValues: {
+      nome: '',
+      email: '',
+      novaSenha: '',
+      confirmarSenha: '',
+    },
+  });
+
+  // Sempre que editarSenha mudar, atualiza a validação
+  useEffect(() => {
+    trigger();
+  }, [editarSenha, trigger]);
+
+  // Gerencia o estado do modal (abrir/fechar)
+  useEffect(() => {
+    if (open && session?.user) {
+      // Modal abriu - carrega dados do usuário e reseta formulário
+      const nomeUsuario = session.user.nome || '';
+      const emailUsuario = session.user.email || '';
+      const permissoes = (session.user.permissao as number) || 0;
+      const cnpjUsuario = (session.user.cnpj as string) || '';
+
+      // Reseta o formulário com os dados do usuário
+      reset({
+        nome: nomeUsuario,
+        email: emailUsuario,
+        novaSenha: '',
+        confirmarSenha: '',
+      });
+
+      // Atualiza dados locais (empresa e cargo)
+      setDados({
+        nome: nomeUsuario,
+        email: emailUsuario,
+        cargo: traduzirCargo(permissoes),
+        empresa: '', // será preenchido pela API
+        novaSenha: '',
+        confirmarSenha: '',
+      });
+
+      // Reseta estado de editar senha
+      setEditarSenha(false);
+
+      // Busca empresa
+      if (cnpjUsuario) {
+        pesquisarEmpresa(cnpjUsuario)
+          .then((res: Empresa) => {
+            setDados((prev) => ({
+              ...prev,
+              empresa: res.nome_social || "—",
+            }));
+          })
+          .catch(() => {
+            setDados((prev) => ({
+              ...prev,
+              empresa: "—",
+            }));
+          });
+      } else {
+        setDados((prev) => ({
+          ...prev,
+          empresa: "—",
+        }));
+      }
+    } else if (!open) {
+      // Modal fechou - limpa tudo
+      clearErrors();
+      setEditarSenha(false);
+    }
+  }, [open, session, reset, clearErrors]);
+
+  // Watch para monitorar mudanças nos campos de senha
+  const watchedValues = watch();
+
   // Hooks para alternar visibilidade das senhas
   const { mostrarSenha: mostrarNovaSenha, adornment: adornmentNovaSenha } =
     useToggleSenha();
@@ -77,50 +184,8 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
     return "—";
   };
 
-  // Ao montar, preenche nome, email, cargo e busca nome da empresa
-  useEffect(() => {
-    if (!session?.user) return;
-
-    const nomeUsuario = session.user.nome || "Sem nome";
-    const emailUsuario = session.user.email || "Sem email";
-    const permissoes = (session.user.permissao as number) || 0;
-    const cnpjUsuario = (session.user.cnpj as string) || "";
-
-    setDados((prev) => ({
-      ...prev,
-      nome: nomeUsuario,
-      email: emailUsuario,
-      cargo: traduzirCargo(permissoes),
-      empresa: "", // será preenchido abaixo
-      novaSenha: "",
-      confirmarSenha: "",
-    }));
-
-    // Busca nome_social da empresa pela API
-    if (cnpjUsuario) {
-      pesquisarEmpresa(cnpjUsuario)
-        .then((res: Empresa) => {
-          setDados((prev) => ({
-            ...prev,
-            empresa: res.nome_social || "—",
-          }));
-        })
-        .catch(() => {
-          setDados((prev) => ({
-            ...prev,
-            empresa: "—",
-          }));
-        });
-    } else {
-      setDados((prev) => ({
-        ...prev,
-        empresa: "—",
-      }));
-    }
-  }, [session]);
-
   // Atualiza qualquer campo do formulário
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setDados((prev) => ({
       ...prev,
@@ -128,21 +193,21 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
     }));
   };
 
-  // Ao clicar em "Salvar", monta payload e faz PUT
-  const handleSalvar = async () => {
+  // Validação e salvamento
+  const handleSalvar = async (formData: any) => {
     if (!session?.user) {
       onClose();
       return;
     }
 
     const idUsuario = session.user.id as number;
-    const novaSenhaTxt = dados.novaSenha.trim();
+    const novaSenhaTxt = formData.novaSenha?.trim() || '';
 
     // Monta o payload conforme Swagger /Usuario/Atualizar/{id}
     const payload: Partial<Usuario> = {
       id_usuario: idUsuario,
-      nome_usuario: dados.nome,
-      email: dados.email,
+      nome_usuario: formData.nome,
+      email: formData.email,
       cnpj: session.user.cnpj as string,
       permissoes_usuario: session.user.permissao as number,
       habilitado: true,
@@ -168,13 +233,41 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
 
   // Colunas fixas do modal
   const colunasBase = [
-    { chave: "nome", titulo: "Nome" },
-    { chave: "email", titulo: "Email" },
+    { chave: "nome", titulo: "Nome",
+      tipo: "custom" as const,
+      componente: (
+        <TextField
+          label="Nome"
+          fullWidth
+          variant="outlined"
+          size="small"
+          className="modal-input"
+          {...register("nome")}
+          error={!!errors.nome}
+          helperText={errors.nome?.message}
+        />
+      )
+    },
+    { chave: "email", titulo: "Email",
+      tipo: "custom" as const,
+      componente: (
+        <TextField
+          label="Email"
+          fullWidth
+          variant="outlined"
+          size="small"
+          className="modal-input"
+          {...register("email")}
+          error={!!errors.email}
+          helperText={errors.email?.message}
+        />
+      )
+    },
     { chave: "empresa", titulo: "Empresa", desativado: true },
     { chave: "cargo", titulo: "Cargo", desativado: true },
   ];
 
-  // Checkbox “Editar senha”
+  // Checkbox "Editar senha"
   const colunaCheckbox = {
     chave: "__editarSenha",
     titulo: "",
@@ -189,11 +282,9 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
                 setEditarSenha(e.target.checked);
                 if (!e.target.checked) {
                   // Limpa campos de senha ao desmarcar
-                  setDados((prev) => ({
-                    ...prev,
-                    novaSenha: "",
-                    confirmarSenha: "",
-                  }));
+                  setValue("novaSenha", "");
+                  setValue("confirmarSenha", "");
+                  clearErrors();
                 }
               }}
               size="small"
@@ -206,7 +297,7 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
     ),
   };
 
-  // “Nova Senha” (uso da classe reduzida .senha-form-group)
+  // "Nova Senha" (uso da classe reduzida .senha-form-group)
   const colunaNovaSenha = {
     chave: "novaSenha",
     titulo: "Nova Senha",
@@ -215,14 +306,14 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
       <Box className="senha-form-group">
         <TextField
           label="Nova Senha"
-          name="novaSenha"
           type={mostrarNovaSenha ? "text" : "password"}
-          value={dados.novaSenha}
-          onChange={handleChange}
           fullWidth
           variant="outlined"
           size="small"
           className="modal-input"
+          {...register("novaSenha")}
+          error={!!errors.novaSenha}
+          helperText={errors.novaSenha?.message}
           InputProps={{
             endAdornment: adornmentNovaSenha,
           }}
@@ -232,7 +323,7 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
     ),
   };
 
-  // “Confirmar Nova Senha” (também usando .senha-form-group)
+  // "Confirmar Nova Senha" (também usando .senha-form-group)
   const colunaConfirmarSenha = {
     chave: "confirmarSenha",
     titulo: "Confirmar Nova Senha",
@@ -241,20 +332,20 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
       <Box className="senha-form-group">
         <TextField
           label="Confirmar Nova Senha"
-          name="confirmarSenha"
           type={mostrarConfirmarSenha ? "text" : "password"}
-          value={dados.confirmarSenha}
-          onChange={handleChange}
           fullWidth
           variant="outlined"
           size="small"
           className="modal-input"
+          {...register("confirmarSenha")}
+          error={!!errors.confirmarSenha}
+          helperText={errors.confirmarSenha?.message}
           InputProps={{
             endAdornment: adornmentConfirmarSenha,
           }}
         />
         {/* Indicador de força somente aqui */}
-        <SenhaForte senha={dados.confirmarSenha} />
+        <SenhaForte senha={watch('confirmarSenha') || ""} />
       </Box>
     ),
   };
@@ -272,7 +363,7 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
       <ModalFormulario
         open={open}
         onClose={onClose}
-        onSalvar={handleSalvar}
+        onSalvar={handleSubmit(handleSalvar)}
         colunas={colunas}
         dados={dados}
         setDados={setDados}

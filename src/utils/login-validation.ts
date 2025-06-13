@@ -32,3 +32,25 @@ export const step2Schema = yup.object().shape({
   empresa: requiredText("Nome da empresa"),
   cnpj: cnpjField,
 });
+
+// Schema para validação do perfil com confirmação de senha
+export const perfilSchema = yup.object().shape({
+  nome: requiredText("Nome"),
+  email: emailField,
+  novaSenha: yup
+    .string()
+    .nullable()
+    .transform((value) => (value === "" ? undefined : value))
+    .min(6, "Mínimo de 6 caracteres")
+    .optional(),
+  confirmarSenha: yup
+    .string()
+    .nullable()
+    .transform((value) => (value === "" ? undefined : value))
+    .when("novaSenha", {
+      is: (val: string | undefined) => val && val.length > 0,
+      then: (schema) => schema.oneOf([yup.ref("novaSenha")], "As senhas devem ser iguais"),
+      otherwise: (schema) => schema.optional(),
+    })
+    .optional(),
+});
