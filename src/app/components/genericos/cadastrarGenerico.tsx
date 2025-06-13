@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Alert } from "@mui/material";
 import { ObjectSchema } from "yup";
 import ModalFormulario, {
@@ -28,7 +28,8 @@ export default function CadastrarGenerico<T extends Record<string, unknown>>({
 }: CadastrarGenericoProps<T>) {
   const [dados, setDados] = useState<Partial<T>>({});
   const [colunasComOpcoes, setColunasComOpcoes] = useState<Coluna[]>(colunas);
-  const [erro, setErro] = useState("");
+  const [erros, setErros] = useState<Record<string, string>>({});
+  const prevOpen = useRef(open);
 
   useEffect(() => {
     const carregar = async () => {
@@ -43,16 +44,22 @@ export default function CadastrarGenerico<T extends Record<string, unknown>>({
         setColunasComOpcoes(colunasAtualizadas);
       } catch (err) {
         console.error(err);
-        setErro("Erro ao carregar opções dinâmicas.");
+        setErros({ geral: "Erro ao carregar opções dinâmicas." });
       }
     };
 
     if (open) {
-      setDados({});
-      setErro("");
       carregar();
     }
   }, [open, colunas, obterOpcoesDinamicas]);
+
+  useEffect(() => {
+    if (!prevOpen.current && open) {
+      setDados({});
+      setErros({});
+    }
+    prevOpen.current = open;
+  }, [open]);
 
   const handleSalvar = async () => {
     try {
@@ -63,13 +70,14 @@ export default function CadastrarGenerico<T extends Record<string, unknown>>({
       onClose();
     } catch (error: any) {
       if (error?.inner?.length) {
-        const msg = error.inner
-          .map((e: any) => `${e.path}: ${e.message}`)
-          .join("\n");
-        setErro(msg);
+        const errosObj: Record<string, string> = {};
+        error.inner.forEach((e: any) => {
+          if (e.path) errosObj[e.path] = e.message;
+        });
+        setErros(errosObj);
       } else {
         console.error("Erro ao salvar:", error);
-        setErro("Erro ao salvar os dados.");
+        setErros({ geral: "Erro ao salvar os dados." });
       }
     }
   };
@@ -84,10 +92,11 @@ export default function CadastrarGenerico<T extends Record<string, unknown>>({
       setDados={setDados}
       titulo={titulo}
       modoEdicao={false}
+      erros={erros}
     >
-      {erro && (
+      {erros.geral && (
         <Alert severity="error" sx={{ whiteSpace: "pre-line" }}>
-          {erro}
+          {erros.geral}
         </Alert>
       )}
     </ModalFormulario>

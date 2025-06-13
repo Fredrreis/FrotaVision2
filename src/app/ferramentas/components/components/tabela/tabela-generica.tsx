@@ -29,6 +29,9 @@ interface TabelaProps<T extends Record<string, unknown>> {
 
 const MAX_CHAR = 20;
 
+// Função para formatar número como moeda brasileira
+const formatarMoeda = (valor: number) => valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 /** Se um texto tiver mais de MAX_CHAR, truncamos e adicionamos "..." */
 const truncateText = (text: string) => {
   return text.length > MAX_CHAR ? text.substring(0, MAX_CHAR) + "..." : text;
@@ -130,7 +133,10 @@ export default function TabelaGenerica<T extends Record<string, unknown>>({
               >
                 {colunas.map(({ chave }) => {
                   const valor = item[chave] ?? "—";
-                  const texto = String(valor);
+                  // Se for o campo custo e for number, formata como moeda
+                  const texto = chave === 'custo' && typeof valor === 'number'
+                    ? formatarMoeda(valor)
+                    : String(valor);
 
                   return (
                     <TableCell key={String(chave)}>

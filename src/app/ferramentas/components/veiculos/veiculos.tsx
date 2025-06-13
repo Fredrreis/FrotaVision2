@@ -256,9 +256,9 @@ export default function Veiculos() {
     { chave: "apelido", titulo: "Nome", tipo: "texto" },
     { chave: "tipo", titulo: "Tipo Caminhão", tipo: "selecao" },
     { chave: "chassi", titulo: "Chassi", tipo: "texto" },
-    { chave: "descricao", titulo: "Descrição", tipo: "texto" },
-    { chave: "quilometragem", titulo: "Km", tipo: "texto" },
-    { chave: "ano", titulo: "Ano", tipo: "texto" },
+    { chave: "descricao", titulo: "Descrição", tipo: "area" },
+    { chave: "quilometragem", titulo: "Km", tipo: "number" },
+    { chave: "ano", titulo: "Ano", tipo: "number" },
   ];
 
   const obterOpcoesDinamicas = async () => {
@@ -309,7 +309,7 @@ export default function Veiculos() {
                 setOpenExportar(false);
               }}
             >
-              Filtros Avançados
+              <span className="button-text">Filtros Avançados</span>
             </Button>
           </Box>
 

@@ -25,3 +25,33 @@ export const compareDateISO = (iso: string, inputData: string): boolean => {
     return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
   };
   
+  /**
+   * Converte uma string 'YYYY-MM-DDTHH:MM' para ISO completo (UTC)
+   */
+  export function formatarDataParaISO(data: string): string {
+    if (!data) return "";
+    // Se já for ISO, retorna
+    if (data.includes("T") && data.endsWith("Z")) return data;
+    // Se vier só a data, adiciona hora zero
+    if (/^\d{4}-\d{2}-\d{2}$/.test(data)) data += "T00:00";
+    // Cria objeto Date e retorna ISO
+    const d = new Date(data);
+    return d.toISOString();
+  }
+  
+  export function isoToInputDatetimeLocal(iso: string): string {
+    if (!iso) return "";
+    const date = new Date(iso);
+    // Ajusta para o timezone local
+    const off = date.getTimezoneOffset();
+    const local = new Date(date.getTime() - off * 60 * 1000);
+    return local.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
+  }
+  
+  export function inputDatetimeLocalToISO(local: string): string {
+    if (!local) return "";
+    // local: yyyy-MM-ddTHH:mm
+    const date = new Date(local);
+    return date.toISOString();
+  }
+  

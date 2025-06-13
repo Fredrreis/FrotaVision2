@@ -1,14 +1,9 @@
+// pages/ferramentas/manutencoes.tsx
 "use client";
+
 import { useEffect, useState } from "react";
-import {
-  listarManutencaoRealizada,
-  deletarManutencaoRealizada,
-  ManutencaoRealizada,
-} from "@/api/services/manutencaoRealizadaService";
 import { useSession } from "next-auth/react";
-import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
-import ModalFormulario from "../components/formulario-modal/formulario-generico";
-import ExportarRelatorioDialog from "../components/export/export-relatorio";
+import { motion } from "framer-motion";
 import {
   Box,
   Typography,
@@ -20,14 +15,36 @@ import SearchIcon from "@mui/icons-material/Search";
 import EngineeringIcon from "@mui/icons-material/Engineering";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import IosShareIcon from "@mui/icons-material/IosShare";
+
+import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
 import FiltroAvancado from "../components/filtro/filtro-avancado";
+import ExportarRelatorioDialog from "../components/export/export-relatorio";
 import Carregamento from "../../../components/carregamento/carregamento";
 import CustomSnackbar from "../../../components/snackbar/snackbar";
-import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
-import { motion } from "framer-motion";
+
+import EditarGenerico from "@/app/components/genericos/editarGenerico";
+import CadastrarGenerico from "@/app/components/genericos/cadastrarGenerico";
+import { Coluna } from "@/app/ferramentas/components/components/formulario-modal/formulario-generico";
+import DeletarGenerico from "@/app/components/genericos/deletarGenerico";
+
+import {
+  listarManutencaoRealizada,
+  cadastrarManutencaoRealizada,
+  atualizarManutencaoRealizada,
+  deletarManutencaoRealizada,
+  ManutencaoRealizadaDetalhado,
+  ManutencaoRealizada,
+} from "@/api/services/manutencaoRealizadaService";
+
+import { compareDateISO, formatarDataISOcomHora, formatarDataParaISO, inputDatetimeLocalToISO } from "@/utils/data";
+import { listarTiposManutencao } from "@/api/services/tipoManutencaoService";
+import { listarVeiculos } from "@/api/services/veiculoService";
+
 import "../styles/shared-styles.css";
 import "./manutencoes.css";
+import { manutencaoSchema } from "@/utils/manutencao-validation";
 
+// view-model para a tabela
 interface Manutencao {
   id: number;
   veiculo: string;
@@ -37,11 +54,12 @@ interface Manutencao {
   descricao: string;
   data: string;
   dataOriginal: string;
-  custo: string;
+  custo: number;
   tipo: string;
   [key: string]: unknown;
 }
 
+// colunas da tabela
 const colunasManutencoes = [
   { chave: "veiculo", titulo: "Veículo", ordenavel: false },
   { chave: "tipoVeiculo", titulo: "Tipo Caminhão", ordenavel: false },
@@ -53,6 +71,7 @@ const colunasManutencoes = [
   { chave: "tipo", titulo: "Tipo", ordenavel: false },
 ];
 
+// mapeamento para exportação
 const mapeamentoCampos = {
   Veículo: "veiculo",
   "Tipo Caminhão": "tipoVeiculo",
@@ -64,135 +83,166 @@ const mapeamentoCampos = {
   Tipo: "tipo",
 };
 
+// colunas do formulário de criação/edição
+const colunasFormulario: Coluna[] = [
+  { chave: "id_veiculo", titulo: "Veículo", tipo: "selecao" },
+  { chave: "id_manutencao", titulo: "Tipo de Manutenção", tipo: "selecao" },
+  { chave: "quilometragem_ultima_manutencao", titulo: "Km da Manutenção", tipo: "number" },
+  { chave: "data_manutencao", titulo: "Data", tipo: "datetime" },
+  { chave: "descricao", titulo: "Descrição", tipo: "area" },
+  { chave: "valor_manutencao", titulo: "Valor", tipo: "number" },
+  { chave: "eManuntencaoPreventiva", titulo: "É manutenção preventiva?", tipo: "radio", opcoes: [
+    { label: "Sim", value: "true" },
+    { label: "Não", value: "false" },
+  ] },
+];
+
+// obtém opções para selects
+async function obterOpcoesDinamicas(session: any) {
+  try {
+    const [tiposManutencao, veiculos] = await Promise.all([
+      listarTiposManutencao(),
+      listarVeiculos(session?.user?.cnpj ?? "")
+    ]);
+
+    return {
+      id_veiculo: veiculos
+        .filter(v => v && v.id_veiculo && v.apelido)
+        .map(v => ({ 
+          label: v.apelido || "Veículo sem nome", 
+          value: String(v.id_veiculo) // string!
+        })),
+      id_manutencao: tiposManutencao
+        .filter(t => t && t.id_manutencao && t.nome)
+        .map(t => ({ 
+          label: t.nome || "Manutenção sem nome", 
+          value: String(t.id_manutencao) // string!
+        })),
+      eManuntencaoPreventiva: [
+        { label: "Sim", value: "true" },
+        { label: "Não", value: "false" },
+      ],
+    };
+  } catch (error) {
+    console.error("Erro ao carregar opções:", error);
+    return {
+      id_veiculo: [],
+      id_manutencao: [],
+      eManuntencaoPreventiva: [
+        { label: "Sim", value: "true" },
+        { label: "Não", value: "false" },
+      ],
+    };
+  }
+}
+
 export default function Manutencoes() {
   const { data: session } = useSession();
-  const [dadosApi, setDadosApi] = useState<ManutencaoRealizada[]>([]);
+
+  // dados da API e loading
+  const [dadosApi, setDadosApi] = useState<ManutencaoRealizadaDetalhado[]>([]);
   const [carregando, setCarregando] = useState(true);
-  const [dados, setDados] = useState<Manutencao | null>(null);
-  const [open, setOpen] = useState(false);
-  const [modoEdicao, setModoEdicao] = useState(false);
+
+  // estados de CRUD
+  const [openCriar, setOpenCriar] = useState(false);
+  const [itemSelecionado, setItemSelecionado] = useState<ManutencaoRealizadaDetalhado | null>(null);
+  const [openEditar, setOpenEditar] = useState(false);
+  const [openDeletar, setOpenDeletar] = useState(false);
+
+  // busca, filtros, export, snackbar
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
+  const [anchorElFiltro, setAnchorElFiltro] = useState<HTMLElement | null>(null);
   const [openExportar, setOpenExportar] = useState(false);
-  const [anchorElFiltro, setAnchorElFiltro] = useState<HTMLElement | null>(
-    null
-  );
-  const [anchorElExportar, setAnchorElExportar] = useState<HTMLElement | null>(
-    null
-  );
-  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
-    {}
-  );
+  const [anchorElExportar, setAnchorElExportar] = useState<HTMLElement | null>(null);
+  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>({});
   const [snackbarAberto, setSnackbarAberto] = useState(false);
   const [snackbarMensagem, setSnackbarMensagem] = useState("");
-  const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
-    "primary"
-  );
+  const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">("primary");
+
+  // carrega lista de manutenções
+  const carregarManutencoes = () => {
+    if (!session?.user?.cnpj) return;
+    setCarregando(true);
+    listarManutencaoRealizada(session.user.cnpj)
+      .then(res => setDadosApi(res))
+      .catch(err => {
+        if (!(err.name === "CanceledError" || err.code === "ERR_CANCELED" || err.message === "canceled"))
+          console.error(err);
+      })
+      .finally(() => setCarregando(false));
+  };
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    if (!session?.user?.cnpj) return;
-
-    listarManutencaoRealizada(session.user.cnpj, controller.signal)
-      .then((res) => {
-        if (!controller.signal.aborted) setDadosApi(res);
-        console.log(res);
-      })
-      .catch((err) => {
-        if (
-          !(
-            err.name === "CanceledError" ||
-            err.code === "ERR_CANCELED" ||
-            err.message === "canceled"
-          )
-        ) {
-          console.error("Erro:", err);
-        }
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setCarregando(false);
-      });
-
-    return () => controller.abort();
+    if (session?.user?.cnpj) {
+      carregarManutencoes();
+    }
   }, [session?.user?.cnpj]);
 
-  const manutencoesData: Manutencao[] = dadosApi.map((m) => ({
+  // mapeia para view-model da tabela
+  const manutencoesData: Manutencao[] = dadosApi.map(m => ({
     id: m.id_manutencao_realizada,
-    veiculo: m.apelido || "Desconhecido",
+    veiculo: m.apelido || "—",
     tipoVeiculo: m.tipo || "—",
     nome: m.manutenção || "—",
     km: m.quilometragem_ultima_manutencao ?? 0,
     descricao: m.descricaoManutencao || "—",
     data: formatarDataISOcomHora(m.data_manutencao),
     dataOriginal: m.data_manutencao,
-    custo: m.valor_manutencao?.toFixed(2).replace(".", ",") || "0,00",
+    custo: m.valor_manutencao,
     tipo: m.eManuntencaoPreventiva ? "Preventiva" : "Corretiva",
   }));
 
-  const dadosFiltrados = manutencoesData.filter((m) => {
+  // aplica busca e filtros
+  const dadosFiltrados = manutencoesData.filter(m => {
     const matchSearch =
-      (m.veiculo?.toLowerCase() ?? "").includes(search.toLowerCase()) ||
-      (m.nome?.toLowerCase() ?? "").includes(search.toLowerCase());
+      m.veiculo.toLowerCase().includes(search.toLowerCase()) ||
+      m.nome.toLowerCase().includes(search.toLowerCase());
     const matchTipoVeiculo = filtrosAvancados.tipoVeiculo
       ? m.tipoVeiculo === filtrosAvancados.tipoVeiculo
       : true;
     const matchData = filtrosAvancados.data
-      ? compareDateISO(m.dataOriginal as string, filtrosAvancados.data)
+      ? compareDateISO(m.dataOriginal, filtrosAvancados.data)
       : true;
     const matchCusto = filtrosAvancados.custo
-      ? parseFloat(m.custo.replace(",", ".")) <= filtrosAvancados.custo
+      ? m.custo <= filtrosAvancados.custo
       : true;
     const matchTipo = filtrosAvancados.tipo
       ? m.tipo === filtrosAvancados.tipo
       : true;
     const matchKm = filtrosAvancados.km ? m.km <= filtrosAvancados.km : true;
-    return (
-      matchSearch &&
-      matchTipoVeiculo &&
-      matchData &&
-      matchCusto &&
-      matchTipo &&
-      matchKm
-    );
+    return matchSearch && matchTipoVeiculo && matchData && matchCusto && matchTipo && matchKm;
   });
 
-  const tiposVeiculo = [...new Set(manutencoesData.map((m) => m.tipoVeiculo))];
-  const tiposManutencao = [...new Set(manutencoesData.map((m) => m.tipo))];
-  const maxKm = Math.max(...manutencoesData.map((m) => m.km));
-  const maxCusto = Math.max(
-    ...manutencoesData.map((m) => parseFloat(m.custo.replace(",", ".")))
-  );
-
+  // configura filtros avançados
+  const tiposVeiculo = [...new Set(manutencoesData.map(m => m.tipoVeiculo))];
+  const tiposManutencao = [...new Set(manutencoesData.map(m => m.tipo))];
+  const maxKm = Math.max(0, ...manutencoesData.map(m => m.km));
+  const maxCusto = Math.max(0, ...manutencoesData.map(m => m.custo));
   const filtrosAvancadosConfig = [
-    {
-      name: "tipoVeiculo",
-      label: "Tipo Caminhão",
-      type: "select" as const,
-      options: tiposVeiculo,
-    },
+    { name: "tipoVeiculo", label: "Tipo Caminhão", type: "select" as const, options: tiposVeiculo },
     { name: "data", label: "Data", type: "data" as const },
-    {
-      name: "tipo",
-      label: "Tipo Manutenção",
-      type: "select" as const,
-      options: tiposManutencao,
-    },
-    {
-      name: "custo",
-      label: "Custo",
-      type: "range" as const,
-      min: 0,
-      max: maxCusto,
-    },
+    { name: "tipo", label: "Tipo", type: "select" as const, options: tiposManutencao },
+    { name: "custo", label: "Custo", type: "range" as const, min: 0, max: maxCusto },
     { name: "km", label: "Km", type: "range" as const, min: 0, max: maxKm },
   ];
 
-  const handleCadastrar = () => {
-    setDados({} as Manutencao);
-    setModoEdicao(false);
-    setOpen(true);
-  };
+  // prepara payload de edição
+  const payloadEdicao: any = itemSelecionado
+    ? {
+        id_manutencao_realizada: itemSelecionado.id_manutencao_realizada,
+        id_veiculo: String(itemSelecionado.id_veiculo),
+        id_manutencao: String(itemSelecionado.id_manutencao),
+        quilometragem_ultima_manutencao: itemSelecionado.quilometragem_ultima_manutencao,
+        data_manutencao: itemSelecionado.data_manutencao,
+        descricao: itemSelecionado.descricaoManutencao,
+        data_cadastro: itemSelecionado.data_cadastro ?? new Date().toISOString(),
+        valor_manutencao: itemSelecionado.valor_manutencao,
+        habilitado: true,
+        cnpj: session?.user?.cnpj!,
+        eManuntencaoPreventiva: String(itemSelecionado.eManuntencaoPreventiva),
+      }
+    : null;
 
   if (carregando) {
     return (
@@ -211,12 +261,12 @@ export default function Manutencoes() {
       transition={{ duration: 0.3 }}
     >
       <Box className="manutencoes-container">
+        {/* Header e Filtros */}
         <Box className="manutencoes-header">
           <Typography variant="h6" className="manutencoes-title">
             <EngineeringIcon className="icon-title" /> MANUTENÇÕES
           </Typography>
         </Box>
-
         <Box className="manutencoes-filtros">
           <Box className="search-filtros-container">
             <TextField
@@ -224,7 +274,7 @@ export default function Manutencoes() {
               size="small"
               placeholder="Buscar por veículo ou manutenção"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={e => setSearch(e.target.value)}
               className="search-input"
               InputProps={{
                 startAdornment: (
@@ -238,29 +288,27 @@ export default function Manutencoes() {
               variant="outlined"
               className="botao-filtrar"
               endIcon={<FilterAltOutlinedIcon />}
-              onClick={(e) => {
+              onClick={e => {
                 setAnchorElFiltro(e.currentTarget);
                 setOpenFiltros(true);
               }}
             >
-              <span className="button-text">Filtros Avançados</span>
+              Filtros Avançados
             </Button>
           </Box>
-
           <Box className="botoes-container">
             <Button
               variant="contained"
               className="botao-cadastrar"
-              onClick={handleCadastrar}
+              onClick={() => setOpenCriar(true)}
             >
               Cadastrar Manutenção
             </Button>
-
             <Button
               variant="contained"
               className="botao-exportar"
               startIcon={<IosShareIcon />}
-              onClick={(e) => {
+              onClick={e => {
                 setAnchorElExportar(e.currentTarget);
                 setOpenExportar(true);
               }}
@@ -270,44 +318,102 @@ export default function Manutencoes() {
           </Box>
         </Box>
 
+        {/* Tabela */}
         <TabelaGenerica<Manutencao>
           colunas={colunasManutencoes}
           dados={dadosFiltrados}
-          onEditar={(item) => {
-            setDados(item);
-            setModoEdicao(true);
-            setOpen(true);
+          onEditar={item => {
+            const original = dadosApi.find(m => m.id_manutencao_realizada === item.id);
+            if (original) {
+              setItemSelecionado(original);
+              setOpenEditar(true);
+            }
           }}
-          onExcluir={async (item) => {
-            try {
-              await deletarManutencaoRealizada(item.id);
-              setDadosApi((prev) =>
-                prev.filter((m) => m.id_manutencao_realizada !== item.id)
-              );
-              setSnackbarMensagem("Manutenção excluída com sucesso!");
-              setSnackbarCor("primary");
-              setSnackbarAberto(true);
-            } catch (err) {
-              setSnackbarMensagem(
-                "Erro ao excluir manutenção. Tente novamente."
-              );
-              setSnackbarCor("light");
-              setSnackbarAberto(true);
+          onExcluir={item => {
+            const original = dadosApi.find(m => m.id_manutencao_realizada === item.id);
+            if (original) {
+              setItemSelecionado(original);
+              setOpenDeletar(true);
             }
           }}
           exibirExaminar={false}
         />
 
-        <ModalFormulario<Manutencao>
-          open={open}
-          onClose={() => setOpen(false)}
-          onSalvar={() => setOpen(false)}
-          colunas={colunasManutencoes}
-          dados={dados}
-          setDados={setDados}
-          modoEdicao={modoEdicao}
-        />
+        {/* Modal de Edição */}
+        {openEditar && payloadEdicao && (
+          <EditarGenerico<ManutencaoRealizada>
+            open={openEditar}
+            onClose={() => setOpenEditar(false)}
+            titulo="EDITAR MANUTENÇÃO"
+            colunas={colunasFormulario}
+            itemEdicao={payloadEdicao}
+            obterOpcoesDinamicas={() => obterOpcoesDinamicas(session)}
+            onSalvar={async payload => {
+              setCarregando(true);
+              const payloadFinal: ManutencaoRealizada = {
+                ...payload,
+                id_veiculo: Number(payload.id_veiculo),
+                id_manutencao: Number(payload.id_manutencao),
+                data_manutencao: inputDatetimeLocalToISO(payload.data_manutencao),
+                eManuntencaoPreventiva: String(payload.eManuntencaoPreventiva) === "true"
+              };
+              try {
+                await atualizarManutencaoRealizada(payloadFinal.id_manutencao_realizada, payloadFinal);
+                await carregarManutencoes();
+                setSnackbarMensagem("Manutenção editada com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem("Erro ao editar manutenção. Tente novamente.");
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenEditar(false);
+              }
+            }}
+            schema={manutencaoSchema}
+          />
+        )}
 
+        {/* Modal de Criação */}
+        {openCriar && (
+          <CadastrarGenerico<ManutencaoRealizada>
+            open={openCriar}
+            onClose={() => setOpenCriar(false)}
+            titulo="CADASTRAR MANUTENÇÃO"
+            colunas={colunasFormulario}
+            obterOpcoesDinamicas={() => obterOpcoesDinamicas(session)}
+            onSalvar={async formValues => {
+              setCarregando(true);
+              const payload: ManutencaoRealizada = {
+                ...(formValues as any),
+                id_veiculo: Number(formValues.id_veiculo),
+                id_manutencao: Number(formValues.id_manutencao),
+                data_manutencao: inputDatetimeLocalToISO(formValues.data_manutencao),
+                eManuntencaoPreventiva: String(formValues.eManuntencaoPreventiva) === "true",
+                data_cadastro: new Date().toISOString(),
+                habilitado: true,
+                cnpj: session?.user?.cnpj!,
+              };
+              try {
+                await cadastrarManutencaoRealizada(payload);
+                await carregarManutencoes();
+                setSnackbarMensagem("Manutenção cadastrada com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem("Erro ao cadastrar manutenção. Tente novamente.");
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenCriar(false);
+              }
+            }}
+            schema={manutencaoSchema}
+          />
+        )}
+
+        {/* Filtros Avançados */}
         <FiltroAvancado
           open={openFiltros}
           onClose={() => setOpenFiltros(false)}
@@ -319,15 +425,44 @@ export default function Manutencoes() {
           onClear={() => setFiltrosAvancados({})}
         />
 
+        {/* Exportar */}
         <ExportarRelatorioDialog
           open={openExportar}
           onClose={() => setOpenExportar(false)}
           anchorEl={anchorElExportar}
-          colunas={colunasManutencoes.map((c) => c.titulo)}
+          colunas={colunasManutencoes.map(c => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
         />
 
+        {/* Modal de Deleção */}
+        {openDeletar && itemSelecionado && (
+          <DeletarGenerico<ManutencaoRealizadaDetalhado>
+            open={openDeletar}
+            onClose={() => setOpenDeletar(false)}
+            item={itemSelecionado}
+            getDescricao={(m) => `manutenção "${m.manutenção ?? m.descricaoManutencao ?? m.id_manutencao_realizada}"`}
+            onConfirmar={async (m) => {
+              setCarregando(true);
+              try {
+                await deletarManutencaoRealizada(m.id_manutencao_realizada);
+                await carregarManutencoes();
+                setSnackbarMensagem("Manutenção excluída com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem("Erro ao excluir manutenção. Tente novamente.");
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenDeletar(false);
+                setItemSelecionado(null);
+              }
+            }}
+          />
+        )}
+
+        {/* Snackbar */}
         <CustomSnackbar
           open={snackbarAberto}
           onClose={() => setSnackbarAberto(false)}

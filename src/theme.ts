@@ -33,17 +33,29 @@ const theme = createTheme({
           width: '100%',
 
           '& .MuiOutlinedInput-root': {
-            height: '2.7rem',
             borderRadius: '0.40rem',
+            // Aplica altura fixa apenas para inputs que NÃO são multiline
+            '&:not(.MuiInputBase-multiline)': {
+              height: '2.7rem',
+            },
 
             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
               borderColor: '#1b3562', // Cor da borda ao focar
             },
 
+            // Aplica altura fixa apenas para inputs que NÃO são multiline
             '& .MuiOutlinedInput-input': {
-              height: '2.5rem',
+              fontSize: '0.875rem',
               padding: '0 0.75rem',
-              fontSize: '0.875rem', // Tamanho da fonte ao digitar
+              height: '2.5rem',
+            },
+            // Para multiline, remove altura fixa e ajusta padding
+            '& .MuiOutlinedInput-inputMultiline': {
+              height: 'auto',
+              minHeight: '48px',
+              padding: '0 0.75rem',
+              fontSize: '0.875rem',
+              lineHeight: 1.5,
             },
           },
 
@@ -89,6 +101,7 @@ const theme = createTheme({
       styleOverrides: {
         label: {
           fontFamily: poppins.style.fontFamily,
+          fontSize: '0.875rem',
         },
       },
     },
@@ -107,6 +120,26 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           fontFamily: poppins.style.fontFamily,
+        },
+      },
+    },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          fontSize: '0.875rem',
+        },
+      },
+    },
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          color: '#1b3562',
+          '&.Mui-checked': {
+            color: '#1b3562',
+          },
+          '& .MuiSvgIcon-root': {
+            fontSize: '1.1rem',
+          },
         },
       },
     },

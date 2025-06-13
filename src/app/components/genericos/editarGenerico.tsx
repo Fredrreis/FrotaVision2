@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Alert } from "@mui/material";
 import { ObjectSchema } from "yup";
 import ModalFormulario, {
@@ -30,31 +30,38 @@ export default function EditarGenerico<T extends Record<string, unknown>>({
 }: EditarGenericoProps<T>) {
   const [dados, setDados] = useState<Partial<T>>(itemEdicao || {});
   const [colunasComOpcoes, setColunasComOpcoes] = useState<Coluna[]>(colunas);
-  const [erro, setErro] = useState("");
+  const [erros, setErros] = useState<Record<string, string>>({});
+  const prevOpen = useRef(open);
+
+  const carregar = async () => {
+    if (!obterOpcoesDinamicas) return;
+    try {
+      const opcoesMapeadas = await obterOpcoesDinamicas();
+      const colunasAtualizadas = colunas.map((coluna) =>
+        coluna.tipo === "selecao" && opcoesMapeadas[coluna.chave]
+          ? { ...coluna, opcoes: opcoesMapeadas[coluna.chave] }
+          : coluna
+      );
+      setColunasComOpcoes(colunasAtualizadas);
+    } catch (err) {
+      console.error(err);
+      setErros({ geral: "Erro ao carregar opções dinâmicas." });
+    }
+  };
 
   useEffect(() => {
-    const carregar = async () => {
-      if (!obterOpcoesDinamicas) return;
-      try {
-        const opcoesMapeadas = await obterOpcoesDinamicas();
-        const colunasAtualizadas = colunas.map((coluna) =>
-          coluna.tipo === "selecao" && opcoesMapeadas[coluna.chave]
-            ? { ...coluna, opcoes: opcoesMapeadas[coluna.chave] }
-            : coluna
-        );
-        setColunasComOpcoes(colunasAtualizadas);
-      } catch (err) {
-        console.error(err);
-        setErro("Erro ao carregar opções dinâmicas.");
-      }
-    };
-
     if (open) {
-      setDados(itemEdicao || {});
-      setErro("");
       carregar();
     }
   }, [open, colunas, obterOpcoesDinamicas, itemEdicao]);
+
+  useEffect(() => {
+    if (!prevOpen.current && open) {
+      setDados(itemEdicao || {});
+      setErros({});
+    }
+    prevOpen.current = open;
+  }, [open, itemEdicao]);
 
   const handleSalvar = async () => {
     try {
@@ -65,13 +72,14 @@ export default function EditarGenerico<T extends Record<string, unknown>>({
       onClose();
     } catch (error: any) {
       if (error?.inner?.length) {
-        const msg = error.inner
-          .map((e: any) => `${e.path}: ${e.message}`)
-          .join("\n");
-        setErro(msg);
+        const errosObj: Record<string, string> = {};
+        error.inner.forEach((e: any) => {
+          if (e.path) errosObj[e.path] = e.message;
+        });
+        setErros(errosObj);
       } else {
         console.error("Erro ao salvar:", error);
-        setErro("Erro ao salvar os dados.");
+        setErros({ geral: "Erro ao salvar os dados." });
       }
     }
   };
@@ -86,10 +94,11 @@ export default function EditarGenerico<T extends Record<string, unknown>>({
       setDados={setDados}
       titulo={titulo}
       modoEdicao={true}
+      erros={erros}
     >
-      {erro && (
+      {erros.geral && (
         <Alert severity="error" sx={{ whiteSpace: "pre-line" }}>
-          {erro}
+          {erros.geral}
         </Alert>
       )}
     </ModalFormulario>
