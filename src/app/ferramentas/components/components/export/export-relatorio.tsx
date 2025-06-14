@@ -55,6 +55,18 @@ export default function ExportarRelatorioDialog({
     if (formato !== "csv") setColunasSelecionadas(colunas);
   }, [formato, colunas]);
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        onClose();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [onClose]);
+
   const requestClose = () => {
     onClose();
   };

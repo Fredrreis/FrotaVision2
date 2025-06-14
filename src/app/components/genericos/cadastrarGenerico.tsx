@@ -4,6 +4,7 @@ import { ObjectSchema } from "yup";
 import ModalFormulario, {
   Coluna,
 } from "@/app/ferramentas/components/components/formulario-modal/formulario-generico";
+import * as Yup from "yup";
 
 interface CadastrarGenericoProps<T extends Record<string, unknown>> {
   open: boolean;
@@ -69,10 +70,15 @@ export default function CadastrarGenerico<T extends Record<string, unknown>>({
       await onSalvar(dados as T);
       onClose();
     } catch (error: unknown) {
-      if (error instanceof Error && error.message) {
+      if (error instanceof Yup.ValidationError) {
+        const fieldErrors: Record<string, string> = {};
+        error.inner.forEach((err) => {
+          if (err.path) fieldErrors[err.path] = err.message;
+        });
+        setErros(fieldErrors);
+      } else if (error instanceof Error && error.message) {
         setErros({ geral: error.message });
       } else {
-        console.error("Erro ao salvar:", error);
         setErros({ geral: "Erro ao salvar os dados." });
       }
     }

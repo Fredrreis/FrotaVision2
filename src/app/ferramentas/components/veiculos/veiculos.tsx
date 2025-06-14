@@ -77,6 +77,8 @@ interface VeiculoDetalhado {
     total: number;
     ultima: string;
     dataUltima: string;
+    origem: string;
+    destino: string;
   };
 }
 
@@ -138,6 +140,8 @@ export default function Veiculos() {
     "primary"
   );
 
+  const [tiposCaminhaoFiltro, setTiposCaminhaoFiltro] = useState<string[]>([]);
+
   // Carrega lista de veículos
   const carregarVeiculos = useCallback(() => {
     if (!session?.user?.cnpj) return;
@@ -164,6 +168,14 @@ export default function Veiculos() {
     fetchTipos();
   }, []);
 
+  useEffect(() => {
+    async function fetchTiposFiltro() {
+      const tipos = await listarTiposCaminhao();
+      setTiposCaminhaoFiltro(tipos.map((t) => t.nome));
+    }
+    fetchTiposFiltro();
+  }, []);
+
   // Recarrega veículos sempre que o CNPJ do usuário muda
   useEffect(() => {
     carregarVeiculos();
@@ -180,7 +192,7 @@ export default function Veiculos() {
         chassi: detalhes.veiculo.chassi,
         ano: detalhes.veiculo.ano,
         km: detalhes.veiculo.quilometragem,
-        dataCadastro: detalhes.veiculo.data_cadastro,
+        dataCadastro: formatarDataISOcomHora(detalhes.veiculo.data_cadastro),
         motorista: detalhes.ultimaViagemMotorista,
         descricao: detalhes.veiculo.descricao,
         manutencao: {
@@ -197,6 +209,8 @@ export default function Veiculos() {
           total: detalhes.countViagens,
           ultima: detalhes.ultimaViagemMotorista,
           dataUltima: detalhes.ultimaViagemData,
+          origem: detalhes.ultimaViagemOrigem,
+          destino: detalhes.ultimaViagemDestino,
         },
       };
       setDadosDetalhados(veiculoDetalhado);
@@ -228,7 +242,6 @@ export default function Veiculos() {
         id: v.id_veiculo,
         placa: v.placa || "—",
         nome: v.apelido || "—",
-        // 👉 aqui substituímos o número pelo nome vindo do mapeamento
         tipo: tiposCaminhao[v.tipo] || `Tipo ${v.tipo}`,
         chassi: v.chassi || "—",
         descricao: v.descricao || "—",
@@ -261,7 +274,7 @@ export default function Veiculos() {
     });
 
   // Extrai todos os nomes únicos de tipo para usar nos filtros
-  const tiposUnicos = [...new Set(dadosFiltrados.map((v) => v.tipo))];
+  const tiposUnicos = tiposCaminhaoFiltro;
   const maxKm = Math.max(0, ...dadosFiltrados.map((v) => v.km));
 
   const filtrosAvancadosConfig = [

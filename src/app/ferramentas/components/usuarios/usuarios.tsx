@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Button,
@@ -105,8 +105,9 @@ export default function Usuarios() {
   const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
     "primary"
   );
+  const [permissoesFiltro, setPermissoesFiltro] = useState<string[]>([]);
 
-  const carregarUsuarios = () => {
+  const carregarUsuarios = useCallback(() => {
     if (!session?.user?.cnpj) return;
     setCarregando(true);
     listarUsuariosDetalhado(session.user.cnpj)
@@ -122,7 +123,7 @@ export default function Usuarios() {
           console.error(err);
       })
       .finally(() => setCarregando(false));
-  };
+  }, [session?.user?.cnpj]);
 
   useEffect(() => {
     if (session?.user?.cnpj) {
@@ -130,7 +131,13 @@ export default function Usuarios() {
     }
   }, [session?.user?.cnpj, carregarUsuarios]);
 
-  console.log(dadosApi);
+  useEffect(() => {
+    async function fetchPermissoesFiltro() {
+      const permissoes = await listarPermissoes();
+      setPermissoesFiltro(permissoes.map((p) => p.nome));
+    }
+    fetchPermissoesFiltro();
+  }, []);
 
   const usuariosData = dadosApi.map((u) => ({
     id: u.id_usuario,
@@ -154,7 +161,7 @@ export default function Usuarios() {
     return matchSearch && matchPermissao && matchData;
   });
 
-  const permissoesUnicas = [...new Set(usuariosData.map((u) => u.permissoes))];
+  const permissoesUnicas = permissoesFiltro;
   const filtrosAvancadosConfig = [
     {
       name: "permissoes",

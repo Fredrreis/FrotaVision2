@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   listarViagensDetalhado,
   cadastrarViagem,
@@ -165,30 +165,55 @@ export default function Viagens() {
   const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
     "primary"
   );
+  const [origensFiltro, setOrigensFiltro] = useState<string[]>([]);
+  const [destinosFiltro, setDestinosFiltro] = useState<string[]>([]);
 
-  const carregarViagens = () => {
-    if (!session?.user?.cnpj) return;
+  useEffect(() => {
+    console.log("[DEBUG] Session em Viagens:", session);
+  }, [session]);
+
+  const carregarViagens = useCallback(() => {
+    if (!session?.user?.cnpj) {
+      console.log(
+        "[DEBUG] CNPJ não encontrado na sessão em Viagens! Session:",
+        session
+      );
+      return;
+    }
     setCarregando(true);
+    console.log(
+      "[DEBUG] Chamando listarViagensDetalhado com CNPJ:",
+      session.user.cnpj
+    );
     listarViagensDetalhado(session.user.cnpj)
-      .then((res) => setDadosApi(res))
-      .catch((err) => {
-        if (
-          !(
-            err.name === "CanceledError" ||
-            err.code === "ERR_CANCELED" ||
-            err.message === "canceled"
-          )
-        )
-          console.error(err);
+      .then((res) => {
+        console.log("[DEBUG] Resposta da API listarViagensDetalhado:", res);
+        setDadosApi(res);
       })
-      .finally(() => setCarregando(false));
-  };
+      .catch((err) => {
+        console.error("[DEBUG] Erro ao carregar viagens:", err);
+      })
+      .finally(() => {
+        console.log("[DEBUG] Finalizou carregamento de viagens");
+        setCarregando(false);
+      });
+  }, [session?.user?.cnpj]);
 
   useEffect(() => {
     if (session?.user?.cnpj) {
       carregarViagens();
     }
   }, [session?.user?.cnpj, carregarViagens]);
+
+  useEffect(() => {
+    async function fetchOrigensDestinosFiltro() {
+      if (!session?.user?.cnpj) return;
+      const viagens = await listarViagensDetalhado(session.user.cnpj);
+      setOrigensFiltro([...new Set(viagens.map((v) => v.origem || "—"))]);
+      setDestinosFiltro([...new Set(viagens.map((v) => v.destino || "—"))]);
+    }
+    fetchOrigensDestinosFiltro();
+  }, [session?.user?.cnpj]);
 
   // View-model para tabela
   const viagensData = dadosApi.map((v) => ({
@@ -244,8 +269,8 @@ export default function Viagens() {
     );
   });
 
-  const origensUnicas = [...new Set(viagensData.map((v) => v.origem))];
-  const destinosUnicas = [...new Set(viagensData.map((v) => v.destino))];
+  const origensUnicas = origensFiltro;
+  const destinosUnicas = destinosFiltro;
   const maxKm = Math.max(0, ...viagensData.map((v) => v.kmPercorrido));
 
   const filtrosAvancadosConfig = [

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Button,
@@ -80,30 +80,37 @@ export default function Motoristas() {
   const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
     "primary"
   );
+  const [apelidosFiltro, setApelidosFiltro] = useState<string[]>([]);
 
-  const carregarMotoristas = () => {
-    if (!session?.user?.cnpj) return;
+  const carregarMotoristas = useCallback(() => {
+    if (!session?.user?.cnpj) {
+      return;
+    }
     setCarregando(true);
     listarMotoristasDetalhado(session.user.cnpj)
-      .then((res) => setDadosApi(res))
-      .catch((err) => {
-        if (
-          !(
-            err.name === "CanceledError" ||
-            err.code === "ERR_CANCELED" ||
-            err.message === "canceled"
-          )
-        )
-          console.error(err);
+      .then((res) => {
+        setDadosApi(res);
       })
-      .finally(() => setCarregando(false));
-  };
+      .finally(() => {
+        setCarregando(false);
+      });
+  }, [session?.user?.cnpj]);
 
   useEffect(() => {
     if (session?.user?.cnpj) {
       carregarMotoristas();
     }
   }, [session?.user?.cnpj, carregarMotoristas]);
+
+  useEffect(() => {
+    async function fetchApelidosFiltro() {
+      const motoristas = await listarMotoristasDetalhado(
+        session?.user?.cnpj ?? ""
+      );
+      setApelidosFiltro([...new Set(motoristas.map((m) => m.apelido || "—"))]);
+    }
+    if (session?.user?.cnpj) fetchApelidosFiltro();
+  }, [session?.user?.cnpj]);
 
   // View-model para tabela
   const motoristasData = dadosApi.map((m) => ({
@@ -139,7 +146,7 @@ export default function Motoristas() {
   });
 
   // Filtros avançados config
-  const opcoesApelido = [...new Set(motoristasData.map((m) => m.apelido))];
+  const opcoesApelido = apelidosFiltro;
   const filtrosAvancadosConfig = [
     { name: "dataCadastro", label: "Data de Cadastro", type: "data" as const },
     {

@@ -1,7 +1,7 @@
 // pages/ferramentas/manutencoes.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import {
@@ -41,6 +41,7 @@ import {
 } from "@/utils/data";
 import { listarTiposManutencao } from "@/api/services/tipoManutencaoService";
 import { listarVeiculos } from "@/api/services/veiculoService";
+import { listarTiposCaminhao } from "@/api/services/tipoCaminhaoService";
 
 import "../styles/shared-styles.css";
 import "./manutencoes.css";
@@ -192,24 +193,47 @@ export default function Manutencoes() {
     "primary"
   );
 
+  const [tiposCaminhaoFiltro, setTiposCaminhaoFiltro] = useState<string[]>([]);
+
+  useEffect(() => {
+    console.log("[DEBUG] Session em Manutencoes:", session);
+  }, [session]);
+
+  useEffect(() => {
+    async function fetchTiposFiltro() {
+      const tipos = await listarTiposCaminhao();
+      setTiposCaminhaoFiltro(tipos.map((t) => t.nome));
+    }
+    fetchTiposFiltro();
+  }, []);
+
   // carrega lista de manutenções
-  const carregarManutencoes = () => {
-    if (!session?.user?.cnpj) return;
+  const carregarManutencoes = useCallback(() => {
+    if (!session?.user?.cnpj) {
+      console.log(
+        "[DEBUG] CNPJ não encontrado na sessão em Manutencoes! Session:",
+        session
+      );
+      return;
+    }
     setCarregando(true);
+    console.log(
+      "[DEBUG] Chamando listarManutencaoRealizada com CNPJ:",
+      session.user.cnpj
+    );
     listarManutencaoRealizada(session.user.cnpj)
-      .then((res) => setDadosApi(res))
-      .catch((err) => {
-        if (
-          !(
-            err.name === "CanceledError" ||
-            err.code === "ERR_CANCELED" ||
-            err.message === "canceled"
-          )
-        )
-          console.error(err);
+      .then((res) => {
+        console.log("[DEBUG] Resposta da API listarManutencaoRealizada:", res);
+        setDadosApi(res);
       })
-      .finally(() => setCarregando(false));
-  };
+      .catch((err) => {
+        console.error("[DEBUG] Erro ao carregar manutenções:", err);
+      })
+      .finally(() => {
+        console.log("[DEBUG] Finalizou carregamento de manutenções");
+        setCarregando(false);
+      });
+  }, [session?.user?.cnpj]);
 
   useEffect(() => {
     if (session?.user?.cnpj) {
@@ -262,7 +286,7 @@ export default function Manutencoes() {
   });
 
   // configura filtros avançados
-  const tiposVeiculo = [...new Set(manutencoesData.map((m) => m.tipoVeiculo))];
+  const tiposVeiculo = tiposCaminhaoFiltro;
   const tiposManutencao = [...new Set(manutencoesData.map((m) => m.tipo))];
   const maxKm = Math.max(0, ...manutencoesData.map((m) => m.km));
   const maxCusto = Math.max(0, ...manutencoesData.map((m) => m.custo));

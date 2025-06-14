@@ -36,6 +36,8 @@ interface VeiculoDetalhado {
     total: number;
     ultima: string;
     dataUltima: string;
+    origem: string;
+    destino: string;
   };
 }
 
@@ -159,7 +161,8 @@ export default function VisualizarVeiculo({
                 Viagens Registradas: {safe(veiculo.viagens.total)}
               </Typography>
               <Typography variant="body2">
-                Última viagem: {safe(veiculo.viagens.ultima)}
+                Última viagem: {safe(veiculo.viagens.origem)} -{" "}
+                {safe(veiculo.viagens.destino)}
               </Typography>
               <Typography variant="body2">
                 Data da última viagem realizada:{" "}

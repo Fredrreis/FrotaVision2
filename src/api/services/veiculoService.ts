@@ -1,5 +1,3 @@
-// src/api/services/veiculoService.ts
-
 import { ApiGateway } from "../api";
 
 export interface Veiculo {
@@ -30,6 +28,8 @@ export interface VeiculoDetalhadoResponse {
   ultimaMantuenacaoUrgenteData: string;
   ultimaViagemData: string;
   ultimaViagemMotorista: string;
+  ultimaViagemOrigem: string;
+  ultimaViagemDestino: string;
 }
 
 export interface NovoVeiculo {
