@@ -1,17 +1,29 @@
-import zxcvbn from "zxcvbn";
+"use client";
+
+import { useEffect, useState } from "react";
 import { Box, Typography, LinearProgress } from "@mui/material";
+import zxcvbn from "zxcvbn";
 
 interface Props {
   senha: string;
 }
 
 export default function SenhaForte({ senha }: Props) {
-  const resultado = zxcvbn(senha);
+  const [resultado, setResultado] = useState<zxcvbn.ZXCVBNResult | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setResultado(zxcvbn(senha));
+    }
+  }, [senha]);
+
+  if (!resultado || !senha) return null;
+
   const niveis = ["Muito Fraca", "Fraca", "Média", "Forte", "Excelente"];
   const score = resultado.score;
   const texto = niveis[score];
 
-  return senha ? (
+  return (
     <Box sx={{ mt: 1 }}>
       <Typography variant="caption">Força da Senha: {texto}</Typography>
       <LinearProgress
@@ -35,5 +47,5 @@ export default function SenhaForte({ senha }: Props) {
         }}
       />
     </Box>
-  ) : null;
+  );
 }

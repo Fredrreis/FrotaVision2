@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { Button, Divider, TextField, Typography, Box } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Button, Divider, TextField, Typography } from "@mui/material";
 import Image from "next/image";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import * as yup from "yup";
+import { step1Schema } from "@/utils/login-validation";
+import ToggleSenha from "@/app/components/toggle-senha/toggle-senha";
+import SenhaForte from "../../../../components/senha-status/senha-status";
 import GoogleIcon from "../../../../img/google.png";
 import MicrosoftIcon from "../../../../img/microsoft.png";
-import SenhaForte from "../../../../components/senha-status/senha-status";
-import { step1Schema } from "@/utils/login-validation";
-import useToggleSenha from "@/app/components/toggle-senha/toggle-senha";
 
 interface Step1Props {
   formData: {
@@ -27,20 +28,22 @@ export default function Step1({
   handleGoogleSignIn,
 }: Step1Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { mostrarSenha, adornment } = useToggleSenha();
+  const { mostrarSenha, adornment } = ToggleSenha();
 
   const handleNext = async () => {
     try {
       await step1Schema.validate(formData, { abortEarly: false });
       setErrors({});
       nextStep();
-    } catch (err: any) {
+    } catch (err: unknown) {
       const newErrors: Record<string, string> = {};
-      err.inner.forEach((e: any) => {
-        if (!newErrors[e.path]) {
-          newErrors[e.path] = e.message;
-        }
-      });
+      if (err instanceof yup.ValidationError) {
+        err.inner.forEach((e: yup.ValidationError) => {
+          if (e.path && !newErrors[e.path]) {
+            newErrors[e.path] = e.message;
+          }
+        });
+      }
       setErrors(newErrors);
     }
   };

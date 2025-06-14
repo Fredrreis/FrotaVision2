@@ -6,15 +6,15 @@ import { Box, Typography, Toolbar, Button } from "@mui/material";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import Passo1 from "./components/passos/passo-1";
-import Passo2 from "./components/passos/passo-2";
-import Passo3 from "./components/passos/passo-3";
-import TelaSucesso from "./components/register-sucesso/register-sucesso";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
-import LogoFrotaVision from "../../img/FrotaVisionLogo.png";
 import { cadastrarEmpresa } from "@/api/services/empresaService";
 import { cadastrarUsuario } from "../../../api/services/usuarioService";
 import CustomSnackbar from "@/app/components/snackbar/snackbar";
+import LogoFrotaVision from "../../img/FrotaVisionLogo.png";
+import TelaSucesso from "./components/register-sucesso/register-sucesso";
+import Passo1 from "./components/passos/passo-1";
+import Passo2 from "./components/passos/passo-2";
+import Passo3 from "./components/passos/passo-3";
 import "./register.css";
 
 export default function Register() {

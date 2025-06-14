@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Box,
@@ -19,7 +19,7 @@ import {
   cadastrarVeiculo,
   editarVeiculo,
   pesquisarVeiculoDetalhado,
-  Veiculo as VeiculoAPI,
+  Veiculo,
   NovoVeiculo,
 } from "@/api/services/veiculoService";
 
@@ -54,6 +54,32 @@ interface VeiculoFormatado {
   [key: string]: unknown;
 }
 
+interface VeiculoDetalhado {
+  apelido: string;
+  placa: string;
+  chassi: string;
+  ano: number;
+  km: number;
+  dataCadastro: string;
+  motorista: string;
+  descricao: string;
+  manutencao: {
+    total: number;
+    ultima: string;
+    dataUltima: string;
+  };
+  preventiva: {
+    total: number;
+    pendente: string;
+    dataNotificacao: string;
+  };
+  viagens: {
+    total: number;
+    ultima: string;
+    dataUltima: string;
+  };
+}
+
 const colunasVeiculos = [
   { chave: "placa", titulo: "Placa", ordenavel: false },
   { chave: "nome", titulo: "Nome", ordenavel: false },
@@ -78,16 +104,15 @@ const mapeamentoCampos = {
 
 export default function Veiculos() {
   const { data: session } = useSession();
-  const [dadosApi, setDadosApi] = useState<VeiculoAPI[]>([]);
-  const [itemSelecionado, setItemSelecionado] = useState<VeiculoAPI | null>(
-    null
-  );
+  const [dadosApi, setDadosApi] = useState<Veiculo[]>([]);
+  const [itemSelecionado, setItemSelecionado] = useState<Veiculo | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [openCadastrar, setOpenCadastrar] = useState(false);
   const [openEditar, setOpenEditar] = useState(false);
   const [openDeletar, setOpenDeletar] = useState(false);
   const [openVisualizar, setOpenVisualizar] = useState(false);
-  const [dadosDetalhados, setDadosDetalhados] = useState<any | null>(null);
+  const [dadosDetalhados, setDadosDetalhados] =
+    useState<VeiculoDetalhado | null>(null);
 
   // 👉 Novo estado: mapeamento de ID do tipo para nome
   const [tiposCaminhao, setTiposCaminhao] = useState<Record<number, string>>(
@@ -103,9 +128,9 @@ export default function Veiculos() {
   const [anchorElExportar, setAnchorElExportar] = useState<HTMLElement | null>(
     null
   );
-  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
-    {}
-  );
+  const [filtrosAvancados, setFiltrosAvancados] = useState<
+    Record<string, unknown>
+  >({});
 
   const [snackbarAberto, setSnackbarAberto] = useState(false);
   const [snackbarMensagem, setSnackbarMensagem] = useState("");
@@ -114,13 +139,13 @@ export default function Veiculos() {
   );
 
   // Carrega lista de veículos
-  const carregarVeiculos = () => {
+  const carregarVeiculos = useCallback(() => {
     if (!session?.user?.cnpj) return;
     setCarregando(true);
     listarVeiculos(session.user.cnpj)
       .then((res) => setDadosApi(res))
       .finally(() => setCarregando(false));
-  };
+  }, [session?.user?.cnpj]);
 
   // Ao montar, busca os tipos de caminhão e preenche o mapeamento
   useEffect(() => {
@@ -142,22 +167,22 @@ export default function Veiculos() {
   // Recarrega veículos sempre que o CNPJ do usuário muda
   useEffect(() => {
     carregarVeiculos();
-  }, [session?.user?.cnpj]);
+  }, [carregarVeiculos]);
 
   // Ao clicar no ícone de visualizar, busca detalhes e abre modal
   const handleVisualizar = async (item: VeiculoFormatado) => {
     try {
+      setCarregando(true);
       const detalhes = await pesquisarVeiculoDetalhado(item.id);
-      const veiculo = detalhes.veiculo;
-      setDadosDetalhados({
-        apelido: veiculo.apelido,
-        placa: veiculo.placa,
-        chassi: veiculo.chassi,
-        ano: veiculo.ano,
-        km: veiculo.quilometragem,
-        dataCadastro: formatarDataISOcomHora(veiculo.data_cadastro),
+      const veiculoDetalhado: VeiculoDetalhado = {
+        apelido: detalhes.veiculo.apelido,
+        placa: detalhes.veiculo.placa,
+        chassi: detalhes.veiculo.chassi,
+        ano: detalhes.veiculo.ano,
+        km: detalhes.veiculo.quilometragem,
+        dataCadastro: detalhes.veiculo.data_cadastro,
         motorista: detalhes.ultimaViagemMotorista,
-        descricao: veiculo.descricao,
+        descricao: detalhes.veiculo.descricao,
         manutencao: {
           total: detalhes.countManutencao,
           ultima: detalhes.nomeUltimaManitencao,
@@ -170,18 +195,18 @@ export default function Veiculos() {
         },
         viagens: {
           total: detalhes.countViagens,
-          ultima: "São João Del Rey(MG) - Ribeirão das Neves(MG)",
+          ultima: detalhes.ultimaViagemMotorista,
           dataUltima: detalhes.ultimaViagemData,
         },
-      });
+      };
+      setDadosDetalhados(veiculoDetalhado);
       setOpenVisualizar(true);
     } catch (err) {
-      console.error("Erro ao buscar veículo detalhado:", err);
-      setSnackbarMensagem(
-        "Não foi possível obter os dados detalhados do veículo."
-      );
-      setSnackbarCor("error");
+      console.error("Erro ao carregar detalhes do veículo:", err);
+      setSnackbarMensagem("Erro ao carregar detalhes do veículo");
       setSnackbarAberto(true);
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -219,7 +244,7 @@ export default function Veiculos() {
         veiculo.placa.toLowerCase().includes(search.toLowerCase());
 
       const matchTipo = filtrosAvancados.tipo
-        ? veiculo.tipo === filtrosAvancados.tipo
+        ? veiculo.tipo === String(filtrosAvancados.tipo)
         : true;
       const matchAno = filtrosAvancados.ano
         ? veiculo.ano === Number(filtrosAvancados.ano)
@@ -229,7 +254,7 @@ export default function Veiculos() {
           ? veiculo.km <= Number(filtrosAvancados.km)
           : true;
       const matchData = filtrosAvancados.data
-        ? compareDateISO(veiculo.dataOriginal, filtrosAvancados.data)
+        ? compareDateISO(veiculo.dataOriginal, String(filtrosAvancados.data))
         : true;
 
       return matchSearch && matchTipo && matchAno && matchKm && matchData;
@@ -419,7 +444,7 @@ export default function Veiculos() {
         )}
 
         {openEditar && itemSelecionado && (
-          <EditarGenerico<VeiculoAPI>
+          <EditarGenerico<Veiculo>
             open={openEditar}
             onClose={() => setOpenEditar(false)}
             onSalvar={async (veiculoAtualizado) => {
@@ -440,7 +465,7 @@ export default function Veiculos() {
         )}
 
         {openDeletar && itemSelecionado && (
-          <DeletarGenerico<VeiculoAPI>
+          <DeletarGenerico<Veiculo>
             open={openDeletar}
             onClose={() => setOpenDeletar(false)}
             item={itemSelecionado}

@@ -1,7 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { exportarDocx } from "./templates/export-docx-file";
-import { exportarPdf } from "./templates/export-pdf-file";
-import { exportarCsv } from "./templates/export-csv-file";
 import {
   Box,
   IconButton,
@@ -15,18 +12,21 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import IosShareIcon from "@mui/icons-material/IosShare";
-import SnackBarCustomizada from "../../../../components/snackbar/snackbar";
 import FormatIndentIncreaseIcon from "@mui/icons-material/FormatIndentIncrease";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ArticleIcon from "@mui/icons-material/Article";
 import GenericPopper from "@/app/components/popper/popper-generico";
+import { exportarCsv } from "./templates/export-csv-file";
+import SnackBarCustomizada from "../../../../components/snackbar/snackbar";
+import { exportarDocx } from "./templates/export-docx-file";
+import { exportarPdf } from "./templates/export-pdf-file";
 import "./export-relatorio.css";
 
-interface Props {
+interface ExportarRelatorioDialogProps {
   open: boolean;
   onClose: () => void;
   colunas: string[];
-  dados: Record<string, any>[];
+  dados: Record<string, unknown>[];
   mapeamentoCampos: Record<string, string>;
   anchorEl: HTMLElement | null;
 }
@@ -38,7 +38,7 @@ export default function ExportarRelatorioDialog({
   dados,
   mapeamentoCampos,
   anchorEl,
-}: Props) {
+}: ExportarRelatorioDialogProps) {
   const [formato, setFormato] = useState("pdf");
   const [colunasSelecionadas, setColunasSelecionadas] =
     useState<string[]>(colunas);

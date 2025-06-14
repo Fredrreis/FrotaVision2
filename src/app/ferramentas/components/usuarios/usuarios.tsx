@@ -1,43 +1,47 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import {
-  listarUsuarios,
-  deletarUsuario,
-  Usuario as UsuarioAPI,
-} from "@/api/services/usuarioService";
-import { useSession } from "next-auth/react";
-import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
-import ModalFormulario from "../components/formulario-modal/formulario-generico";
-import ExportarRelatorioDialog from "../components/export/export-relatorio";
+import React, { useEffect, useState } from "react";
 import {
   Box,
-  Typography,
   Button,
+  Typography,
   TextField,
   InputAdornment,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { useSession } from "next-auth/react";
+import { motion } from "framer-motion";
+import {
+  listarUsuariosDetalhado,
+  cadastrarUsuario,
+  atualizarUsuario,
+  deletarUsuario,
+  UsuarioDetalhado,
+  UsuarioPayload,
+} from "@/api/services/usuarioService";
+import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
+import ExportarRelatorioDialog from "../components/export/export-relatorio";
+import FiltroAvancado from "../components/filtro/filtro-avancado";
+import CustomSnackbar from "../../../components/snackbar/snackbar";
+import Carregamento from "../../../components/carregamento/carregamento";
+import { formatarDataISOcomHora, compareDateISO } from "@/utils/data";
+import "./usuarios.css";
+import EditarGenerico from "@/app/components/genericos/editarGenerico";
+import CadastrarGenerico from "@/app/components/genericos/cadastrarGenerico";
+import DeletarGenerico from "@/app/components/genericos/deletarGenerico";
+import AddIcon from "@mui/icons-material/Add";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import IosShareIcon from "@mui/icons-material/IosShare";
-import FiltroAvancado from "../components/filtro/filtro-avancado";
-import Carregamento from "../../../components/carregamento/carregamento";
-import CustomSnackbar from "../../../components/snackbar/snackbar";
-import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
-import { motion } from "framer-motion";
-import "../styles/shared-styles.css";
-import "./usuarios.css";
+import SearchIcon from "@mui/icons-material/Search";
+import { usuarioSchema } from "@/utils/usuario-validation";
+import {
+  listarPermissoes,
+  PermissaoUsuario,
+} from "@/api/services/permissaoUsuarioService";
 
-interface Usuario {
-  nome: string;
-  email: string;
-  data: string;
-  dataOriginal: string;
-  permissoes: string;
-  [key: string]: string;
-}
-
-const colunasUsuarios = [
+const colunasUsuarios: {
+  chave: "id" | "nome" | "email" | "data" | "dataOriginal" | "permissoes";
+  titulo: string;
+  ordenavel: boolean;
+}[] = [
   { chave: "email", titulo: "Email", ordenavel: false },
   { chave: "nome", titulo: "Nome de Usuário", ordenavel: false },
   { chave: "data", titulo: "Data", ordenavel: true },
@@ -51,42 +55,62 @@ const mapeamentoCampos = {
   "Permissões do Usuário": "permissoes",
 };
 
+const colunasFormulario = [
+  { chave: "nome_usuario", titulo: "Nome de Usuário", tipo: "texto" as const },
+  { chave: "email", titulo: "Email", tipo: "texto" as const },
+  { chave: "senha", titulo: "Senha", tipo: "senha" as const },
+  {
+    chave: "permissoes_usuario",
+    titulo: "Permissão",
+    tipo: "selecao" as const,
+  },
+];
+
+// Função para buscar opções dinâmicas do select de permissões
+async function obterOpcoesDinamicasPermissoes() {
+  try {
+    const permissoes: PermissaoUsuario[] = await listarPermissoes();
+    return {
+      permissoes_usuario: permissoes.map((p) => ({
+        label: p.nome,
+        value: String(p.id_permissao),
+      })),
+    };
+  } catch {
+    return { permissoes_usuario: [] };
+  }
+}
+
 export default function Usuarios() {
   const { data: session } = useSession();
-  const [dadosApi, setDadosApi] = useState<UsuarioAPI[]>([]);
+  const [dadosApi, setDadosApi] = useState<UsuarioDetalhado[]>([]);
   const [carregando, setCarregando] = useState(true);
-  const [dados, setDados] = useState<Usuario | null>(null);
-  const [open, setOpen] = useState(false);
-  const [modoEdicao, setModoEdicao] = useState(false);
+  const [openCriar, setOpenCriar] = useState(false);
+  const [itemSelecionado, setItemSelecionado] =
+    useState<UsuarioDetalhado | null>(null);
+  const [openEditar, setOpenEditar] = useState(false);
+  const [openDeletar, setOpenDeletar] = useState(false);
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
   const [openExportar, setOpenExportar] = useState(false);
-  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
-    {}
-  );
+  const [filtrosAvancados, setFiltrosAvancados] = useState<
+    Record<string, unknown>
+  >({});
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [anchorElExportar, setAnchorElExportar] = useState<HTMLElement | null>(
     null
   );
-
   const [snackbarAberto, setSnackbarAberto] = useState(false);
   const [snackbarMensagem, setSnackbarMensagem] = useState("");
   const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
     "primary"
   );
 
-  const isMounted = useRef(true);
-  useEffect(() => {
-    const controller = new AbortController();
-
+  const carregarUsuarios = () => {
     if (!session?.user?.cnpj) return;
-
-    listarUsuarios(session.user.cnpj, controller.signal)
-      .then((res) => {
-        if (!controller.signal.aborted) {
-          setDadosApi(res);
-        }
-      })
+    setCarregando(true);
+    listarUsuariosDetalhado(session.user.cnpj)
+      .then((res) => setDadosApi(res))
       .catch((err) => {
         if (
           !(
@@ -94,47 +118,43 @@ export default function Usuarios() {
             err.code === "ERR_CANCELED" ||
             err.message === "canceled"
           )
-        ) {
-          console.error("Erro:", err);
-        }
+        )
+          console.error(err);
       })
-      .finally(() => {
-        if (!controller.signal.aborted) {
-          setCarregando(false);
-        }
-      });
+      .finally(() => setCarregando(false));
+  };
 
-    return () => {
-      controller.abort();
-    };
-  }, [session?.user?.cnpj]);
+  useEffect(() => {
+    if (session?.user?.cnpj) {
+      carregarUsuarios();
+    }
+  }, [session?.user?.cnpj, carregarUsuarios]);
 
-  const usuariosData: Usuario[] = dadosApi.map((u) => ({
+  console.log(dadosApi);
+
+  const usuariosData = dadosApi.map((u) => ({
+    id: u.id_usuario,
     nome: u.nome_usuario || "—",
     email: u.email || "—",
-    data: formatarDataISOcomHora(u.data_cadastro),
-    dataOriginal: u.data_cadastro,
-    permissoes: "Admin", // valor temporário
+    data: u.data_cadastro ? formatarDataISOcomHora(u.data_cadastro) : "—",
+    dataOriginal: u.data_cadastro || "",
+    permissoes: u.nomePermissao || "—",
   }));
 
   const dadosFiltrados = usuariosData.filter((usuario) => {
     const matchSearch =
       usuario.nome.toLowerCase().includes(search.toLowerCase()) ||
       usuario.email.toLowerCase().includes(search.toLowerCase());
-
     const matchPermissao = filtrosAvancados.permissoes
-      ? usuario.permissoes === filtrosAvancados.permissoes
+      ? usuario.permissoes === String(filtrosAvancados.permissoes)
       : true;
-
     const matchData = filtrosAvancados.data
-      ? compareDateISO(usuario.dataOriginal, filtrosAvancados.data)
+      ? compareDateISO(usuario.dataOriginal, String(filtrosAvancados.data))
       : true;
-
     return matchSearch && matchPermissao && matchData;
   });
 
   const permissoesUnicas = [...new Set(usuariosData.map((u) => u.permissoes))];
-
   const filtrosAvancadosConfig = [
     {
       name: "permissoes",
@@ -149,54 +169,19 @@ export default function Usuarios() {
     },
   ];
 
-  const handleEditar = (item: Usuario) => {
-    setDados(item);
-    setModoEdicao(true);
-    setOpen(true);
-  };
-
-  const handleExcluir = async (item: Usuario) => {
-    try {
-      const usuarioCorrespondente = dadosApi.find(
-        (u) =>
-          u.nome_usuario === item.nome &&
-          u.email === item.email &&
-          formatarDataISOcomHora(u.data_cadastro) === item.data
-      );
-
-      if (!usuarioCorrespondente) {
-        throw new Error("Usuário não encontrado na lista original.");
+  // Payload para edição
+  const payloadEdicao: UsuarioPayload | null = itemSelecionado
+    ? {
+        id_usuario: itemSelecionado.id_usuario,
+        nome_usuario: itemSelecionado.nome_usuario,
+        email: itemSelecionado.email,
+        senha: "",
+        permissoes_usuario: itemSelecionado.permissoes_usuario,
+        data_cadastro: itemSelecionado.data_cadastro,
+        cnpj: session?.user?.cnpj ?? "",
+        habilitado: true,
       }
-
-      await deletarUsuario(usuarioCorrespondente.id_usuario);
-      setDadosApi((prev) =>
-        prev.filter((u) => u.id_usuario !== usuarioCorrespondente.id_usuario)
-      );
-
-      setSnackbarMensagem("Usuário excluído com sucesso!");
-      setSnackbarCor("primary");
-      setSnackbarAberto(true);
-    } catch (err) {
-      console.error("Erro ao excluir usuário:", err);
-      setSnackbarMensagem("Erro ao excluir usuário. Tente novamente.");
-      setSnackbarCor("light");
-      setSnackbarAberto(true);
-    }
-  };
-
-  const handleCadastrar = () => {
-    setDados({} as Usuario);
-    setModoEdicao(false);
-    setOpen(true);
-  };
-
-  const handleSalvar = () => {
-    console.log(
-      modoEdicao ? "Salvando edição:" : "Cadastrando novo usuário:",
-      dados
-    );
-    setOpen(false);
-  };
+    : null;
 
   if (carregando) {
     return (
@@ -217,10 +202,9 @@ export default function Usuarios() {
       <Box className="usuarios-container">
         <Box className="usuarios-header">
           <Typography variant="h6" className="usuarios-title">
-            <AccountCircleIcon className="icon-title" /> USUÁRIOS
+            <AddIcon className="icon-title" /> USUÁRIOS
           </Typography>
         </Box>
-
         <Box className="usuarios-filtros">
           <Box className="search-filtros-container">
             <TextField
@@ -247,19 +231,17 @@ export default function Usuarios() {
                 setOpenFiltros(true);
               }}
             >
-              <span className="button-text">Filtros Avançados</span>
+              Filtros Avançados
             </Button>
           </Box>
-
           <Box className="botoes-container">
             <Button
               variant="contained"
               className="botao-cadastrar"
-              onClick={handleCadastrar}
+              onClick={() => setOpenCriar(true)}
             >
               Cadastrar Usuário
             </Button>
-
             <Button
               variant="contained"
               className="botao-exportar"
@@ -273,25 +255,90 @@ export default function Usuarios() {
             </Button>
           </Box>
         </Box>
-
-        <TabelaGenerica<Usuario>
+        <TabelaGenerica
           colunas={colunasUsuarios}
           dados={dadosFiltrados}
-          onEditar={handleEditar}
-          onExcluir={handleExcluir}
+          onEditar={(item) => {
+            const original = dadosApi.find((u) => u.id_usuario === item.id);
+            if (original) {
+              setItemSelecionado(original);
+              setOpenEditar(true);
+            }
+          }}
+          onExcluir={(item) => {
+            const original = dadosApi.find((u) => u.id_usuario === item.id);
+            if (original) {
+              setItemSelecionado(original);
+              setOpenDeletar(true);
+            }
+          }}
           exibirExaminar={false}
         />
-
-        <ModalFormulario<Usuario>
-          open={open}
-          onClose={() => setOpen(false)}
-          onSalvar={handleSalvar}
-          colunas={colunasUsuarios}
-          dados={dados}
-          setDados={setDados}
-          modoEdicao={modoEdicao}
-        />
-
+        {/* Modal de Edição */}
+        {openEditar && payloadEdicao && (
+          <EditarGenerico<UsuarioPayload>
+            open={openEditar}
+            onClose={() => setOpenEditar(false)}
+            titulo="EDITAR USUÁRIO"
+            colunas={colunasFormulario}
+            itemEdicao={payloadEdicao}
+            schema={usuarioSchema}
+            obterOpcoesDinamicas={obterOpcoesDinamicasPermissoes}
+            onSalvar={async (payload) => {
+              setCarregando(true);
+              try {
+                await atualizarUsuario(payload.id_usuario, payload);
+                await carregarUsuarios();
+                setSnackbarMensagem("Usuário editado com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem("Erro ao editar usuário. Tente novamente.");
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenEditar(false);
+              }
+            }}
+          />
+        )}
+        {/* Modal de Criação */}
+        {openCriar && (
+          <CadastrarGenerico<UsuarioPayload>
+            open={openCriar}
+            onClose={() => setOpenCriar(false)}
+            titulo="CADASTRAR USUÁRIO"
+            colunas={colunasFormulario}
+            schema={usuarioSchema}
+            obterOpcoesDinamicas={obterOpcoesDinamicasPermissoes}
+            onSalvar={async (formValues) => {
+              setCarregando(true);
+              const payload: UsuarioPayload = {
+                ...formValues,
+                id_usuario: 0,
+                data_cadastro: new Date().toISOString(),
+                cnpj: session?.user?.cnpj ?? "",
+                habilitado: true,
+              };
+              try {
+                await cadastrarUsuario(payload);
+                await carregarUsuarios();
+                setSnackbarMensagem("Usuário cadastrado com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem(
+                  "Erro ao cadastrar usuário. Tente novamente."
+                );
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenCriar(false);
+              }
+            }}
+          />
+        )}
+        {/* Filtros Avançados */}
         <FiltroAvancado
           open={openFiltros}
           onClose={() => setOpenFiltros(false)}
@@ -302,7 +349,7 @@ export default function Usuarios() {
           onClear={() => setFiltrosAvancados({})}
           anchorEl={anchorEl}
         />
-
+        {/* Exportar */}
         <ExportarRelatorioDialog
           open={openExportar}
           onClose={() => setOpenExportar(false)}
@@ -311,7 +358,35 @@ export default function Usuarios() {
           mapeamentoCampos={mapeamentoCampos}
           anchorEl={anchorElExportar}
         />
-
+        {/* Modal de Deleção */}
+        {openDeletar && itemSelecionado && (
+          <DeletarGenerico<UsuarioDetalhado>
+            open={openDeletar}
+            onClose={() => setOpenDeletar(false)}
+            item={itemSelecionado}
+            getDescricao={(u) => `usuário "${u.nome_usuario}"`}
+            onConfirmar={async (u) => {
+              setCarregando(true);
+              try {
+                await deletarUsuario(u.id_usuario);
+                await carregarUsuarios();
+                setSnackbarMensagem("Usuário excluído com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem(
+                  "Erro ao excluir usuário. Tente novamente."
+                );
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenDeletar(false);
+                setItemSelecionado(null);
+              }
+            }}
+          />
+        )}
+        {/* Snackbar */}
         <CustomSnackbar
           open={snackbarAberto}
           onClose={() => setSnackbarAberto(false)}

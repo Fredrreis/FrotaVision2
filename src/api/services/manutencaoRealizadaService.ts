@@ -25,10 +25,9 @@ export interface ManutencaoRealizadaDetalhado extends ManutencaoRealizadaBase {
   id_manutencao_realizada: number;
   apelido: string;
   tipo: string;
-  descricaoManutencao: string;
-  manutenção: string;
+  descricaoRealizada: string;
+  manutencao: string;
   data_cadastro?: string;
-  // outros campos que só vêm na resposta
 }
 
 const api = new ApiGateway();

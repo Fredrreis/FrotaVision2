@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Link } from "react-scroll";
+import Image from "next/image";
 import {
   Toolbar,
   Typography,
@@ -11,13 +14,10 @@ import {
   MenuItem,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useRouter } from "next/navigation";
-import FrotaVisionLogo from "../../../img/FrotaVisionLogo.png";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HelpIcon from "@mui/icons-material/Help";
-import Image from "next/image";
+import FrotaVisionLogo from "../../../img/FrotaVisionLogo.png";
 import "./header.css";
-import { Link } from "react-scroll";
 
 export default function Header() {
   const router = useRouter();

@@ -1,6 +1,7 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
+import eslintPluginImport from "eslint-plugin-import";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,7 +15,7 @@ const eslintConfig = [
 
   {
     plugins: {
-      import: require("eslint-plugin-import"),
+      import: eslintPluginImport,
     },
     rules: {
       "import/no-unresolved": "error", // opcional, alerta se você errar o caminho
@@ -30,6 +31,5 @@ const eslintConfig = [
   },
   
 ];
-
 
 export default eslintConfig;

@@ -2,15 +2,33 @@
 
 import { ApiGateway } from "../api";
 
-export interface Usuario {
-  id_usuario: number;
+// Interface base com campos comuns
+export interface UsuarioBase {
   nome_usuario: string;
   email: string;
-  senha: string;
+  senha?: string;
   data_cadastro: string;
   cnpj: string;
   permissoes_usuario: number;
   habilitado: boolean;
+}
+
+// Payload de cadastro/edição
+export interface UsuarioPayload extends UsuarioBase {
+  id_usuario: number;
+  [key: string]: unknown;
+}
+
+// Resposta detalhada da API
+export interface UsuarioDetalhado extends UsuarioBase {
+  id_usuario: number;
+  nomePermissao: string;
+  // outros campos que podem vir na resposta detalhada
+}
+
+// Resposta básica da API (listagem simples)
+export interface UsuarioListagem extends UsuarioBase {
+  id_usuario: number;
 }
 
 export interface LoginResponse {
@@ -23,19 +41,38 @@ export interface LoginResponse {
 
 const api = new ApiGateway();
 
+export const cadastrarUsuario = async (
+  usuario: UsuarioPayload
+): Promise<void> => {
+  await api.post("/Usuario/Cadastrar", usuario);
+};
+
 export const listarUsuarios = async (
   cnpj: string,
   signal?: AbortSignal
-): Promise<Usuario[]> => {
-  return await api.get<Usuario[]>(`/Usuario/Listar/${cnpj}`, {}, signal);
+): Promise<UsuarioListagem[]> => {
+  return await api.get<UsuarioListagem[]>(`/Usuario/Listar/${cnpj}`, {}, signal);
 };
 
-export const deletarUsuario = async (id: number): Promise<void> => {
-  await api.delete(`/Usuario/Deletar/${id}`);
+export const listarUsuariosDetalhado = async (
+  cnpj: string,
+  signal?: AbortSignal
+): Promise<UsuarioDetalhado[]> => {
+  return await api.get<UsuarioDetalhado[]>(`/Usuario/ListarDetalhado/${cnpj}`, {}, signal);
 };
 
-export const cadastrarUsuario = async (usuario: Usuario): Promise<void> => {
-  await api.post("/Usuario/Cadastrar", usuario);
+export const deletarUsuario = async (
+  id: number,
+  signal?: AbortSignal
+): Promise<void> => {
+  await api.delete<void>(`/Usuario/Deletar/${id}`, signal);
+};
+
+export const atualizarUsuario = async (
+  id: number,
+  usuario: UsuarioPayload
+): Promise<void> => {
+  await api.put(`/Usuario/Atualizar/${id}`, usuario);
 };
 
 export const loginUsuario = async (
@@ -43,11 +80,4 @@ export const loginUsuario = async (
   password: string
 ): Promise<LoginResponse> => {
   return await api.post<LoginResponse>("/Usuario/login", { email, password });
-};
-
-export const atualizarUsuario = async (
-  id: number,
-  usuario: Usuario
-): Promise<void> => {
-  await api.put(`/Usuario/Atualizar/${id}`, usuario);
 };

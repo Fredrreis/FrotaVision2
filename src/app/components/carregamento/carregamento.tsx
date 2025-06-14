@@ -1,7 +1,9 @@
-import Lottie from "lottie-react";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
 import "./carregamento.css";
+
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 interface CarregamentoProps {
   animationUrl: string;
@@ -16,7 +18,7 @@ export default function Carregamento({
   altura = 200,
   mensagem,
 }: CarregamentoProps) {
-  const [animacao, setAnimacao] = useState<any>(null);
+  const [animacao, setAnimacao] = useState<unknown>(null);
 
   useEffect(() => {
     fetch(animationUrl)

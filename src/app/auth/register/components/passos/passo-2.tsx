@@ -35,11 +35,11 @@ export default function Passo2({
       await step2Schema.validate(formData, { abortEarly: false });
       setErrors({});
       nextStep();
-    } catch (err: any) {
-      const newErrors: any = {};
-      if (err.inner) {
+    } catch (err: unknown) {
+      const newErrors: Record<string, string> = {};
+      if (err instanceof yup.ValidationError) {
         err.inner.forEach((e: yup.ValidationError) => {
-          if (e.path && typeof e.path === "string" && !newErrors[e.path]) {
+          if (e.path && !newErrors[e.path]) {
             newErrors[e.path] = e.message;
           }
         });

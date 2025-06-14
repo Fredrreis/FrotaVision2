@@ -34,7 +34,7 @@ export default function Video() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
     >
-        {/* Vídeo de fundo 
+      {/* Vídeo de fundo 
           Vídeo por Freepik: https://www.freepik.com
           Link: https://br.freepik.com/video-gratuito/motorista-camiao-escrever-quadro_2816181#fromView=search&page=1&position=31&uuid=dd0f276b-d075-491f-b388-07b39b1b8640
       */}

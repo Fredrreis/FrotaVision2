@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 
 export function exportarPdf(
   colunas: string[],
-  dados: Record<string, any>[],
+  dados: Record<string, unknown>[],
   mapeamentoCampos: Record<string, string>
 ) {
   const campos = colunas.map((col) => ({
@@ -15,7 +15,7 @@ export function exportarPdf(
   const margemLabel = 10;
   const margemValor = 90;
 
-  dados.forEach((item, index) => {
+  dados.forEach((item) => {
     campos.forEach(({ label, key }) => {
       doc.setFont("helvetica", "bold");
       doc.text(`${label}:`, margemLabel, y);

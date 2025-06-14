@@ -13,38 +13,40 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import "./visualizar-veiculo.css";
 
-interface VisualizarVeiculoProps {
-  open: boolean;
-  onClose: () => void;
-  veiculo?: {
-    apelido: string;
-    placa: string;
-    chassi: string;
-    ano: number;
-    km: number;
-    dataCadastro: string;
-    motorista: string;
-    descricao: string;
-    manutencao: {
-      total: number;
-      ultima: string;
-      dataUltima: string;
-    };
-    preventiva: {
-      total: number;
-      pendente: string;
-      dataNotificacao: string;
-    };
-    viagens: {
-      total: number;
-      ultima: string;
-      dataUltima: string;
-    };
+interface VeiculoDetalhado {
+  apelido: string;
+  placa: string;
+  chassi: string;
+  ano: number;
+  km: number;
+  dataCadastro: string;
+  motorista: string;
+  descricao: string;
+  manutencao: {
+    total: number;
+    ultima: string;
+    dataUltima: string;
+  };
+  preventiva: {
+    total: number;
+    pendente: string;
+    dataNotificacao: string;
+  };
+  viagens: {
+    total: number;
+    ultima: string;
+    dataUltima: string;
   };
 }
 
-const safe = (value: any) =>
-  value === undefined || value === null || value === "" ? "-" : value;
+interface VisualizarVeiculoProps {
+  open: boolean;
+  onClose: () => void;
+  veiculo?: VeiculoDetalhado;
+}
+
+const safe = (value: unknown): string =>
+  value === undefined || value === null || value === "" ? "-" : String(value);
 
 export default function VisualizarVeiculo({
   open,

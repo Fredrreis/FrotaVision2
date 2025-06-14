@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import MenuFerramentas from "./components/menu/menu";
 import { Box } from "@mui/material";
-import "./ferramentas.css";
-
+import { AnimatePresence, motion } from "framer-motion";
+import MenuFerramentas from "./components/menu/menu";
 import Notificacoes from "./components/notificacoes/notificacoes";
 import Veiculos from "./components/veiculos/veiculos";
 import Motoristas from "./components/motoristas/motoristas";
@@ -12,8 +11,7 @@ import Manutencoes from "./components/manutencoes/manutencoes";
 import Viagens from "./components/viagens/viagens";
 import Usuarios from "./components/usuarios/usuarios";
 import Ajuda from "./components/ajuda/ajuda";
-
-import { AnimatePresence, motion } from "framer-motion";
+import "./ferramentas.css";
 
 export const Ferramentas: React.FC = () => {
   const [paginaAtiva, setPaginaAtiva] = useState("NOTIFICAÇÕES");

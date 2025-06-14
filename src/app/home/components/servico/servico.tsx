@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import "./servico.css";
 import { Box, Typography, Button } from "@mui/material";
 import { motion } from "framer-motion";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import ServicoImage3 from "../../../img/two-guys-talking-about-work-work-garage-near-truck-transfer-documents-with-goods.png";
 import ServicoImage2 from "../../../img/marcin-jozwiak-kGoPcmpPT7c-unsplash.jpg";
 import ServicoImage1 from "../../../img/seb-creativo-3jG-UM8IZ40-unsplash.jpg";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import "./servico.css";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },

@@ -14,7 +14,7 @@ interface CadastrarGenericoProps<T extends Record<string, unknown>> {
   obterOpcoesDinamicas?: () => Promise<
     Record<string, { label: string; value: string }[]>
   >;
-  schema?: ObjectSchema<any>; // opcional
+  schema?: ObjectSchema<Record<string, unknown>>; // opcional
 }
 
 export default function CadastrarGenerico<T extends Record<string, unknown>>({
@@ -68,13 +68,9 @@ export default function CadastrarGenerico<T extends Record<string, unknown>>({
       }
       await onSalvar(dados as T);
       onClose();
-    } catch (error: any) {
-      if (error?.inner?.length) {
-        const errosObj: Record<string, string> = {};
-        error.inner.forEach((e: any) => {
-          if (e.path) errosObj[e.path] = e.message;
-        });
-        setErros(errosObj);
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message) {
+        setErros({ geral: error.message });
       } else {
         console.error("Erro ao salvar:", error);
         setErros({ geral: "Erro ao salvar os dados." });

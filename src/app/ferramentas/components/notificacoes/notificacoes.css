@@ -24,34 +24,6 @@
   margin-right: 0.5rem !important;
 }
 
-.notificacoes-timeline {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.timeline-date {
-  font-size: 0.75rem !important;
-  color: #777 !important;
-  flex: 0.1 !important;
-  margin: auto 0 !important;
-}
-
-.timeline-dot {
-  box-shadow: none !important;
-}
-
-.timeline-connector {
-  background-color: #ccc !important;
-}
-
-.timeline-content {
-  padding: 0.5rem 1rem !important;
-}
-
-.timeline-item {
-  align-items: flex-start !important;
-}
-
 .notificacao-card {
   max-width: 75rem !important;
   width: 100% !important;
@@ -104,34 +76,6 @@
 
   .notificacoes-container {
     padding: 1rem !important;
-  }
-
-  .timeline-item {
-    flex-direction: row !important;
-    align-items: flex-start !important;
-    margin-bottom: 1.5rem !important;
-  }
-
-  .timeline-separator {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    margin-right: 0.75rem !important;
-    min-width: 30px !important;
-  }
-
-  .timeline-dot {
-    margin-top: 0.25rem !important;
-    margin-right: 0.5rem !important;
-  }
-
-  .timeline-date {
-    display: none !important;
-  }
-
-  .timeline-content {
-    padding: 0 !important;
-    width: 100% !important;
   }
 
   .notificacao-card {

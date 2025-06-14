@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import {
   Box,
   Avatar,
@@ -27,9 +28,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import FrotaVisionLogo from "../../../img/FrotaVisionLogo.png";
 import PerfilModal from "./components/perfil-modal/perfil-modal";
 import UsuarioDropdown from "./components/usuario-dropdown/usuario-dropdown";
-import Image from "next/image";
 import "./menu.css";
-import React from "react";
 
 const menuItems = [
   { text: "NOTIFICAÇÕES", icon: <NotificationsIcon /> },

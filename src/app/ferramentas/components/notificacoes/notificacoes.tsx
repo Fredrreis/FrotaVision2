@@ -1,9 +1,9 @@
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
   Button,
   Paper,
-  useTheme,
   Divider,
   TextField,
   InputAdornment,
@@ -23,11 +23,10 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import { useEffect, useState } from "react";
-import { listarNotificacoes } from "@/api/services/notificacaoService";
 import { useSession } from "next-auth/react";
 import Carregamento from "@/app/components/carregamento/carregamento";
 import FiltroAvancado from "../components/filtro/filtro-avancado";
+import { listarNotificacoes } from "@/api/services/notificacaoService";
 import { formatarDataISOcomHora, compareDateISO } from "@/utils/data";
 import "../styles/shared-styles.css";
 import "./notificacoes.css";
@@ -35,7 +34,7 @@ import "./notificacoes.css";
 interface NotificacaoFormatada {
   id: number;
   data: string;
-  dataOriginal: string;  // Adicionando campo para data original
+  dataOriginal: string; // Adicionando campo para data original
   caminhao: string;
   tipo: string;
   peca: string;
@@ -46,7 +45,6 @@ interface NotificacaoFormatada {
 }
 
 export default function Notificacoes() {
-  const theme = useTheme();
   const { data: session } = useSession();
   const [notificacoes, setNotificacoes] = useState<NotificacaoFormatada[]>([]);
   const [vistas, setVistas] = useState<number[]>([]);
@@ -54,7 +52,9 @@ export default function Notificacoes() {
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>({});
+  const [filtrosAvancados, setFiltrosAvancados] = useState<
+    Record<string, unknown>
+  >({});
 
   useEffect(() => {
     const buscarNotificacoes = async () => {
@@ -65,25 +65,33 @@ export default function Notificacoes() {
 
         // Transformar os dados da API no formato necessário para exibição
         const notificacoesFormatadas: NotificacaoFormatada[] = dados.map(
-          (n: any) => {
-            const dataOriginal = n.data_Manutencao || "";
+          (n: unknown) => {
+            if (typeof n !== "object" || n === null)
+              return {} as NotificacaoFormatada;
+            const obj = n as Record<string, unknown>;
+            const dataOriginal =
+              typeof obj.data_Manutencao === "string"
+                ? obj.data_Manutencao
+                : "";
             return {
-              id: n.idManutencaoRealizada,
+              id: Number(obj.idManutencaoRealizada),
               data: formatarDataISOcomHora(dataOriginal),
               dataOriginal,
-              caminhao: n.nomeVeiculo,
-              tipo: n.tipo_caminhao,
-              peca: n.nomeManutencao,
-              descricao: n.descricao_manutencao,
-              vidaUtil: n.quilometragemManutencao,
-              atual: n.quilometragemAtual,
-              urgente: n.urgencia,
+              caminhao: String(obj.nomeVeiculo ?? ""),
+              tipo: String(obj.tipo_caminhao ?? ""),
+              peca: String(obj.nomeManutencao ?? ""),
+              descricao: String(obj.descricao_manutencao ?? ""),
+              vidaUtil: Number(obj.quilometragemManutencao ?? 0),
+              atual: Number(obj.quilometragemAtual ?? 0),
+              urgente: Boolean(obj.urgencia),
             };
           }
         );
 
         const ordenadas = notificacoesFormatadas.sort(
-          (a, b) => new Date(b.dataOriginal).getTime() - new Date(a.dataOriginal).getTime()
+          (a, b) =>
+            new Date(b.dataOriginal).getTime() -
+            new Date(a.dataOriginal).getTime()
         );
 
         setNotificacoes(ordenadas);
@@ -106,25 +114,29 @@ export default function Notificacoes() {
   }, [notificacoes]);
 
   const notificacoesFiltradas = notificacoes.filter((notificacao) => {
-    const matchSearch = notificacao.caminhao.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = notificacao.caminhao
+      .toLowerCase()
+      .includes(search.toLowerCase());
 
-    const matchTipo = filtrosAvancados.tipo 
-      ? notificacao.tipo === filtrosAvancados.tipo
+    const matchTipo = filtrosAvancados.tipo
+      ? notificacao.tipo === String(filtrosAvancados.tipo)
       : true;
 
     // Ajustando a lógica do filtro de urgência
-    const matchUrgencia = filtrosAvancados.urgencia === undefined || filtrosAvancados.urgencia === ""
-      ? true
-      : notificacao.urgente === (filtrosAvancados.urgencia === "Sim");
+    const matchUrgencia =
+      filtrosAvancados.urgencia === undefined ||
+      filtrosAvancados.urgencia === ""
+        ? true
+        : notificacao.urgente === (String(filtrosAvancados.urgencia) === "Sim");
 
     const matchData = filtrosAvancados.data
-      ? compareDateISO(notificacao.dataOriginal, filtrosAvancados.data)
+      ? compareDateISO(notificacao.dataOriginal, String(filtrosAvancados.data))
       : true;
 
     return matchSearch && matchTipo && matchUrgencia && matchData;
   });
 
-  const tiposUnicos = [...new Set(notificacoes.map(n => n.tipo))];
+  const tiposUnicos = [...new Set(notificacoes.map((n) => n.tipo))];
 
   const filtrosAvancadosConfig = [
     {
@@ -139,9 +151,9 @@ export default function Notificacoes() {
       type: "select" as const,
       options: ["Sim", "Não"],
     },
-    { 
-      name: "data", 
-      label: "Data", 
+    {
+      name: "data",
+      label: "Data",
       type: "data" as const,
     },
   ];
@@ -194,22 +206,28 @@ export default function Notificacoes() {
         </Box>
       </Box>
 
-      <Timeline className="notificacoes-timeline">
+      <Timeline sx={{ p: 0, m: 0 }}>
         {notificacoesFiltradas.map((n, i) => {
           const isUrgente = n.urgente;
           const isNova = !vistas.includes(n.id);
           const uniqueKey = `notificacao-${n.id || i}-${Date.now()}-${i}`;
-          
           return (
-            <TimelineItem key={uniqueKey} className="timeline-item">
-              <TimelineOppositeContent className="timeline-date">
+            <TimelineItem key={uniqueKey} sx={{ alignItems: "flex-start" }}>
+              <TimelineOppositeContent
+                sx={{
+                  fontSize: "0.75rem",
+                  color: "#777",
+                  flex: 0.1,
+                  margin: "auto 0",
+                  display: { xs: "none", md: "block" },
+                }}
+              >
                 {n.data}
               </TimelineOppositeContent>
-
-              <TimelineSeparator className="timeline-separator">
+              <TimelineSeparator sx={{}}>
                 <TimelineDot
-                  className="timeline-dot"
                   sx={{
+                    boxShadow: "none",
                     backgroundColor: isUrgente
                       ? "#A30D11"
                       : isNova
@@ -231,41 +249,44 @@ export default function Notificacoes() {
                     />
                   )}
                 </TimelineDot>
-
                 {i < notificacoes.length - 1 && (
-                  <TimelineConnector className="timeline-connector" />
+                  <TimelineConnector sx={{ backgroundColor: "#ccc" }} />
                 )}
               </TimelineSeparator>
-
-              <TimelineContent className="timeline-content">
+              <TimelineContent>
                 <Paper elevation={3} className="notificacao-card">
+                  <Box
+                    sx={{
+                      display: { xs: "block", md: "none" },
+                      fontSize: "0.75rem",
+                      color: "#777",
+                      marginBottom: "0.25rem",
+                    }}
+                  >
+                    {n.data}
+                  </Box>
                   <Typography variant="subtitle2" fontWeight={600}>
                     {n.caminhao} - {n.peca}
                   </Typography>
-
                   <Divider className="divider" />
-
                   <Typography variant="body2">
                     <Box component="span" fontWeight={600}>
                       Tipo Caminhão:
                     </Box>{" "}
                     {n.tipo}
                   </Typography>
-
                   <Typography variant="body2" mt={0.7}>
                     <Box component="span" fontWeight={600}>
                       Descrição:
                     </Box>{" "}
                     {n.descricao}
                   </Typography>
-
                   <Typography variant="body2" mt={0.7}>
                     <Box component="span" fontWeight={600}>
                       Vida útil:
                     </Box>{" "}
                     {n.vidaUtil} km
                   </Typography>
-
                   <Typography
                     mt={0.7}
                     variant="body2"
@@ -276,7 +297,6 @@ export default function Notificacoes() {
                     </Box>{" "}
                     {n.atual} km
                   </Typography>
-
                   <Box className="notificacao-botao-container">
                     <Button
                       endIcon={<ArrowForwardIcon />}

@@ -1,92 +1,91 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import {
-  listarMotoristas,
-  deletarMotorista,
-  cadastrarMotorista,
-  Motorista as MotoristaAPI,
-} from "@/api/services/motoristaService";
-import { useSession } from "next-auth/react";
-import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
-import ModalFormulario from "../components/formulario-modal/formulario-generico";
-import ExportarRelatorioDialog from "../components/export/export-relatorio";
-import FiltroAvancado from "../components/filtro/filtro-avancado";
-import CustomSnackbar from "../../../components/snackbar/snackbar";
+import React, { useEffect, useState } from "react";
 import {
   Box,
-  Typography,
   Button,
+  Typography,
   TextField,
   InputAdornment,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import PeopleIcon from "@mui/icons-material/People";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import IosShareIcon from "@mui/icons-material/IosShare";
+import { useSession } from "next-auth/react";
+import { motion } from "framer-motion";
+import {
+  listarMotoristasDetalhado,
+  cadastrarMotorista,
+  atualizarMotorista,
+  deletarMotorista,
+  MotoristaDetalhado,
+  MotoristaPayload,
+} from "@/api/services/motoristaService";
+import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
+import ExportarRelatorioDialog from "../components/export/export-relatorio";
+import FiltroAvancado from "../components/filtro/filtro-avancado";
+import CustomSnackbar from "../../../components/snackbar/snackbar";
 import Carregamento from "../../../components/carregamento/carregamento";
 import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
-import { motion } from "framer-motion";
-import "../styles/shared-styles.css";
 import "./motoristas.css";
+import EditarGenerico from "@/app/components/genericos/editarGenerico";
+import CadastrarGenerico from "@/app/components/genericos/cadastrarGenerico";
+import DeletarGenerico from "@/app/components/genericos/deletarGenerico";
+import AddIcon from "@mui/icons-material/Add";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import IosShareIcon from "@mui/icons-material/IosShare";
+import { motoristaSchema } from "@/utils/motorista-validation";
 
-interface Motorista {
-  id: number;
-  nome: string;
-  dataCadastro: string;
-  dataOriginal: string;
-  caminhaoDirigido: string;
-  ultimaViagem: string;
-  [key: string]: string | number;
-}
-
-const colunasMotoristas = [
+const colunasMotoristas: {
+  chave: "id" | "nome" | "dataCadastro" | "apelido" | "dataUltimaViagem";
+  titulo: string;
+  ordenavel: boolean;
+}[] = [
   { chave: "nome", titulo: "Nome", ordenavel: false },
   { chave: "dataCadastro", titulo: "Data de Cadastro", ordenavel: true },
-  {
-    chave: "caminhaoDirigido",
-    titulo: "Último Caminhão Dirigido",
-    ordenavel: false,
-  },
-  { chave: "ultimaViagem", titulo: "Data Última Viagem", ordenavel: true },
+  { chave: "apelido", titulo: "Último Caminhão Dirigido", ordenavel: false },
+  { chave: "dataUltimaViagem", titulo: "Data Última Viagem", ordenavel: true },
 ];
 
 const mapeamentoCampos = {
   Nome: "nome",
   "Data de Cadastro": "dataCadastro",
-  "Último Caminhão Dirigido": "caminhaoDirigido",
-  "Data Última Viagem": "ultimaViagem",
+  "Último caminhão dirigido": "apelido",
+  "Data Última Viagem": "dataUltimaViagem",
 };
+
+const colunasFormulario: { chave: string; titulo: string; tipo: "texto" }[] = [
+  { chave: "nome", titulo: "Nome", tipo: "texto" },
+];
 
 export default function Motoristas() {
   const { data: session } = useSession();
-  const [dadosApi, setDadosApi] = useState<MotoristaAPI[]>([]);
-  const [dados, setDados] = useState<Motorista | null>(null);
+  const [dadosApi, setDadosApi] = useState<MotoristaDetalhado[]>([]);
   const [carregando, setCarregando] = useState(true);
-  const [open, setOpen] = useState(false);
-  const [modoEdicao, setModoEdicao] = useState(false);
+  const [openCriar, setOpenCriar] = useState(false);
+  const [itemSelecionado, setItemSelecionado] =
+    useState<MotoristaDetalhado | null>(null);
+  const [openEditar, setOpenEditar] = useState(false);
+  const [openDeletar, setOpenDeletar] = useState(false);
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
-  const [openExportar, setOpenExportar] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
-    {}
+  const [anchorElFiltro, setAnchorElFiltro] = useState<HTMLElement | null>(
+    null
   );
-
+  const [openExportar, setOpenExportar] = useState(false);
+  const [anchorElExportar, setAnchorElExportar] = useState<HTMLElement | null>(
+    null
+  );
+  const [filtrosAvancados, setFiltrosAvancados] = useState<
+    Record<string, unknown>
+  >({});
   const [snackbarAberto, setSnackbarAberto] = useState(false);
   const [snackbarMensagem, setSnackbarMensagem] = useState("");
   const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
     "primary"
   );
 
-  useEffect(() => {
-    const controller = new AbortController();
-
+  const carregarMotoristas = () => {
     if (!session?.user?.cnpj) return;
-
-    listarMotoristas(session.user.cnpj, controller.signal)
-      .then((res) => {
-        if (!controller.signal.aborted) setDadosApi(res);
-      })
+    setCarregando(true);
+    listarMotoristasDetalhado(session.user.cnpj)
+      .then((res) => setDadosApi(res))
       .catch((err) => {
         if (
           !(
@@ -94,129 +93,78 @@ export default function Motoristas() {
             err.code === "ERR_CANCELED" ||
             err.message === "canceled"
           )
-        ) {
-          console.error("Erro:", err);
-        }
+        )
+          console.error(err);
       })
-      .finally(() => {
-        if (!controller.signal.aborted) setCarregando(false);
-      });
+      .finally(() => setCarregando(false));
+  };
 
-    return () => controller.abort();
-  }, [session?.user?.cnpj]);
+  useEffect(() => {
+    if (session?.user?.cnpj) {
+      carregarMotoristas();
+    }
+  }, [session?.user?.cnpj, carregarMotoristas]);
 
-  const motoristasData: Motorista[] = dadosApi.map((m) => {
-    const dataOriginal = m.data_cadastro || "";
-    return {
-      id: m.id_motorista,
-      nome: m.nome || "—",
-      dataCadastro: formatarDataISOcomHora(dataOriginal),
-      dataOriginal,
-      caminhaoDirigido: "—",
-      ultimaViagem: "—",
-    };
-  });
+  // View-model para tabela
+  const motoristasData = dadosApi.map((m) => ({
+    id: m.id_motorista,
+    nome: m.nome || "—",
+    dataCadastro: m.data_cadastro
+      ? formatarDataISOcomHora(m.data_cadastro)
+      : "—",
+    dataOriginal: m.data_cadastro || "",
+    apelido: m.apelido || "—",
+    dataUltimaViagem: m.data_ultima_viagem
+      ? formatarDataISOcomHora(m.data_ultima_viagem)
+      : "—",
+    dataUltimaViagemOriginal: m.data_ultima_viagem || "",
+  }));
 
+  // Filtros e busca
   const dadosFiltrados = motoristasData.filter((m) => {
     const matchSearch = m.nome.toLowerCase().includes(search.toLowerCase());
     const matchCadastro = filtrosAvancados.dataCadastro
-      ? compareDateISO(m.dataOriginal, filtrosAvancados.dataCadastro)
+      ? compareDateISO(m.dataOriginal, String(filtrosAvancados.dataCadastro))
       : true;
-    const matchCaminhao = filtrosAvancados.caminhaoDirigido
-      ? m.caminhaoDirigido === filtrosAvancados.caminhaoDirigido
+    const matchApelido = filtrosAvancados.apelido
+      ? m.apelido === String(filtrosAvancados.apelido)
       : true;
-    const matchUltima = filtrosAvancados.ultimaViagem
-      ? m.ultimaViagem === filtrosAvancados.ultimaViagem
+    const matchUltima = filtrosAvancados.dataUltimaViagem
+      ? compareDateISO(
+          m.dataUltimaViagemOriginal,
+          String(filtrosAvancados.dataUltimaViagem)
+        )
       : true;
-    return matchSearch && matchCadastro && matchCaminhao && matchUltima;
+    return matchSearch && matchCadastro && matchApelido && matchUltima;
   });
 
-  const opcoesCaminhao = [
-    ...new Set(motoristasData.map((m) => m.caminhaoDirigido)),
-  ];
-
+  // Filtros avançados config
+  const opcoesApelido = [...new Set(motoristasData.map((m) => m.apelido))];
   const filtrosAvancadosConfig = [
     { name: "dataCadastro", label: "Data de Cadastro", type: "data" as const },
     {
-      name: "caminhaoDirigido",
-      label: "Último Caminhão Dirigido",
+      name: "apelido",
+      label: "Último caminhão dirigido",
       type: "select" as const,
-      options: opcoesCaminhao,
+      options: opcoesApelido,
     },
     {
-      name: "ultimaViagem",
+      name: "dataUltimaViagem",
       label: "Data Última Viagem",
       type: "data" as const,
     },
   ];
 
-  const handleEditar = (item: Motorista) => {
-    setDados(item);
-    setModoEdicao(true);
-    setOpen(true);
-  };
-
-  const handleExcluir = async (item: Motorista) => {
-    try {
-      await deletarMotorista(item.id);
-      setDadosApi((prev) => prev.filter((m) => m.id_motorista !== item.id));
-      setSnackbarMensagem("Motorista excluído com sucesso!");
-      setSnackbarCor("primary");
-      setSnackbarAberto(true);
-    } catch (err) {
-      console.error("Erro ao excluir motorista:", err);
-      setSnackbarMensagem("Erro ao excluir motorista.");
-      setSnackbarCor("light");
-      setSnackbarAberto(true);
-    }
-  };
-
-  const handleCadastrar = () => {
-    setDados({
-      id: 0,
-      nome: "",
-      dataCadastro: "",
-      dataOriginal: "",
-      caminhaoDirigido: "—",
-      ultimaViagem: "—",
-    });
-    setModoEdicao(false);
-    setOpen(true);
-  };
-  const handleSalvar = async () => {
-    try {
-      if (!dados?.nome) {
-        alert("Nome é obrigatório");
-        return;
-      }
-      if (!session?.user?.cnpj) {
-        alert("Erro: CNPJ não encontrado na sessão.");
-        return;
-      }
-      const payload = {
-        id_motorista: 0,
-        nome: dados.nome,
-        data_cadastro: new Date().toISOString(),
-        cnpj: session.user.cnpj,
+  // Payload para edição
+  const payloadEdicao: MotoristaPayload | null = itemSelecionado
+    ? {
+        id_motorista: itemSelecionado.id_motorista,
+        nome: itemSelecionado.nome,
+        data_cadastro: itemSelecionado.data_cadastro,
+        cnpj: session?.user?.cnpj ?? "",
         habilitado: true,
-      };
-      await cadastrarMotorista(payload);
-      setSnackbarMensagem("Motorista cadastrado com sucesso!");
-      setSnackbarCor("primary");
-      setSnackbarAberto(true);
-      setOpen(false);
-      setCarregando(true);
-      const res = await listarMotoristas(session.user.cnpj);
-      setDadosApi(res);
-    } catch (err) {
-      console.error("Erro ao cadastrar motorista:", err);
-      setSnackbarMensagem("Erro ao cadastrar motorista.");
-      setSnackbarCor("light");
-      setSnackbarAberto(true);
-    } finally {
-      setCarregando(false);
-    }
-  };
+      }
+    : null;
 
   if (carregando) {
     return (
@@ -237,10 +185,9 @@ export default function Motoristas() {
       <Box className="motoristas-container">
         <Box className="motoristas-header">
           <Typography variant="h6" className="motoristas-title">
-            <PeopleIcon className="icon-title" /> MOTORISTAS
+            <AddIcon className="icon-title" /> MOTORISTAS
           </Typography>
         </Box>
-
         <Box className="motoristas-filtros">
           <Box className="search-filtros-container">
             <TextField
@@ -253,7 +200,7 @@ export default function Motoristas() {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon className="search-icon" />
+                    <FilterAltOutlinedIcon className="search-icon" />
                   </InputAdornment>
                 ),
               }}
@@ -263,19 +210,18 @@ export default function Motoristas() {
               className="botao-filtrar"
               endIcon={<FilterAltOutlinedIcon />}
               onClick={(e) => {
-                setAnchorEl(e.currentTarget);
+                setAnchorElFiltro(e.currentTarget);
                 setOpenFiltros(true);
               }}
             >
-              <span className="button-text">Filtros Avançados</span>
+              Filtros Avançados
             </Button>
           </Box>
-
           <Box className="botoes-container">
             <Button
               variant="contained"
               className="botao-cadastrar"
-              onClick={handleCadastrar}
+              onClick={() => setOpenCriar(true)}
             >
               Cadastrar Motorista
             </Button>
@@ -284,7 +230,7 @@ export default function Motoristas() {
               className="botao-exportar"
               startIcon={<IosShareIcon />}
               onClick={(e) => {
-                setAnchorEl(e.currentTarget);
+                setAnchorElExportar(e.currentTarget);
                 setOpenExportar(true);
               }}
             >
@@ -292,45 +238,138 @@ export default function Motoristas() {
             </Button>
           </Box>
         </Box>
-
-        <TabelaGenerica<Motorista>
+        <TabelaGenerica
           colunas={colunasMotoristas}
           dados={dadosFiltrados}
-          onEditar={handleEditar}
-          onExcluir={handleExcluir}
+          onEditar={(item) => {
+            const original = dadosApi.find((m) => m.id_motorista === item.id);
+            if (original) {
+              setItemSelecionado(original);
+              setOpenEditar(true);
+            }
+          }}
+          onExcluir={(item) => {
+            const original = dadosApi.find((m) => m.id_motorista === item.id);
+            if (original) {
+              setItemSelecionado(original);
+              setOpenDeletar(true);
+            }
+          }}
           exibirExaminar={false}
         />
-
-        <ModalFormulario<Motorista>
-          open={open}
-          onClose={() => setOpen(false)}
-          onSalvar={handleSalvar}
-          colunas={colunasMotoristas.filter((c) => c.chave === "nome")}
-          dados={dados}
-          setDados={setDados}
-          modoEdicao={modoEdicao}
-        />
-
+        {/* Modal de Edição */}
+        {openEditar && payloadEdicao && (
+          <EditarGenerico<MotoristaPayload>
+            open={openEditar}
+            onClose={() => setOpenEditar(false)}
+            titulo="EDITAR MOTORISTA"
+            colunas={colunasFormulario}
+            itemEdicao={payloadEdicao}
+            schema={motoristaSchema}
+            onSalvar={async (payload) => {
+              setCarregando(true);
+              try {
+                await atualizarMotorista(payload.id_motorista, payload);
+                await carregarMotoristas();
+                setSnackbarMensagem("Motorista editado com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem(
+                  "Erro ao editar motorista. Tente novamente."
+                );
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenEditar(false);
+              }
+            }}
+          />
+        )}
+        {/* Modal de Criação */}
+        {openCriar && (
+          <CadastrarGenerico<MotoristaPayload>
+            open={openCriar}
+            onClose={() => setOpenCriar(false)}
+            titulo="CADASTRAR MOTORISTA"
+            colunas={colunasFormulario}
+            schema={motoristaSchema}
+            onSalvar={async (formValues) => {
+              setCarregando(true);
+              const payload: MotoristaPayload = {
+                ...formValues,
+                id_motorista: 0,
+                data_cadastro: new Date().toISOString(),
+                cnpj: session?.user?.cnpj ?? "",
+                habilitado: true,
+              };
+              try {
+                await cadastrarMotorista(payload);
+                await carregarMotoristas();
+                setSnackbarMensagem("Motorista cadastrado com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem(
+                  "Erro ao cadastrar motorista. Tente novamente."
+                );
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenCriar(false);
+              }
+            }}
+          />
+        )}
+        {/* Filtros Avançados */}
         <FiltroAvancado
           open={openFiltros}
           onClose={() => setOpenFiltros(false)}
+          anchorEl={anchorElFiltro}
           filters={filtrosAvancadosConfig}
           values={filtrosAvancados}
           onChange={setFiltrosAvancados}
           onApply={() => setOpenFiltros(false)}
           onClear={() => setFiltrosAvancados({})}
-          anchorEl={anchorEl}
         />
-
+        {/* Exportar */}
         <ExportarRelatorioDialog
           open={openExportar}
           onClose={() => setOpenExportar(false)}
+          anchorEl={anchorElExportar}
           colunas={colunasMotoristas.map((c) => c.titulo)}
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
-          anchorEl={anchorEl}
         />
-
+        {/* Modal de Deleção */}
+        {openDeletar && itemSelecionado && (
+          <DeletarGenerico<MotoristaDetalhado>
+            open={openDeletar}
+            onClose={() => setOpenDeletar(false)}
+            item={itemSelecionado}
+            getDescricao={(m) => `motorista "${m.nome}"`}
+            onConfirmar={async (m) => {
+              setCarregando(true);
+              try {
+                await deletarMotorista(m.id_motorista);
+                await carregarMotoristas();
+                setSnackbarMensagem("Motorista excluído com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem(
+                  "Erro ao excluir motorista. Tente novamente."
+                );
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenDeletar(false);
+                setItemSelecionado(null);
+              }
+            }}
+          />
+        )}
+        {/* Snackbar */}
         <CustomSnackbar
           open={snackbarAberto}
           onClose={() => setSnackbarAberto(false)}

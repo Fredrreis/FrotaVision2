@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import Register from "./register";
-import '../../home/home.css';
+import dynamic from "next/dynamic";
+import "../../home/home.css";
+
+const Register = dynamic(() => import("./register"), { ssr: false });
 
 export default function App() {
-    return (
-        <Register/>
-    );
-  }
+  return <Register />;
+}

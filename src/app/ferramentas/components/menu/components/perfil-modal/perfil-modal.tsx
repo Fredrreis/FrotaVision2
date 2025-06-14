@@ -26,7 +26,10 @@ import SenhaForte from "@/app/components/senha-status/senha-status";
 import useToggleSenha from "@/app/components/toggle-senha/toggle-senha";
 
 import { pesquisarEmpresa, Empresa } from "@/api/services/empresaService";
-import { atualizarUsuario, Usuario } from "@/api/services/usuarioService";
+import {
+  atualizarUsuario,
+  UsuarioPayload,
+} from "@/api/services/usuarioService";
 
 import "./perfil-modal.css";
 
@@ -64,13 +67,22 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
   // Schema dinâmico baseado no estado editarSenha
   const schema = useMemo(() => {
     return yup.object().shape({
-      nome: yup.string().required('Nome obrigatório'),
-      email: yup.string().email('E-mail inválido').required('E-mail obrigatório'),
-      novaSenha: editarSenha 
-        ? yup.string().min(6, 'Mínimo de 6 caracteres').required('Senha obrigatória')
+      nome: yup.string().required("Nome obrigatório"),
+      email: yup
+        .string()
+        .email("E-mail inválido")
+        .required("E-mail obrigatório"),
+      novaSenha: editarSenha
+        ? yup
+            .string()
+            .min(6, "Mínimo de 6 caracteres")
+            .required("Senha obrigatória")
         : yup.string().notRequired(),
       confirmarSenha: editarSenha
-        ? yup.string().oneOf([yup.ref('novaSenha')], 'As senhas devem ser iguais').required('Confirme a senha')
+        ? yup
+            .string()
+            .oneOf([yup.ref("novaSenha")], "As senhas devem ser iguais")
+            .required("Confirme a senha")
         : yup.string().notRequired(),
     });
   }, [editarSenha]);
@@ -92,10 +104,10 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
     resolver,
     mode: "onSubmit",
     defaultValues: {
-      nome: '',
-      email: '',
-      novaSenha: '',
-      confirmarSenha: '',
+      nome: "",
+      email: "",
+      novaSenha: "",
+      confirmarSenha: "",
     },
   });
 
@@ -108,17 +120,17 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
   useEffect(() => {
     if (open && session?.user) {
       // Modal abriu - carrega dados do usuário e reseta formulário
-      const nomeUsuario = session.user.nome || '';
-      const emailUsuario = session.user.email || '';
+      const nomeUsuario = session.user.nome || "";
+      const emailUsuario = session.user.email || "";
       const permissoes = (session.user.permissao as number) || 0;
-      const cnpjUsuario = (session.user.cnpj as string) || '';
+      const cnpjUsuario = (session.user.cnpj as string) || "";
 
       // Reseta o formulário com os dados do usuário
       reset({
         nome: nomeUsuario,
         email: emailUsuario,
-        novaSenha: '',
-        confirmarSenha: '',
+        novaSenha: "",
+        confirmarSenha: "",
       });
 
       // Atualiza dados locais (empresa e cargo)
@@ -126,9 +138,9 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
         nome: nomeUsuario,
         email: emailUsuario,
         cargo: traduzirCargo(permissoes),
-        empresa: '', // será preenchido pela API
-        novaSenha: '',
-        confirmarSenha: '',
+        empresa: "", // será preenchido pela API
+        novaSenha: "",
+        confirmarSenha: "",
       });
 
       // Reseta estado de editar senha
@@ -162,9 +174,6 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
     }
   }, [open, session, reset, clearErrors]);
 
-  // Watch para monitorar mudanças nos campos de senha
-  const watchedValues = watch();
-
   // Hooks para alternar visibilidade das senhas
   const { mostrarSenha: mostrarNovaSenha, adornment: adornmentNovaSenha } =
     useToggleSenha();
@@ -184,45 +193,37 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
     return "—";
   };
 
-  // Atualiza qualquer campo do formulário
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setDados((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   // Validação e salvamento
-  const handleSalvar = async (formData: any) => {
+  const handleSalvar = async (formData: unknown) => {
     if (!session?.user) {
       onClose();
       return;
     }
 
+    const { nome, email, novaSenha } = formData as PerfilDados;
     const idUsuario = session.user.id as number;
-    const novaSenhaTxt = formData.novaSenha?.trim() || '';
+    const novaSenhaTxt = novaSenha?.trim() || "";
 
     // Monta o payload conforme Swagger /Usuario/Atualizar/{id}
-    const payload: Partial<Usuario> = {
+    const payload: Partial<UsuarioPayload> = {
       id_usuario: idUsuario,
-      nome_usuario: formData.nome,
-      email: formData.email,
+      nome_usuario: nome,
+      email: email,
       cnpj: session.user.cnpj as string,
       permissoes_usuario: session.user.permissao as number,
       habilitado: true,
-      data_cadastro: (session.user as any).data_cadastro
-        ? String((session.user as any).data_cadastro)
-        : new Date().toISOString(),
+      data_cadastro: (session.user as { data_cadastro?: string }).data_cadastro
+        ? String((session.user as { data_cadastro?: string }).data_cadastro)
+        : undefined,
     };
 
     // Se o usuário optou por editar a senha, inclui no payload
     if (editarSenha && novaSenhaTxt.length > 0) {
-      (payload as Usuario).senha = novaSenhaTxt;
+      (payload as UsuarioPayload).senha = novaSenhaTxt;
     }
 
     try {
-      await atualizarUsuario(idUsuario, payload as Usuario);
+      await atualizarUsuario(idUsuario, payload as UsuarioPayload);
       // Se sucesso, abre diálogo de logout forçado
       setSucessoDialogOpen(true);
     } catch (error) {
@@ -233,7 +234,9 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
 
   // Colunas fixas do modal
   const colunasBase = [
-    { chave: "nome", titulo: "Nome",
+    {
+      chave: "nome",
+      titulo: "Nome",
       tipo: "custom" as const,
       componente: (
         <TextField
@@ -246,9 +249,11 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
           error={!!errors.nome}
           helperText={errors.nome?.message}
         />
-      )
+      ),
     },
-    { chave: "email", titulo: "Email",
+    {
+      chave: "email",
+      titulo: "Email",
       tipo: "custom" as const,
       componente: (
         <TextField
@@ -261,7 +266,7 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
           error={!!errors.email}
           helperText={errors.email?.message}
         />
-      )
+      ),
     },
     { chave: "empresa", titulo: "Empresa", desativado: true },
     { chave: "cargo", titulo: "Cargo", desativado: true },
@@ -345,7 +350,7 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
           }}
         />
         {/* Indicador de força somente aqui */}
-        <SenhaForte senha={watch('confirmarSenha') || ""} />
+        <SenhaForte senha={watch("confirmarSenha") || ""} />
       </Box>
     ),
   };

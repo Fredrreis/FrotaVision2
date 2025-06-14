@@ -15,31 +15,31 @@ export class ApiGateway {
     });
   }
 
-  async get<T = any>(endPoint: string, params: any = {}, signal?: AbortSignal): Promise<T> {
+  async get<T = unknown>(endPoint: string, params: Record<string, unknown> = {}, signal?: AbortSignal): Promise<T> {
     const config: AxiosRequestConfig = { params, signal };
     const response = await this.axiosInstance.get<T>(endPoint, config);
     return response.data;
   }
 
-  async post<T = any>(endPoint: string, data: any, signal?: AbortSignal): Promise<T> {
+  async post<T = unknown>(endPoint: string, data: unknown, signal?: AbortSignal): Promise<T> {
     const config: AxiosRequestConfig = { signal };
     const response = await this.axiosInstance.post<T>(endPoint, data, config);
     return response.data;
   }
 
-  async put<T = any>(endPoint: string, data: any, signal?: AbortSignal): Promise<T> {
+  async put<T = unknown>(endPoint: string, data: unknown, signal?: AbortSignal): Promise<T> {
     const config: AxiosRequestConfig = { signal };
     const response = await this.axiosInstance.put<T>(endPoint, data, config);
     return response.data;
   }
 
-  async delete<T = any>(endPoint: string, signal?: AbortSignal): Promise<T> {
+  async delete<T = unknown>(endPoint: string, signal?: AbortSignal): Promise<T> {
     const config: AxiosRequestConfig = { signal };
     const response = await this.axiosInstance.delete<T>(endPoint, config);
     return response.data;
   }
 
-  async patch<T = any>(endPoint: string, data: any, signal?: AbortSignal): Promise<T> {
+  async patch<T = unknown>(endPoint: string, data: unknown, signal?: AbortSignal): Promise<T> {
     const config: AxiosRequestConfig = { signal };
     const response = await this.axiosInstance.patch<T>(endPoint, data, config);
     return response.data;

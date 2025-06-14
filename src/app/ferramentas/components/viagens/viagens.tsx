@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import {
-  listarViagens,
+  listarViagensDetalhado,
+  cadastrarViagem,
+  atualizarViagem,
   deletarViagem,
-  Viagem as ViagemAPI,
+  ViagemDetalhada,
+  ViagemPayload,
 } from "@/api/services/viagemService";
 import { useSession } from "next-auth/react";
 import TabelaGenerica from "@/app/ferramentas/components/components/tabela/tabela-generica";
-import ModalFormulario from "../components/formulario-modal/formulario-generico";
 import ExportarRelatorioDialog from "../components/export/export-relatorio";
 import {
   Box,
@@ -22,28 +24,55 @@ import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import FiltroAvancado from "../components/filtro/filtro-avancado";
 import Carregamento from "../../../components/carregamento/carregamento";
-import { compareDateISO, formatarDataISOcomHora } from "@/utils/data";
+import {
+  compareDateISO,
+  formatarDataISOcomHora,
+  inputDatetimeLocalToISO,
+} from "@/utils/data";
 import { motion } from "framer-motion";
 import CustomSnackbar from "../../../components/snackbar/snackbar";
 import "../styles/shared-styles.css";
 import "./viagens.css";
+import EditarGenerico from "@/app/components/genericos/editarGenerico";
+import CadastrarGenerico from "@/app/components/genericos/cadastrarGenerico";
+import DeletarGenerico from "@/app/components/genericos/deletarGenerico";
+import { listarVeiculos } from "@/api/services/veiculoService";
+import { listarMotoristas } from "@/api/services/motoristaService";
+import { viagemSchema } from "@/utils/viagem-validation";
 
-interface Viagem {
-  id: number;
-  veiculo: string;
-  motorista: string;
-  origem: string;
-  destino: string;
-  dataSaida: string;
-  dataRetorno: string;
-  dataSaidaOriginal: string;
-  dataRetornoOriginal: string;
-  kmPercorrido: number;
-  descricao: string;
-  [key: string]: any;
+interface SessionUser {
+  cnpj: string;
 }
 
-const colunasViagens = [
+interface Session {
+  user: SessionUser;
+}
+
+interface Veiculo {
+  id_veiculo: number;
+  apelido?: string;
+  placa?: string;
+}
+
+interface Motorista {
+  id_motorista: number;
+  nome: string;
+}
+
+const colunasViagens: {
+  chave:
+    | "id"
+    | "veiculo"
+    | "motorista"
+    | "origem"
+    | "destino"
+    | "dataSaida"
+    | "dataRetorno"
+    | "kmPercorrido"
+    | "descricao";
+  titulo: string;
+  ordenavel: boolean;
+}[] = [
   { chave: "veiculo", titulo: "Veículo", ordenavel: false },
   { chave: "motorista", titulo: "Motorista", ordenavel: false },
   { chave: "origem", titulo: "Origem", ordenavel: false },
@@ -65,39 +94,83 @@ const mapeamentoCampos = {
   Descrição: "descricao",
 };
 
+const colunasFormulario: {
+  chave: string;
+  titulo: string;
+  tipo: "texto" | "number" | "datetime" | "area" | "selecao";
+}[] = [
+  { chave: "id_veiculo", titulo: "Veículo", tipo: "selecao" },
+  { chave: "id_motorista", titulo: "Motorista", tipo: "selecao" },
+  { chave: "origem", titulo: "Origem", tipo: "texto" },
+  { chave: "destino", titulo: "Destino", tipo: "texto" },
+  { chave: "data_inicio", titulo: "Data de Saída", tipo: "datetime" },
+  { chave: "data_fim", titulo: "Data de Retorno", tipo: "datetime" },
+  { chave: "quilometragem_viagem", titulo: "Km Percorrido", tipo: "number" },
+  { chave: "descricao", titulo: "Descrição", tipo: "area" },
+];
+
+async function obterOpcoesDinamicas(session: unknown) {
+  if (
+    !session ||
+    typeof session !== "object" ||
+    !("user" in session) ||
+    !(session as Session).user?.cnpj
+  ) {
+    return { id_veiculo: [], id_motorista: [] };
+  }
+  try {
+    const user = (session as Session).user;
+    const [veiculos, motoristas] = await Promise.all([
+      listarVeiculos(user.cnpj),
+      listarMotoristas(user.cnpj),
+    ]);
+    return {
+      id_veiculo: veiculos.map((v: Veiculo) => ({
+        label: v.apelido || v.placa || "Sem nome",
+        value: String(v.id_veiculo),
+      })),
+      id_motorista: motoristas.map((m: Motorista) => ({
+        label: m.nome,
+        value: String(m.id_motorista),
+      })),
+    };
+  } catch {
+    return { id_veiculo: [], id_motorista: [] };
+  }
+}
+
 export default function Viagens() {
   const { data: session } = useSession();
-  const [dadosApi, setDadosApi] = useState<ViagemAPI[]>([]);
+  const [dadosApi, setDadosApi] = useState<ViagemDetalhada[]>([]);
   const [carregando, setCarregando] = useState(true);
-  const [dados, setDados] = useState<Viagem | null>(null);
-  const [open, setOpen] = useState(false);
-  const [modoEdicao, setModoEdicao] = useState(false);
+  const [openCriar, setOpenCriar] = useState(false);
+  const [itemSelecionado, setItemSelecionado] =
+    useState<ViagemDetalhada | null>(null);
+  const [openEditar, setOpenEditar] = useState(false);
+  const [openDeletar, setOpenDeletar] = useState(false);
   const [search, setSearch] = useState("");
   const [openFiltros, setOpenFiltros] = useState(false);
-  const [openExportar, setOpenExportar] = useState(false);
   const [anchorElFiltro, setAnchorElFiltro] = useState<HTMLElement | null>(
     null
   );
+  const [openExportar, setOpenExportar] = useState(false);
   const [anchorElExportar, setAnchorElExportar] = useState<HTMLElement | null>(
     null
   );
-  const [filtrosAvancados, setFiltrosAvancados] = useState<Record<string, any>>(
-    {}
-  );
+  const [filtrosAvancados, setFiltrosAvancados] = useState<
+    Record<string, unknown>
+  >({});
   const [snackbarAberto, setSnackbarAberto] = useState(false);
   const [snackbarMensagem, setSnackbarMensagem] = useState("");
   const [snackbarCor, setSnackbarCor] = useState<"primary" | "light">(
     "primary"
   );
-  useEffect(() => {
-    const controller = new AbortController();
 
+  const carregarViagens = () => {
     if (!session?.user?.cnpj) return;
-
-    listarViagens(session.user.cnpj, controller.signal)
-      .then((res) => {
-        if (!controller.signal.aborted) setDadosApi(res);
-      })
+    setCarregando(true);
+    listarViagensDetalhado(session.user.cnpj)
+      .then((res) => setDadosApi(res))
       .catch((err) => {
         if (
           !(
@@ -105,47 +178,56 @@ export default function Viagens() {
             err.code === "ERR_CANCELED" ||
             err.message === "canceled"
           )
-        ) {
-          console.error("Erro:", err);
-        }
+        )
+          console.error(err);
       })
-      .finally(() => {
-        if (!controller.signal.aborted) setCarregando(false);
-      });
+      .finally(() => setCarregando(false));
+  };
 
-    return () => controller.abort();
-  }, [session?.user?.cnpj]);
+  useEffect(() => {
+    if (session?.user?.cnpj) {
+      carregarViagens();
+    }
+  }, [session?.user?.cnpj, carregarViagens]);
 
-  const viagensData: Viagem[] = dadosApi.map((v) => ({
+  // View-model para tabela
+  const viagensData = dadosApi.map((v) => ({
     id: v.id_viagem,
     veiculo: v.apelido_veiculo || "—",
     motorista: v.nome_motorista || "—",
-    origem: "Origem Temporária",
-    destino: "Destino Temporária",
-    dataSaida: formatarDataISOcomHora(v.data_inicio),
-    dataRetorno: formatarDataISOcomHora(v.data_fim),
-    dataSaidaOriginal: v.data_inicio,
-    dataRetornoOriginal: v.data_fim,
+    origem: v.origem || "—",
+    destino: v.destino || "—",
+    dataSaida: v.data_inicio ? formatarDataISOcomHora(v.data_inicio) : "—",
+    dataRetorno: v.data_fim ? formatarDataISOcomHora(v.data_fim) : "—",
+    dataSaidaOriginal: v.data_inicio || "",
+    dataRetornoOriginal: v.data_fim || "",
     kmPercorrido: v.quilometragem_viagem ?? 0,
-    descricao: "Descrição temporária",
+    descricao: v.descricao || "—",
   }));
 
+  // Filtros e busca
   const dadosFiltrados = viagensData.filter((viagem) => {
     const matchesSearch =
       (viagem.veiculo?.toLowerCase() ?? "").includes(search.toLowerCase()) ||
       (viagem.motorista?.toLowerCase() ?? "").includes(search.toLowerCase());
 
     const matchOrigem = filtrosAvancados.origem
-      ? viagem.origem === filtrosAvancados.origem
+      ? viagem.origem === String(filtrosAvancados.origem)
       : true;
     const matchDestino = filtrosAvancados.destino
-      ? viagem.destino === filtrosAvancados.destino
+      ? viagem.destino === String(filtrosAvancados.destino)
       : true;
     const matchSaida = filtrosAvancados.dataSaida
-      ? compareDateISO(viagem.dataSaidaOriginal, filtrosAvancados.dataSaida)
+      ? compareDateISO(
+          viagem.dataSaidaOriginal,
+          String(filtrosAvancados.dataSaida)
+        )
       : true;
     const matchRetorno = filtrosAvancados.dataRetorno
-      ? compareDateISO(viagem.dataRetornoOriginal, filtrosAvancados.dataRetorno)
+      ? compareDateISO(
+          viagem.dataRetornoOriginal,
+          String(filtrosAvancados.dataRetorno)
+        )
       : true;
     const matchKm =
       filtrosAvancados.km !== undefined && filtrosAvancados.km !== ""
@@ -184,10 +266,26 @@ export default function Viagens() {
     { name: "km", label: "Km", type: "range" as const, min: 0, max: maxKm },
   ];
 
-  const handleCadastrar = () => {
-    setDados({} as Viagem);
-    setModoEdicao(false);
-    setOpen(true);
+  // prepara payload de edição
+  const payloadEdicao: ViagemPayload | null =
+    itemSelecionado && session?.user?.cnpj
+      ? {
+          id_viagem: itemSelecionado.id_viagem,
+          id_veiculo: itemSelecionado.id_veiculo,
+          quilometragem_viagem: itemSelecionado.quilometragem_viagem,
+          id_motorista: itemSelecionado.id_motorista,
+          origem: itemSelecionado.origem,
+          destino: itemSelecionado.destino,
+          data_inicio: itemSelecionado.data_inicio,
+          data_fim: itemSelecionado.data_fim,
+          descricao: itemSelecionado.descricao,
+          habilitado: true,
+          cnpj: session.user.cnpj,
+        }
+      : null;
+
+  const handleChange = (values: Record<string, unknown>) => {
+    setFiltrosAvancados(values);
   };
 
   if (carregando) {
@@ -212,7 +310,6 @@ export default function Viagens() {
             <TimelineIcon className="icon-title" /> VIAGENS
           </Typography>
         </Box>
-
         <Box className="viagens-filtros">
           <Box className="search-filtros-container">
             <TextField
@@ -239,15 +336,14 @@ export default function Viagens() {
                 setOpenFiltros(true);
               }}
             >
-              <span className="button-text">Filtros Avançados</span>
+              Filtros Avançados
             </Button>
           </Box>
-
           <Box className="botoes-container">
             <Button
               variant="contained"
               className="botao-cadastrar"
-              onClick={handleCadastrar}
+              onClick={() => setOpenCriar(true)}
             >
               Cadastrar Viagem
             </Button>
@@ -264,54 +360,107 @@ export default function Viagens() {
             </Button>
           </Box>
         </Box>
-
-        <TabelaGenerica<Viagem>
+        <TabelaGenerica
           colunas={colunasViagens}
           dados={dadosFiltrados}
           onEditar={(item) => {
-            setDados(item);
-            setModoEdicao(true);
-            setOpen(true);
+            const original = dadosApi.find((v) => v.id_viagem === item.id);
+            if (original) {
+              setItemSelecionado(original);
+              setOpenEditar(true);
+            }
           }}
-          onExcluir={async (item) => {
-            try {
-              await deletarViagem(item.id);
-              setDadosApi((prev) =>
-                prev.filter((v) => v.id_viagem !== item.id)
-              );
-              setSnackbarMensagem("Viagem excluída com sucesso!");
-              setSnackbarCor("primary");
-              setSnackbarAberto(true);
-            } catch (err) {
-              setSnackbarMensagem("Erro ao excluir viagem. Tente novamente.");
-              setSnackbarCor("light");
-              setSnackbarAberto(true);
+          onExcluir={(item) => {
+            const original = dadosApi.find((v) => v.id_viagem === item.id);
+            if (original) {
+              setItemSelecionado(original);
+              setOpenDeletar(true);
             }
           }}
           exibirExaminar={false}
         />
-
-        <ModalFormulario<Viagem>
-          open={open}
-          onClose={() => setOpen(false)}
-          onSalvar={() => setOpen(false)}
-          colunas={colunasViagens}
-          dados={dados}
-          setDados={setDados}
-          modoEdicao={modoEdicao}
-        />
-
+        {/* Modal de Edição */}
+        {openEditar && payloadEdicao && (
+          <EditarGenerico<ViagemPayload>
+            open={openEditar}
+            onClose={() => setOpenEditar(false)}
+            titulo="EDITAR VIAGEM"
+            colunas={colunasFormulario}
+            itemEdicao={payloadEdicao}
+            obterOpcoesDinamicas={() => obterOpcoesDinamicas(session)}
+            schema={viagemSchema}
+            onSalvar={async (payload) => {
+              setCarregando(true);
+              try {
+                const payloadFinal = {
+                  ...payload,
+                  data_inicio: inputDatetimeLocalToISO(payload.data_inicio),
+                  data_fim: inputDatetimeLocalToISO(payload.data_fim),
+                };
+                await atualizarViagem(payloadFinal.id_viagem, payloadFinal);
+                await carregarViagens();
+                setSnackbarMensagem("Viagem editada com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem("Erro ao editar viagem. Tente novamente.");
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenEditar(false);
+              }
+            }}
+          />
+        )}
+        {/* Modal de Criação */}
+        {openCriar && (
+          <CadastrarGenerico<ViagemPayload>
+            open={openCriar}
+            onClose={() => setOpenCriar(false)}
+            titulo="CADASTRAR VIAGEM"
+            colunas={colunasFormulario}
+            obterOpcoesDinamicas={() => obterOpcoesDinamicas(session)}
+            schema={viagemSchema}
+            onSalvar={async (formValues) => {
+              setCarregando(true);
+              const payload: ViagemPayload = {
+                ...formValues,
+                id_viagem: 0,
+                habilitado: true,
+                cnpj: session?.user?.cnpj ?? "",
+                data_inicio: inputDatetimeLocalToISO(formValues.data_inicio),
+                data_fim: inputDatetimeLocalToISO(formValues.data_fim),
+              };
+              try {
+                await cadastrarViagem(payload);
+                await carregarViagens();
+                setSnackbarMensagem("Viagem cadastrada com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem(
+                  "Erro ao cadastrar viagem. Tente novamente."
+                );
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenCriar(false);
+              }
+            }}
+          />
+        )}
+        {/* Filtros Avançados */}
         <FiltroAvancado
           open={openFiltros}
           onClose={() => setOpenFiltros(false)}
           anchorEl={anchorElFiltro}
           filters={filtrosAvancadosConfig}
           values={filtrosAvancados}
-          onChange={setFiltrosAvancados}
+          onChange={handleChange}
           onApply={() => setOpenFiltros(false)}
           onClear={() => setFiltrosAvancados({})}
         />
-
+        {/* Exportar */}
         <ExportarRelatorioDialog
           open={openExportar}
           onClose={() => setOpenExportar(false)}
@@ -320,7 +469,33 @@ export default function Viagens() {
           dados={dadosFiltrados}
           mapeamentoCampos={mapeamentoCampos}
         />
-
+        {/* Modal de Deleção */}
+        {openDeletar && itemSelecionado && (
+          <DeletarGenerico<ViagemDetalhada>
+            open={openDeletar}
+            onClose={() => setOpenDeletar(false)}
+            item={itemSelecionado}
+            getDescricao={(v) => `viagem de "${v.nome_motorista}"`}
+            onConfirmar={async (v) => {
+              setCarregando(true);
+              try {
+                await deletarViagem(v.id_viagem);
+                await carregarViagens();
+                setSnackbarMensagem("Viagem excluída com sucesso!");
+                setSnackbarCor("primary");
+              } catch {
+                setSnackbarMensagem("Erro ao excluir viagem. Tente novamente.");
+                setSnackbarCor("light");
+              } finally {
+                setCarregando(false);
+                setSnackbarAberto(true);
+                setOpenDeletar(false);
+                setItemSelecionado(null);
+              }
+            }}
+          />
+        )}
+        {/* Snackbar */}
         <CustomSnackbar
           open={snackbarAberto}
           onClose={() => setSnackbarAberto(false)}
