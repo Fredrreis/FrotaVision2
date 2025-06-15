@@ -13,6 +13,7 @@ import {
   RadioGroup,
   FormControlLabel,
   FormLabel,
+  Checkbox,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import "./formulario-generico.css";
@@ -37,10 +38,16 @@ export interface Coluna {
     | "data"
     | "datetime"
     | "radio"
-    | "senha";
+    | "senha"
+    | "checkbox";
   opcoes?: string[] | OpcaoSelect[];
   desativado?: boolean;
   componente?: React.ReactNode;
+  mostrarSenhaForte?: boolean;
+  checked?: boolean;
+  onChange?: (checked: boolean) => void;
+  label?: string;
+  className?: string;
 }
 
 interface ModalProps<T extends Record<string, unknown>> {
@@ -132,6 +139,11 @@ export default function ModalFormulario<T extends Record<string, unknown>>({
             opcoes,
             desativado,
             componente,
+            mostrarSenhaForte,
+            checked,
+            onChange,
+            label,
+            className,
           }) => (
             <Box key={chave} className="modal-form-group">
               {(() => {
@@ -153,31 +165,59 @@ export default function ModalFormulario<T extends Record<string, unknown>>({
                         helperText={erros[chave]}
                         InputProps={{ endAdornment: adornment }}
                       />
-                      <SenhaForte
-                        senha={String(dados?.[chave as keyof T] || "")}
-                      />
+                      {mostrarSenhaForte !== false && (
+                        <SenhaForte
+                          senha={String(dados?.[chave as keyof T] || "")}
+                        />
+                      )}
                     </>
+                  );
+                } else if (tipo === "checkbox") {
+                  return (
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={checked}
+                          onChange={(e) => onChange?.(e.target.checked)}
+                          size="small"
+                        />
+                      }
+                      label={label}
+                      className={className}
+                    />
                   );
                 } else if (tipo === "custom" && componente) {
                   return componente;
                 } else if (tipo === "selecao") {
-                  if (opcoes && opcoes.length > 0) {
-                    return (
-                      <TextField
-                        select
-                        label={titulo}
-                        name={chave}
-                        value={dados?.[chave as keyof T] || ""}
-                        onChange={handleChange}
-                        fullWidth
-                        variant="outlined"
-                        size="small"
-                        className="modal-input"
-                        disabled={desativado}
-                        error={!!erros[chave]}
-                        helperText={erros[chave]}
-                      >
-                        {opcoes.map((opcao) =>
+                  const isLoading =
+                    modoEdicao && (!opcoes || opcoes.length === 0);
+                  return (
+                    <TextField
+                      select
+                      label={titulo}
+                      name={chave}
+                      value={dados?.[chave as keyof T] || ""}
+                      onChange={handleChange}
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      className="modal-input"
+                      disabled={desativado || isLoading}
+                      error={!!erros[chave]}
+                      helperText={erros[chave]}
+                      slotProps={{
+                        input: {
+                          startAdornment: isLoading ? (
+                            <CircularProgress
+                              size={20}
+                              sx={{ color: "#1b3562" }}
+                            />
+                          ) : undefined,
+                        },
+                      }}
+                    >
+                      {opcoes && opcoes.length > 0 ? (
+                        opcoes.map((opcao) =>
                           typeof opcao === "string" ? (
                             <MenuItem
                               key={opcao}
@@ -195,28 +235,16 @@ export default function ModalFormulario<T extends Record<string, unknown>>({
                               {opcao.label}
                             </MenuItem>
                           )
-                        )}
-                      </TextField>
-                    );
-                  } else {
-                    return (
-                      <TextField
-                        select
-                        label={titulo}
-                        name={chave}
-                        value=""
-                        fullWidth
-                        variant="outlined"
-                        size="small"
-                        className="modal-input"
-                        disabled
-                        error={!!erros[chave]}
-                        helperText={erros[chave]}
-                      >
-                        <MenuItem value="">Carregando opções...</MenuItem>
-                      </TextField>
-                    );
-                  }
+                        )
+                      ) : (
+                        <MenuItem
+                          disabled
+                          value=""
+                          style={{ display: "none" }}
+                        />
+                      )}
+                    </TextField>
+                  );
                 } else if (tipo === "radio") {
                   return (
                     <Box>

@@ -215,7 +215,6 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
       dataCadastro = undefined;
     }
 
-    console.log(dataCadastro);
     // Monta o payload conforme Swagger /Usuario/Atualizar/{id}
     const payload: Partial<UsuarioPayload> = {
       id_usuario: idUsuario,
@@ -235,8 +234,6 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
       // Backend exige um valor qualquer para senha mesmo se não for trocar
       (payload as UsuarioPayload).senha = "senha qualquer";
     }
-
-    console.log(payload);
 
     try {
       await atualizarUsuario(idUsuario, payload as UsuarioPayload, editarSenha);

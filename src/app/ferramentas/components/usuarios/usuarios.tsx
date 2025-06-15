@@ -1,5 +1,7 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
   Button,
@@ -24,18 +26,30 @@ import CustomSnackbar from "../../../components/snackbar/snackbar";
 import Carregamento from "../../../components/carregamento/carregamento";
 import { formatarDataISOcomHora, compareDateISO } from "@/utils/data";
 import "./usuarios.css";
-import EditarGenerico from "@/app/components/genericos/editarGenerico";
 import CadastrarGenerico from "@/app/components/genericos/cadastrarGenerico";
 import DeletarGenerico from "@/app/components/genericos/deletarGenerico";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import SearchIcon from "@mui/icons-material/Search";
-import { usuarioSchema } from "@/utils/usuario-validation";
+import {
+  usuarioCadastroSchema,
+  usuarioEdicaoSchema,
+} from "@/utils/usuario-validation";
 import {
   listarPermissoes,
   PermissaoUsuario,
 } from "@/api/services/permissaoUsuarioService";
+import EditarGenerico from "@/app/components/genericos/editarGenerico";
+
+interface UsuarioData extends Record<string, unknown> {
+  id: number;
+  nome: string;
+  email: string;
+  data: string;
+  dataOriginal: string;
+  permissoes: string;
+}
 
 const colunasUsuarios: {
   chave: "id" | "nome" | "email" | "data" | "dataOriginal" | "permissoes";
@@ -44,7 +58,7 @@ const colunasUsuarios: {
 }[] = [
   { chave: "email", titulo: "Email", ordenavel: false },
   { chave: "nome", titulo: "Nome de Usuário", ordenavel: false },
-  { chave: "data", titulo: "Data", ordenavel: true },
+  { chave: "data", titulo: "Data Cadastro", ordenavel: true },
   { chave: "permissoes", titulo: "Permissões do Usuário", ordenavel: false },
 ];
 
@@ -66,7 +80,6 @@ const colunasFormulario = [
   },
 ];
 
-// Função para buscar opções dinâmicas do select de permissões
 async function obterOpcoesDinamicasPermissoes() {
   try {
     const permissoes: PermissaoUsuario[] = await listarPermissoes();
@@ -106,6 +119,17 @@ export default function Usuarios() {
     "primary"
   );
   const [permissoesFiltro, setPermissoesFiltro] = useState<string[]>([]);
+  const [editarSenha, setEditarSenha] = useState(false);
+
+  const resolver = useMemo(() => yupResolver(usuarioEdicaoSchema), []);
+  const { trigger } = useForm({
+    resolver,
+    mode: "onSubmit",
+  });
+
+  useEffect(() => {
+    trigger();
+  }, [editarSenha, trigger]);
 
   const carregarUsuarios = useCallback(() => {
     if (!session?.user?.cnpj) return;
@@ -139,14 +163,16 @@ export default function Usuarios() {
     fetchPermissoesFiltro();
   }, []);
 
-  const usuariosData = dadosApi.map((u) => ({
-    id: u.id_usuario,
-    nome: u.nome_usuario || "—",
-    email: u.email || "—",
-    data: u.data_cadastro ? formatarDataISOcomHora(u.data_cadastro) : "—",
-    dataOriginal: u.data_cadastro || "",
-    permissoes: u.nomePermissao || "—",
-  }));
+  const usuariosData: UsuarioData[] = dadosApi
+    .filter((u) => u.email !== session?.user?.email)
+    .map((u) => ({
+      id: u.id_usuario,
+      nome: u.nome_usuario || "—",
+      email: u.email || "—",
+      data: u.data_cadastro ? formatarDataISOcomHora(u.data_cadastro) : "—",
+      dataOriginal: u.data_cadastro || "",
+      permissoes: u.nomePermissao || "—",
+    }));
 
   const dadosFiltrados = usuariosData.filter((usuario) => {
     const matchSearch =
@@ -176,18 +202,85 @@ export default function Usuarios() {
     },
   ];
 
-  const payloadEdicao: UsuarioPayload | null = itemSelecionado
-    ? {
-        id_usuario: itemSelecionado.id_usuario,
-        nome_usuario: itemSelecionado.nome_usuario,
-        email: itemSelecionado.email,
-        senha: "",
-        permissoes_usuario: itemSelecionado.permissoes_usuario,
-        data_cadastro: itemSelecionado.data_cadastro,
-        cnpj: session?.user?.cnpj ?? "",
-        habilitado: true,
-      }
-    : null;
+  const payloadEdicao = useMemo(() => {
+    if (!itemSelecionado) return null;
+    return {
+      id_usuario: itemSelecionado.id_usuario,
+      nome_usuario: itemSelecionado.nome_usuario,
+      email: itemSelecionado.email,
+      senha: "",
+      permissoes_usuario: itemSelecionado.permissoes_usuario,
+      data_cadastro: itemSelecionado.data_cadastro,
+      cnpj: session?.user?.cnpj ?? "",
+      habilitado: true,
+    };
+  }, [itemSelecionado, session?.user?.cnpj]);
+
+  const colunasBase = useMemo(
+    () => [
+      {
+        chave: "nome_usuario",
+        titulo: "Nome de Usuário",
+        tipo: "texto" as const,
+      },
+      {
+        chave: "email",
+        titulo: "Email",
+        tipo: "texto" as const,
+      },
+      {
+        chave: "permissoes_usuario",
+        titulo: "Permissão",
+        tipo: "selecao" as const,
+      },
+      {
+        chave: "__editarSenha",
+        titulo: "",
+        tipo: "checkbox" as const,
+        checked: editarSenha,
+        onChange: (newValue: boolean) => {
+          setEditarSenha(newValue);
+          if (!newValue && payloadEdicao) {
+            payloadEdicao.senha = "";
+          }
+        },
+        label: "Editar senha",
+        className: "perfil-editar-senha-checkbox",
+      },
+    ],
+    [editarSenha, payloadEdicao]
+  );
+
+  const colunasSenha = useMemo(
+    () => [
+      {
+        chave: "senha",
+        titulo: "Nova Senha",
+        tipo: "senha" as const,
+        mostrarSenhaForte: true,
+      },
+      {
+        chave: "confirmarSenha",
+        titulo: "Confirmar Senha",
+        tipo: "senha" as const,
+        mostrarSenhaForte: false,
+      },
+    ],
+    []
+  );
+
+  const colunasEdicao = useMemo(() => {
+    return editarSenha ? [...colunasBase, ...colunasSenha] : colunasBase;
+  }, [colunasBase, colunasSenha, editarSenha]);
+
+  const itemEdicaoMemo = useMemo(() => {
+    if (!payloadEdicao) return null;
+    return {
+      ...payloadEdicao,
+      __editarSenha: editarSenha,
+      confirmarSenha: "",
+    };
+  }, [payloadEdicao, editarSenha]);
 
   if (carregando) {
     return (
@@ -280,20 +373,31 @@ export default function Usuarios() {
           }}
           exibirExaminar={false}
         />
-        {/* Modal de Edição */}
-        {openEditar && payloadEdicao && (
+        {openEditar && itemEdicaoMemo && (
           <EditarGenerico<UsuarioPayload>
+            key={`edit-${editarSenha}`}
             open={openEditar}
-            onClose={() => setOpenEditar(false)}
+            onClose={() => {
+              setOpenEditar(false);
+              setEditarSenha(false);
+            }}
             titulo="EDITAR USUÁRIO"
-            colunas={colunasFormulario}
-            itemEdicao={payloadEdicao}
-            schema={usuarioSchema}
+            colunas={colunasEdicao}
+            itemEdicao={itemEdicaoMemo}
+            schema={usuarioEdicaoSchema}
             obterOpcoesDinamicas={obterOpcoesDinamicasPermissoes}
             onSalvar={async (payload) => {
               setCarregando(true);
               try {
-                await atualizarUsuario(payload.id_usuario, payload);
+                const payloadToSend = { ...payload };
+                if (!editarSenha) {
+                  payloadToSend.senha = "senha qualquer";
+                }
+                await atualizarUsuario(
+                  payloadToSend.id_usuario,
+                  payloadToSend,
+                  editarSenha
+                );
                 await carregarUsuarios();
                 setSnackbarMensagem("Usuário editado com sucesso!");
                 setSnackbarCor("primary");
@@ -304,18 +408,18 @@ export default function Usuarios() {
                 setCarregando(false);
                 setSnackbarAberto(true);
                 setOpenEditar(false);
+                setEditarSenha(false);
               }
             }}
           />
         )}
-        {/* Modal de Criação */}
         {openCriar && (
           <CadastrarGenerico<UsuarioPayload>
             open={openCriar}
             onClose={() => setOpenCriar(false)}
             titulo="CADASTRAR USUÁRIO"
             colunas={colunasFormulario}
-            schema={usuarioSchema}
+            schema={usuarioCadastroSchema}
             obterOpcoesDinamicas={obterOpcoesDinamicasPermissoes}
             onSalvar={async (formValues) => {
               setCarregando(true);
@@ -344,7 +448,6 @@ export default function Usuarios() {
             }}
           />
         )}
-        {/* Filtros Avançados */}
         <FiltroAvancado
           open={openFiltros}
           onClose={() => setOpenFiltros(false)}
@@ -355,7 +458,6 @@ export default function Usuarios() {
           onClear={() => setFiltrosAvancados({})}
           anchorEl={anchorEl}
         />
-        {/* Exportar */}
         <ExportarRelatorioDialog
           open={openExportar}
           onClose={() => setOpenExportar(false)}
@@ -364,7 +466,6 @@ export default function Usuarios() {
           mapeamentoCampos={mapeamentoCampos}
           anchorEl={anchorElExportar}
         />
-        {/* Modal de Deleção */}
         {openDeletar && itemSelecionado && (
           <DeletarGenerico<UsuarioDetalhado>
             open={openDeletar}
@@ -392,7 +493,6 @@ export default function Usuarios() {
             }}
           />
         )}
-        {/* Snackbar */}
         <CustomSnackbar
           open={snackbarAberto}
           onClose={() => setSnackbarAberto(false)}

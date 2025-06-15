@@ -41,8 +41,6 @@ export const authOptions: NextAuthOptions = {
           const token = (response as { token: string }).token;
           const decoded: JwtUserPayload = jwtDecode<JwtUserPayload>(token);
 
-          console.log("Decoded JWT:", decoded);
-
           return {
             id: Number(decoded.ID),
             nome: decoded.Nome,
