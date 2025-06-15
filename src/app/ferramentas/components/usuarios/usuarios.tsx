@@ -27,7 +27,7 @@ import "./usuarios.css";
 import EditarGenerico from "@/app/components/genericos/editarGenerico";
 import CadastrarGenerico from "@/app/components/genericos/cadastrarGenerico";
 import DeletarGenerico from "@/app/components/genericos/deletarGenerico";
-import AddIcon from "@mui/icons-material/Add";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import SearchIcon from "@mui/icons-material/Search";
@@ -208,7 +208,7 @@ export default function Usuarios() {
       <Box className="usuarios-container">
         <Box className="usuarios-header">
           <Typography variant="h6" className="usuarios-title">
-            <AddIcon className="icon-title" /> USUÁRIOS
+            <AccountCircleIcon className="icon-title" /> USUÁRIOS
           </Typography>
         </Box>
         <Box className="usuarios-filtros">

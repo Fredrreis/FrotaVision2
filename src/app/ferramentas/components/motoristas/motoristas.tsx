@@ -27,7 +27,7 @@ import "./motoristas.css";
 import EditarGenerico from "@/app/components/genericos/editarGenerico";
 import CadastrarGenerico from "@/app/components/genericos/cadastrarGenerico";
 import DeletarGenerico from "@/app/components/genericos/deletarGenerico";
-import AddIcon from "@mui/icons-material/Add";
+import PeopleIcon from "@mui/icons-material/People";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import IosShareIcon from "@mui/icons-material/IosShare";
@@ -193,7 +193,7 @@ export default function Motoristas() {
       <Box className="motoristas-container">
         <Box className="motoristas-header">
           <Typography variant="h6" className="motoristas-title">
-            <AddIcon className="icon-title" /> MOTORISTAS
+            <PeopleIcon className="icon-title" /> MOTORISTAS
           </Typography>
         </Box>
         <Box className="motoristas-filtros">

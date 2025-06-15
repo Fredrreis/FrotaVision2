@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const response: unknown = await api.post("/Usuario/loginJWT", {
-            email: credentials.email,
+              email: credentials.email,
             password: credentials.password,
             twoFactorCode: "",
             twoFactorRecoveryCode: ""
@@ -41,8 +41,10 @@ export const authOptions: NextAuthOptions = {
           const token = (response as { token: string }).token;
           const decoded: JwtUserPayload = jwtDecode<JwtUserPayload>(token);
 
+          console.log("Decoded JWT:", decoded);
+
           return {
-            id: decoded.Id,
+            id: Number(decoded.ID),
             nome: decoded.Nome,
             email: decoded.Email,
             cnpj: decoded.Cnpj,

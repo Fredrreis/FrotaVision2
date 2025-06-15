@@ -29,6 +29,7 @@ import { pesquisarEmpresa, Empresa } from "@/api/services/empresaService";
 import {
   atualizarUsuario,
   UsuarioPayload,
+  pesquisarUsuario,
 } from "@/api/services/usuarioService";
 
 import "./perfil-modal.css";
@@ -204,6 +205,17 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
     const idUsuario = session.user.id as number;
     const novaSenhaTxt = novaSenha?.trim() || "";
 
+    // Buscar data_cadastro antes de atualizar
+    let dataCadastro: string | undefined = undefined;
+    try {
+      const usuarioPesquisado = await pesquisarUsuario(idUsuario);
+      dataCadastro = usuarioPesquisado.data_cadastro;
+    } catch {
+      // Se não conseguir buscar, deixa undefined
+      dataCadastro = undefined;
+    }
+
+    console.log(dataCadastro);
     // Monta o payload conforme Swagger /Usuario/Atualizar/{id}
     const payload: Partial<UsuarioPayload> = {
       id_usuario: idUsuario,
@@ -212,21 +224,25 @@ export default function PerfilModal({ open, onClose }: PerfilModalProps) {
       cnpj: session.user.cnpj as string,
       permissoes_usuario: session.user.permissao as number,
       habilitado: true,
-      data_cadastro: (session.user as { data_cadastro?: string }).data_cadastro
-        ? String((session.user as { data_cadastro?: string }).data_cadastro)
-        : undefined,
+      data_cadastro: dataCadastro,
+      trocarSenha: editarSenha ? true : false,
     };
 
     // Se o usuário optou por editar a senha, inclui no payload
     if (editarSenha && novaSenhaTxt.length > 0) {
       (payload as UsuarioPayload).senha = novaSenhaTxt;
+    } else {
+      // Backend exige um valor qualquer para senha mesmo se não for trocar
+      (payload as UsuarioPayload).senha = "senha qualquer";
     }
 
+    console.log(payload);
+
     try {
-      await atualizarUsuario(idUsuario, payload as UsuarioPayload);
+      await atualizarUsuario(idUsuario, payload as UsuarioPayload, editarSenha);
       // Se sucesso, abre diálogo de logout forçado
       setSucessoDialogOpen(true);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Erro ao atualizar usuário:", error);
       onClose();
     }

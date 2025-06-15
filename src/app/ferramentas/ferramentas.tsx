@@ -16,7 +16,7 @@ import { useSession } from "next-auth/react";
 import Carregamento from "@/app/components/carregamento/carregamento";
 
 export const permissoesMenu: { [key: number]: string[] } = {
-  0: [
+  1: [
     "NOTIFICAÇÕES",
     "VEÍCULOS",
     "MANUTENÇÕES",
@@ -25,7 +25,7 @@ export const permissoesMenu: { [key: number]: string[] } = {
     "USUÁRIOS",
     "AJUDA",
   ], // Admin
-  1: [
+  2: [
     "NOTIFICAÇÕES",
     "VEÍCULOS",
     "MANUTENÇÕES",
@@ -33,8 +33,8 @@ export const permissoesMenu: { [key: number]: string[] } = {
     "VIAGENS",
     "AJUDA",
   ], // Coordenador de frotas
-  2: ["NOTIFICAÇÕES", "VEÍCULOS", "MANUTENÇÕES", "AJUDA"], // Gestor de Manutenções
-  3: ["VEÍCULOS", "MOTORISTAS", "VIAGENS", "AJUDA"], // Administrador de Viagens
+  3: ["NOTIFICAÇÕES", "VEÍCULOS", "MANUTENÇÕES", "AJUDA"], // Gestor de Manutenções
+  4: ["VEÍCULOS", "MOTORISTAS", "VIAGENS", "AJUDA"], // Administrador de Viagens
 };
 
 export const Ferramentas: React.FC = () => {

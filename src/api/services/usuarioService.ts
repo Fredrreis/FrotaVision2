@@ -1,5 +1,3 @@
-// src/api/services/usuarioService.ts
-
 import { ApiGateway } from "../api";
 
 // Interface base com campos comuns
@@ -70,9 +68,10 @@ export const deletarUsuario = async (
 
 export const atualizarUsuario = async (
   id: number,
-  usuario: UsuarioPayload
+  usuario: UsuarioPayload,
+  trocarSenha: boolean = true // valor padrão true (1)
 ): Promise<void> => {
-  await api.put(`/Usuario/Atualizar/${id}`, usuario);
+  await api.put(`/Usuario/Atualizar/${id}?trocarSenha=${trocarSenha}`, usuario);
 };
 
 export const loginUsuario = async (
@@ -80,4 +79,11 @@ export const loginUsuario = async (
   password: string
 ): Promise<LoginResponse> => {
   return await api.post<LoginResponse>("/Usuario/login", { email, password });
+};
+
+export const pesquisarUsuario = async (
+  id: number,
+  signal?: AbortSignal
+): Promise<UsuarioDetalhado> => {
+  return await api.get<UsuarioDetalhado>(`/Usuario/Pesquisar/${id}`, {}, signal);
 };
