@@ -6,7 +6,8 @@ import "./carregamento.css";
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 interface CarregamentoProps {
-  animationUrl: string;
+  animationUrl?: string;
+  lottie?: object;
   largura?: number;
   altura?: number;
   mensagem?: string;
@@ -14,6 +15,7 @@ interface CarregamentoProps {
 
 export default function Carregamento({
   animationUrl,
+  lottie,
   largura = 200,
   altura = 200,
   mensagem,
@@ -21,11 +23,15 @@ export default function Carregamento({
   const [animacao, setAnimacao] = useState<unknown>(null);
 
   useEffect(() => {
-    fetch(animationUrl)
-      .then((res) => res.json())
-      .then(setAnimacao)
-      .catch(console.error);
-  }, [animationUrl]);
+    if (lottie) {
+      setAnimacao(lottie);
+    } else if (animationUrl) {
+      fetch(animationUrl)
+        .then((res) => res.json())
+        .then(setAnimacao)
+        .catch(console.error);
+    }
+  }, [animationUrl, lottie]);
 
   if (!animacao) return null;
 

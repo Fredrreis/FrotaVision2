@@ -12,17 +12,45 @@ import Viagens from "./components/viagens/viagens";
 import Usuarios from "./components/usuarios/usuarios";
 import Ajuda from "./components/ajuda/ajuda";
 import "./ferramentas.css";
+import { useSession } from "next-auth/react";
+import Carregamento from "@/app/components/carregamento/carregamento";
+
+export const permissoesMenu: { [key: number]: string[] } = {
+  0: [
+    "NOTIFICAÇÕES",
+    "VEÍCULOS",
+    "MANUTENÇÕES",
+    "MOTORISTAS",
+    "VIAGENS",
+    "USUÁRIOS",
+    "AJUDA",
+  ], // Admin
+  1: [
+    "NOTIFICAÇÕES",
+    "VEÍCULOS",
+    "MANUTENÇÕES",
+    "MOTORISTAS",
+    "VIAGENS",
+    "AJUDA",
+  ], // Coordenador de frotas
+  2: ["NOTIFICAÇÕES", "VEÍCULOS", "MANUTENÇÕES", "AJUDA"], // Gestor de Manutenções
+  3: ["VEÍCULOS", "MOTORISTAS", "VIAGENS", "AJUDA"], // Administrador de Viagens
+};
 
 export const Ferramentas: React.FC = () => {
   const [paginaAtiva, setPaginaAtiva] = useState("NOTIFICAÇÕES");
   const [isMobile, setIsMobile] = useState(false);
   const [menuVisible, setMenuVisible] = useState(true);
+  const { data: session, status } = useSession();
+  const idPermissao =
+    typeof session?.user?.permissao === "number" ? session.user.permissao : 0;
+  const menuPermitido = permissoesMenu[idPermissao] || [];
 
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile) setMenuVisible(true); // garante menuDrawer visível no mobile
+      if (mobile) setMenuVisible(true);
     };
 
     handleResize();
@@ -30,11 +58,27 @@ export const Ferramentas: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    if (!menuPermitido.includes(paginaAtiva)) {
+      setPaginaAtiva(menuPermitido[0] || "NOTIFICAÇÕES");
+    }
+  }, [idPermissao, paginaAtiva]);
+
   const handleMenuClick = (pagina: string) => {
-    setPaginaAtiva(pagina);
+    if (menuPermitido.includes(pagina)) {
+      setPaginaAtiva(pagina);
+    }
   };
 
   const renderizarConteudo = () => {
+    if (!menuPermitido.includes(paginaAtiva)) {
+      return (
+        <Box p={4} textAlign="center">
+          <h2>Acesso não permitido</h2>
+          <p>Você não tem permissão para acessar esta funcionalidade.</p>
+        </Box>
+      );
+    }
     let componente: React.ReactNode;
 
     switch (paginaAtiva) {
@@ -76,6 +120,10 @@ export const Ferramentas: React.FC = () => {
       </AnimatePresence>
     );
   };
+
+  if (status === "loading") {
+    return <Carregamento animationUrl="/lotties/carregamento_pagina.json" />;
+  }
 
   return (
     <Box className={`ferramentas-container ${isMobile ? "mobile" : ""}`}>

@@ -176,7 +176,6 @@ export default function Usuarios() {
     },
   ];
 
-  // Payload para edição
   const payloadEdicao: UsuarioPayload | null = itemSelecionado
     ? {
         id_usuario: itemSelecionado.id_usuario,

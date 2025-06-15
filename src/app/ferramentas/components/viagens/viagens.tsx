@@ -168,33 +168,16 @@ export default function Viagens() {
   const [origensFiltro, setOrigensFiltro] = useState<string[]>([]);
   const [destinosFiltro, setDestinosFiltro] = useState<string[]>([]);
 
-  useEffect(() => {
-    console.log("[DEBUG] Session em Viagens:", session);
-  }, [session]);
-
   const carregarViagens = useCallback(() => {
     if (!session?.user?.cnpj) {
-      console.log(
-        "[DEBUG] CNPJ não encontrado na sessão em Viagens! Session:",
-        session
-      );
       return;
     }
     setCarregando(true);
-    console.log(
-      "[DEBUG] Chamando listarViagensDetalhado com CNPJ:",
-      session.user.cnpj
-    );
     listarViagensDetalhado(session.user.cnpj)
       .then((res) => {
-        console.log("[DEBUG] Resposta da API listarViagensDetalhado:", res);
         setDadosApi(res);
       })
-      .catch((err) => {
-        console.error("[DEBUG] Erro ao carregar viagens:", err);
-      })
       .finally(() => {
-        console.log("[DEBUG] Finalizou carregamento de viagens");
         setCarregando(false);
       });
   }, [session?.user?.cnpj]);

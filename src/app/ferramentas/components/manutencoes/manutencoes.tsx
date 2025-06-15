@@ -148,7 +148,6 @@ async function obterOpcoesDinamicas(session: unknown) {
       ],
     };
   } catch (error) {
-    console.error("Erro ao carregar opções:", error);
     return {
       id_veiculo: [],
       id_manutencao: [],
@@ -195,9 +194,7 @@ export default function Manutencoes() {
 
   const [tiposCaminhaoFiltro, setTiposCaminhaoFiltro] = useState<string[]>([]);
 
-  useEffect(() => {
-    console.log("[DEBUG] Session em Manutencoes:", session);
-  }, [session]);
+  useEffect(() => {}, [session]);
 
   useEffect(() => {
     async function fetchTiposFiltro() {
@@ -210,27 +207,14 @@ export default function Manutencoes() {
   // carrega lista de manutenções
   const carregarManutencoes = useCallback(() => {
     if (!session?.user?.cnpj) {
-      console.log(
-        "[DEBUG] CNPJ não encontrado na sessão em Manutencoes! Session:",
-        session
-      );
       return;
     }
     setCarregando(true);
-    console.log(
-      "[DEBUG] Chamando listarManutencaoRealizada com CNPJ:",
-      session.user.cnpj
-    );
     listarManutencaoRealizada(session.user.cnpj)
       .then((res) => {
-        console.log("[DEBUG] Resposta da API listarManutencaoRealizada:", res);
         setDadosApi(res);
       })
-      .catch((err) => {
-        console.error("[DEBUG] Erro ao carregar manutenções:", err);
-      })
       .finally(() => {
-        console.log("[DEBUG] Finalizou carregamento de manutenções");
         setCarregando(false);
       });
   }, [session?.user?.cnpj]);

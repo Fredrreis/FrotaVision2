@@ -29,6 +29,7 @@ import CadastrarGenerico from "@/app/components/genericos/cadastrarGenerico";
 import DeletarGenerico from "@/app/components/genericos/deletarGenerico";
 import AddIcon from "@mui/icons-material/Add";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import { motoristaSchema } from "@/utils/motorista-validation";
 
@@ -207,7 +208,7 @@ export default function Motoristas() {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <FilterAltOutlinedIcon className="search-icon" />
+                    <SearchIcon className="search-icon" />
                   </InputAdornment>
                 ),
               }}
