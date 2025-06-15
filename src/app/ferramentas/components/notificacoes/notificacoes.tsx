@@ -30,6 +30,7 @@ import { listarNotificacoes } from "@/api/services/notificacaoService";
 import { formatarDataISOcomHora, compareDateISO } from "@/utils/data";
 import "../styles/shared-styles.css";
 import "./notificacoes.css";
+import { motion } from "framer-motion";
 
 interface NotificacaoFormatada {
   id: number;
@@ -168,169 +169,176 @@ export default function Notificacoes() {
   }
 
   return (
-    <Box className="notificacoes-container">
-      <Box className="notificacoes-header">
-        <Typography variant="h6" className="notificacoes-title">
-          <NotificationsIcon className="icon-title" /> NOTIFICAÇÕES
-        </Typography>
-      </Box>
-
-      <Box className="notificacoes-filtros">
-        <Box className="search-filtros-container">
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="Buscar por nome do veículo"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="search-input"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon className="search-icon" />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Button
-            variant="outlined"
-            className="botao-filtrar"
-            endIcon={<FilterAltOutlinedIcon />}
-            onClick={(e) => {
-              setAnchorEl(e.currentTarget);
-              setOpenFiltros(true);
-            }}
-          >
-            <span className="button-text">Filtros Avançados</span>
-          </Button>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Box className="notificacoes-container">
+        <Box className="notificacoes-header">
+          <Typography variant="h6" className="notificacoes-title">
+            <NotificationsIcon className="icon-title" /> NOTIFICAÇÕES
+          </Typography>
         </Box>
-      </Box>
 
-      <Timeline sx={{ p: 0, m: 0 }}>
-        {notificacoesFiltradas.map((n, i) => {
-          const isUrgente = n.urgente;
-          const isNova = !vistas.includes(n.id);
-          const uniqueKey = `notificacao-${n.id || i}-${Date.now()}-${i}`;
-          return (
-            <TimelineItem key={uniqueKey} sx={{ alignItems: "flex-start" }}>
-              <TimelineOppositeContent
-                sx={{
-                  fontSize: "0.75rem",
-                  color: "#777",
-                  flex: 0.1,
-                  margin: "auto 0",
-                  display: { xs: "none", md: "block" },
-                }}
-              >
-                {n.data}
-              </TimelineOppositeContent>
-              <TimelineSeparator sx={{}}>
-                <TimelineDot
+        <Box className="notificacoes-filtros">
+          <Box className="search-filtros-container">
+            <TextField
+              variant="outlined"
+              size="small"
+              placeholder="Buscar por nome do veículo"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="search-input"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon className="search-icon" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button
+              variant="outlined"
+              className="botao-filtrar"
+              endIcon={<FilterAltOutlinedIcon />}
+              onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+                setOpenFiltros(true);
+              }}
+            >
+              <span className="button-text">Filtros Avançados</span>
+            </Button>
+          </Box>
+        </Box>
+
+        <Timeline sx={{ p: 0, m: 0 }}>
+          {notificacoesFiltradas.map((n, i) => {
+            const isUrgente = n.urgente;
+            const isNova = !vistas.includes(n.id);
+            const uniqueKey = `notificacao-${n.id || i}-${Date.now()}-${i}`;
+            return (
+              <TimelineItem key={uniqueKey} sx={{ alignItems: "flex-start" }}>
+                <TimelineOppositeContent
                   sx={{
-                    boxShadow: "none",
-                    backgroundColor: isUrgente
-                      ? "#A30D11"
-                      : isNova
-                      ? "#1e70ff"
-                      : "#1B3561",
+                    fontSize: "0.75rem",
+                    color: "#777",
+                    flex: 0.1,
+                    margin: "auto 0",
+                    display: { xs: "none", md: "block" },
                   }}
                 >
-                  {isUrgente ? (
-                    <WarningIcon fontSize="small" style={{ color: "#fff" }} />
-                  ) : isNova ? (
-                    <NewReleasesIcon
-                      fontSize="small"
-                      style={{ color: "#fff" }}
-                    />
-                  ) : (
-                    <NotificationsIcon
-                      fontSize="small"
-                      style={{ color: "#fff" }}
-                    />
-                  )}
-                </TimelineDot>
-                {i < notificacoes.length - 1 && (
-                  <TimelineConnector sx={{ backgroundColor: "#ccc" }} />
-                )}
-              </TimelineSeparator>
-              <TimelineContent>
-                <Paper elevation={3} className="notificacao-card">
-                  <Box
+                  {n.data}
+                </TimelineOppositeContent>
+                <TimelineSeparator sx={{}}>
+                  <TimelineDot
                     sx={{
-                      display: { xs: "block", md: "none" },
-                      fontSize: "0.75rem",
-                      color: "#777",
-                      marginBottom: "0.25rem",
+                      boxShadow: "none",
+                      backgroundColor: isUrgente
+                        ? "#A30D11"
+                        : isNova
+                        ? "#1e70ff"
+                        : "#1B3561",
                     }}
                   >
-                    {n.data}
-                  </Box>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    {n.caminhao} - {n.peca}
-                  </Typography>
-                  <Divider className="divider" />
-                  <Typography variant="body2">
-                    <Box component="span" fontWeight={600}>
-                      Tipo Caminhão:
-                    </Box>{" "}
-                    {n.tipo}
-                  </Typography>
-                  <Typography variant="body2" mt={0.7}>
-                    <Box component="span" fontWeight={600}>
-                      Descrição:
-                    </Box>{" "}
-                    {n.descricao}
-                  </Typography>
-                  <Typography variant="body2" mt={0.7}>
-                    <Box component="span" fontWeight={600}>
-                      Vida útil:
-                    </Box>{" "}
-                    {n.vidaUtil} km
-                  </Typography>
-                  <Typography
-                    mt={0.7}
-                    variant="body2"
-                    className={isUrgente ? "texto-urgente" : ""}
-                  >
-                    <Box component="span" fontWeight={600}>
-                      Atual:
-                    </Box>{" "}
-                    {n.atual} km
-                  </Typography>
-                  <Box className="notificacao-botao-container">
-                    <Button
-                      endIcon={<ArrowForwardIcon />}
-                      size="small"
-                      className="notificacao-botao"
+                    {isUrgente ? (
+                      <WarningIcon fontSize="small" style={{ color: "#fff" }} />
+                    ) : isNova ? (
+                      <NewReleasesIcon
+                        fontSize="small"
+                        style={{ color: "#fff" }}
+                      />
+                    ) : (
+                      <NotificationsIcon
+                        fontSize="small"
+                        style={{ color: "#fff" }}
+                      />
+                    )}
+                  </TimelineDot>
+                  {i < notificacoes.length - 1 && (
+                    <TimelineConnector sx={{ backgroundColor: "#ccc" }} />
+                  )}
+                </TimelineSeparator>
+                <TimelineContent>
+                  <Paper elevation={3} className="notificacao-card">
+                    <Box
                       sx={{
-                        color: isUrgente
-                          ? "#A30D11"
-                          : isNova
-                          ? "#1e70ff"
-                          : "#1B3561",
-                        fontWeight: 600,
+                        display: { xs: "block", md: "none" },
+                        fontSize: "0.75rem",
+                        color: "#777",
+                        marginBottom: "0.25rem",
                       }}
                     >
-                      Verificar caminhão
-                    </Button>
-                  </Box>
-                </Paper>
-              </TimelineContent>
-            </TimelineItem>
-          );
-        })}
-      </Timeline>
+                      {n.data}
+                    </Box>
+                    <Typography variant="subtitle2" fontWeight={600}>
+                      {n.caminhao} - {n.peca}
+                    </Typography>
+                    <Divider className="divider" />
+                    <Typography variant="body2">
+                      <Box component="span" fontWeight={600}>
+                        Tipo Caminhão:
+                      </Box>{" "}
+                      {n.tipo}
+                    </Typography>
+                    <Typography variant="body2" mt={0.7}>
+                      <Box component="span" fontWeight={600}>
+                        Descrição:
+                      </Box>{" "}
+                      {n.descricao}
+                    </Typography>
+                    <Typography variant="body2" mt={0.7}>
+                      <Box component="span" fontWeight={600}>
+                        Vida útil:
+                      </Box>{" "}
+                      {n.vidaUtil} km
+                    </Typography>
+                    <Typography
+                      mt={0.7}
+                      variant="body2"
+                      className={isUrgente ? "texto-urgente" : ""}
+                    >
+                      <Box component="span" fontWeight={600}>
+                        Atual:
+                      </Box>{" "}
+                      {n.atual} km
+                    </Typography>
+                    <Box className="notificacao-botao-container">
+                      <Button
+                        endIcon={<ArrowForwardIcon />}
+                        size="small"
+                        className="notificacao-botao"
+                        sx={{
+                          color: isUrgente
+                            ? "#A30D11"
+                            : isNova
+                            ? "#1e70ff"
+                            : "#1B3561",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Verificar caminhão
+                      </Button>
+                    </Box>
+                  </Paper>
+                </TimelineContent>
+              </TimelineItem>
+            );
+          })}
+        </Timeline>
 
-      <FiltroAvancado
-        open={openFiltros}
-        onClose={() => setOpenFiltros(false)}
-        filters={filtrosAvancadosConfig}
-        values={filtrosAvancados}
-        onChange={setFiltrosAvancados}
-        onApply={() => setOpenFiltros(false)}
-        onClear={() => setFiltrosAvancados({})}
-        anchorEl={anchorEl}
-      />
-    </Box>
+        <FiltroAvancado
+          open={openFiltros}
+          onClose={() => setOpenFiltros(false)}
+          filters={filtrosAvancadosConfig}
+          values={filtrosAvancados}
+          onChange={setFiltrosAvancados}
+          onApply={() => setOpenFiltros(false)}
+          onClear={() => setFiltrosAvancados({})}
+          anchorEl={anchorEl}
+        />
+      </Box>
+    </motion.div>
   );
 }

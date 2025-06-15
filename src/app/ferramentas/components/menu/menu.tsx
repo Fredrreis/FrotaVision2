@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import {
   Box,
-  Avatar,
   Typography,
   List,
   ListItem,
@@ -142,12 +141,20 @@ export default function MenuFerramentas({
 
           {isMobile && (
             <Box className="menu-icons-header">
-              <IconButton className="avatar-icon">
-                <Avatar
-                  src="https://randomuser.me/api/portraits/men/1.jpg"
-                  sx={{ width: "2rem", height: "2rem" }}
+              <IconButton onClick={handleUserClick}>
+                <AccountCircleIcon
+                  sx={{ color: "white", width: "1.5rem", height: "1.5rem" }}
                 />
               </IconButton>
+              <UsuarioDropdown
+                open={dropdownOpen}
+                anchorEl={anchorEl}
+                onClose={() => setDropdownOpen(false)}
+                onOpenSettings={() => {
+                  setDropdownOpen(false);
+                  setPerfilModalOpen(true);
+                }}
+              />
               <IconButton
                 onClick={handleMenuToggle}
                 className="menu-hamburguer"

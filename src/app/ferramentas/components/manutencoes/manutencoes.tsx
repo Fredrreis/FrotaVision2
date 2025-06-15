@@ -369,7 +369,7 @@ export default function Manutencoes() {
                 setOpenFiltros(true);
               }}
             >
-              Filtros Avançados
+              <span className="button-text">Filtros Avançados</span>
             </Button>
           </Box>
           <Box className="botoes-container">

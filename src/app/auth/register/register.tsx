@@ -31,7 +31,7 @@ function RegisterContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
 
-  const planoCodificado = searchParams.get("plano");
+  const planoCodificado = searchParams?.get("plano");
 
   const [step, setStep] = useState(1);
   const [erroCadastro, setErroCadastro] = useState(false);

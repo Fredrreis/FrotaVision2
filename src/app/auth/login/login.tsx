@@ -6,7 +6,6 @@ import {
   Typography,
   TextField,
   Button,
-  Divider,
   CircularProgress,
 } from "@mui/material";
 import { motion } from "framer-motion";
@@ -15,14 +14,13 @@ import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import GoogleIcon from "../../img/google.png";
-import MicrosoftIcon from "../../img/microsoft.png";
 import LogoFrotaVisionV2 from "../../img/FrotaVisionLogoV2.png";
 import { step1Schema } from "@/utils/login-validation";
 import useToggleSenha from "@/app/components/toggle-senha/toggle-senha";
 import CustomSnackbar from "@/app/components/snackbar/snackbar";
 import Carregamento from "@/app/components/carregamento/carregamento";
 import "./login.css";
+import RecuperarSenha from "./components/recuperar-senha";
 
 interface LoginFormInputs {
   email: string;
@@ -32,6 +30,7 @@ interface LoginFormInputs {
 export default function Login() {
   const router = useRouter();
   const { mostrarSenha, adornment } = useToggleSenha();
+  const [openRecuperarSenha, setOpenRecuperarSenha] = useState(false);
 
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openError, setOpenError] = useState(false);
@@ -78,10 +77,6 @@ export default function Login() {
     } finally {
       setLoadingLogin(false);
     }
-  };
-
-  const handleGoogleLogin = () => {
-    signIn("google");
   };
 
   useEffect(() => {
@@ -155,7 +150,11 @@ export default function Login() {
             InputProps={{ endAdornment: adornment }}
           />
 
-          <Typography variant="body2" className="forgot-password">
+          <Typography
+            variant="body2"
+            className="forgot-password"
+            onClick={() => setOpenRecuperarSenha(true)}
+          >
             Esqueceu sua senha?
           </Typography>
 
@@ -180,34 +179,6 @@ export default function Login() {
             )}
           </Button>
 
-          <Divider className="login-divider">ou</Divider>
-
-          <Box className="login-social-buttons">
-            <Button
-              variant="outlined"
-              className="login-social-button"
-              onClick={handleGoogleLogin}
-            >
-              <Image
-                src={GoogleIcon}
-                alt="Google Icon"
-                width={20}
-                height={20}
-              />
-              Login com Google
-            </Button>
-
-            <Button variant="outlined" className="login-social-button" disabled>
-              <Image
-                src={MicrosoftIcon}
-                alt="Microsoft Icon"
-                width={20}
-                height={20}
-              />
-              Login com Microsoft
-            </Button>
-          </Box>
-
           <Typography variant="body2" className="register-link">
             Não tem uma conta?{" "}
             <span onClick={() => (window.location.href = "/?section=planos")}>
@@ -229,6 +200,11 @@ export default function Login() {
         onClose={() => setOpenError(false)}
         message="E-mail ou senha inválidos."
         color="error"
+      />
+
+      <RecuperarSenha
+        open={openRecuperarSenha}
+        onClose={() => setOpenRecuperarSenha(false)}
       />
     </motion.div>
   );

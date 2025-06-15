@@ -330,7 +330,7 @@ export default function Usuarios() {
                 setOpenFiltros(true);
               }}
             >
-              Filtros Avançados
+              <span className="button-text">Filtros Avançados</span>
             </Button>
           </Box>
           <Box className="botoes-container">

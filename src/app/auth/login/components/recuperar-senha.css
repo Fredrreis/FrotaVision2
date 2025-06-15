@@ -1,0 +1,53 @@
+.recuperar-senha-dialog {
+  border-radius: 0.75rem !important;
+  background: #fff;
+}
+
+.recuperar-senha-title {
+  color: #1B3562 !important;
+  font-weight: 600 !important;
+  font-size: 1.2rem !important;
+  margin-top: 0.5rem !important;
+  text-align: center !important;
+}
+
+.recuperar-senha-content {
+  padding: 0 2.5rem 2rem 2.5rem !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.recuperar-senha-instrucao {
+  color: #222;
+  margin-bottom: 1.5rem !important;
+}
+
+.recuperar-senha-input {
+  margin-bottom: 1.5rem !important;
+  width: 100%;
+}
+
+.recuperar-senha-botao {
+  background-color: #1B3562 !important;
+  color: #fff !important;
+  font-weight: bold !important;
+  border-radius: 0.40rem !important;
+  padding: 0.6rem 0 !important;
+  margin-bottom: 1rem !important;
+  margin-top: 0.5rem !important;
+}
+
+.recuperar-senha-botao:disabled {
+  background-color: #bfc8d6 !important;
+  color: #fff !important;
+}
+
+@media (max-width: 600px) {
+  .recuperar-senha-content {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem !important;
+  }
+  .recuperar-senha-title {
+    font-size: 1.1rem !important;
+  }
+} 

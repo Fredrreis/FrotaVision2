@@ -62,10 +62,9 @@ export const deletarVeiculo = async (id: number): Promise<void> => {
 };
 
 export const cadastrarVeiculo = async (
-  idUsuario: number,
   veiculo: NovoVeiculo
 ): Promise<void> => {
-  await api.post(`/Veiculo/Cadastrar/${idUsuario}`, veiculo);
+  await api.post(`/Veiculo/Cadastrar`, veiculo);
 };
 
 export const editarVeiculo = async (

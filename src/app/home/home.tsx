@@ -25,7 +25,7 @@ export default function Home() {
 function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const sectionParam = searchParams.get("section");
+  const sectionParam = searchParams?.get("section");
 
   const [isClient, setIsClient] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);

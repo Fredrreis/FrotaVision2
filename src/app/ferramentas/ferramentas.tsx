@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Box } from "@mui/material";
-import { AnimatePresence, motion } from "framer-motion";
 import MenuFerramentas from "./components/menu/menu";
 import Notificacoes from "./components/notificacoes/notificacoes";
 import Veiculos from "./components/veiculos/veiculos";
@@ -39,12 +38,16 @@ export const permissoesMenu: { [key: number]: string[] } = {
 
 export const Ferramentas: React.FC = () => {
   const [paginaAtiva, setPaginaAtiva] = useState("NOTIFICAÇÕES");
+  const [paginaRenderizada, setPaginaRenderizada] = useState("NOTIFICAÇÕES");
   const [isMobile, setIsMobile] = useState(false);
   const [menuVisible, setMenuVisible] = useState(true);
   const { data: session, status } = useSession();
   const idPermissao =
     typeof session?.user?.permissao === "number" ? session.user.permissao : 0;
-  const menuPermitido = permissoesMenu[idPermissao] || [];
+  const menuPermitido = useMemo(
+    () => permissoesMenu[idPermissao] || [],
+    [idPermissao]
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -62,7 +65,18 @@ export const Ferramentas: React.FC = () => {
     if (!menuPermitido.includes(paginaAtiva)) {
       setPaginaAtiva(menuPermitido[0] || "NOTIFICAÇÕES");
     }
-  }, [idPermissao, paginaAtiva]);
+  }, [idPermissao, paginaAtiva, menuPermitido]);
+
+  // Delay para desmontar componente antigo antes de montar o novo
+  useEffect(() => {
+    if (paginaRenderizada !== paginaAtiva) {
+      setPaginaRenderizada("");
+      const timeout = setTimeout(() => {
+        setPaginaRenderizada(paginaAtiva);
+      }, 50);
+      return () => clearTimeout(timeout);
+    }
+  }, [paginaAtiva, paginaRenderizada]);
 
   const handleMenuClick = (pagina: string) => {
     if (menuPermitido.includes(pagina)) {
@@ -81,44 +95,33 @@ export const Ferramentas: React.FC = () => {
     }
     let componente: React.ReactNode;
 
-    switch (paginaAtiva) {
+    switch (paginaRenderizada) {
       case "VEÍCULOS":
-        componente = <Veiculos />;
+        componente = <Veiculos key="VEICULOS" />;
         break;
       case "MOTORISTAS":
-        componente = <Motoristas />;
+        componente = <Motoristas key="MOTORISTAS" />;
         break;
       case "MANUTENÇÕES":
-        componente = <Manutencoes />;
+        componente = <Manutencoes key="MANUTENCOES" />;
         break;
       case "VIAGENS":
-        componente = <Viagens />;
+        componente = <Viagens key="VIAGENS" />;
         break;
       case "USUÁRIOS":
-        componente = <Usuarios />;
+        componente = <Usuarios key="USUARIOS" />;
         break;
       case "NOTIFICAÇÕES":
-        componente = <Notificacoes />;
+        componente = <Notificacoes key="NOTIFICACOES" />;
         break;
       case "AJUDA":
-        componente = <Ajuda />;
+        componente = <Ajuda key="AJUDA" />;
         break;
       default:
+        componente = null;
     }
 
-    return (
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={paginaAtiva}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-        >
-          {componente}
-        </motion.div>
-      </AnimatePresence>
-    );
+    return componente;
   };
 
   if (status === "loading") {

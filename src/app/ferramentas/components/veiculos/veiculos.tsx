@@ -438,7 +438,7 @@ export default function Veiculos() {
             open={openCadastrar}
             onClose={() => setOpenCadastrar(false)}
             onSalvar={async (novo) => {
-              await cadastrarVeiculo(Number(session?.user?.id), {
+              await cadastrarVeiculo({
                 ...novo,
                 cnpj: session?.user?.cnpj ?? "",
                 habilitado: true,
