@@ -1,15 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Button, Divider, TextField, Typography } from "@mui/material";
-import Image from "next/image";
+import { Button, TextField, Typography } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import * as yup from "yup";
 import { step1Schema } from "@/utils/login-validation";
 import ToggleSenha from "@/app/components/toggle-senha/toggle-senha";
 import SenhaForte from "../../../../components/senha-status/senha-status";
-import GoogleIcon from "../../../../img/google.png";
-import MicrosoftIcon from "../../../../img/microsoft.png";
 
 interface Step1Props {
   formData: {
@@ -18,14 +15,12 @@ interface Step1Props {
   };
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   nextStep: () => void;
-  handleGoogleSignIn: () => void;
 }
 
 export default function Step1({
   formData,
   handleChange,
   nextStep,
-  handleGoogleSignIn,
 }: Step1Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { mostrarSenha, adornment } = ToggleSenha();
@@ -98,28 +93,6 @@ export default function Step1({
       >
         CONTINUAR
       </Button>
-
-      <Divider className="register-divider">ou</Divider>
-
-      <Box className="register-social-buttons">
-        <Button
-          variant="outlined"
-          className="register-social-button"
-          onClick={handleGoogleSignIn}
-        >
-          <Image src={GoogleIcon} alt="Google Icon" width={20} height={20} />
-          Sign in com Google
-        </Button>
-        <Button variant="outlined" className="register-social-button" disabled>
-          <Image
-            src={MicrosoftIcon}
-            alt="Microsoft Icon"
-            width={20}
-            height={20}
-          />
-          Sign in com Microsoft
-        </Button>
-      </Box>
     </>
   );
 }

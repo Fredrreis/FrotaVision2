@@ -87,3 +87,10 @@ export const pesquisarUsuario = async (
 ): Promise<UsuarioDetalhado> => {
   return await api.get<UsuarioDetalhado>(`/Usuario/Pesquisar/${id}`, {}, signal);
 };
+
+export const pesquisarUsuarioPorEmail = async (
+  email: string,
+  signal?: AbortSignal
+): Promise<UsuarioDetalhado> => {
+  return await api.get<UsuarioDetalhado>(`/Usuario/PesquisarEmail/${email}`, {}, signal);
+};

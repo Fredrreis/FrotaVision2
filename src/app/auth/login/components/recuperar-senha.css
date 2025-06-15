@@ -23,9 +23,13 @@
   margin-bottom: 1.5rem !important;
 }
 
-.recuperar-senha-input {
-  margin-bottom: 1.5rem !important;
+.recuperar-senha-input, .recuperar-senha-input-confirmar {
   width: 100%;
+}
+
+.recuperar-senha-input-confirmar {
+  margin-top: 1.5rem !important;
+  margin-bottom: 1rem !important;
 }
 
 .recuperar-senha-botao {

@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
 import { Box, Typography, Toolbar, Button } from "@mui/material";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { cadastrarEmpresa } from "@/api/services/empresaService";
@@ -145,17 +145,6 @@ function RegisterContent() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      const result = await signIn("google", { redirect: false });
-      if (result?.error) {
-        alert("Erro ao fazer login com o Google.");
-      }
-    } catch (error) {
-      console.error("Erro no login Google:", error);
-    }
-  };
-
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -164,7 +153,6 @@ function RegisterContent() {
             formData={formData}
             handleChange={handleChange}
             nextStep={nextStep}
-            handleGoogleSignIn={handleGoogleSignIn}
           />
         );
       case 2:

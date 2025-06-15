@@ -15,9 +15,12 @@ import { motion } from "framer-motion";
 import useToggleSenha from "@/app/components/toggle-senha/toggle-senha";
 import SenhaForte from "@/app/components/senha-status/senha-status";
 import CustomSnackbar from "@/app/components/snackbar/snackbar";
-import { removerCodigoRecuperacao } from "@/utils/codigos-recuperacao";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import "./recuperar-senha.css";
+import {
+  atualizarUsuario,
+  pesquisarUsuarioPorEmail,
+} from "@/api/services/usuarioService";
 
 interface RecuperarSenhaProps {
   open: boolean;
@@ -95,12 +98,17 @@ export default function RecuperarSenha({ open, onClose }: RecuperarSenhaProps) {
 
     setLoading(true);
     try {
-      // Aqui você implementará a chamada à API para alterar a senha
-      // const response = await api.post('/alterar-senha', { email, novaSenha });
-
-      // Remove o código de recuperação após o uso
-      removerCodigoRecuperacao(email);
-
+      // Busca os dados completos do usuário pelo e-mail
+      const usuario = await pesquisarUsuarioPorEmail(email);
+      if (!usuario || !usuario.id_usuario) {
+        throw new Error("Usuário não encontrado");
+      }
+      // Monta o payload com a nova senha
+      const payload = {
+        ...usuario,
+        senha: novaSenha,
+      };
+      await atualizarUsuario(usuario.id_usuario, payload, true);
       setOpenSuccess(true);
       setTimeout(() => {
         onClose();
@@ -149,7 +157,11 @@ export default function RecuperarSenha({ open, onClose }: RecuperarSenhaProps) {
                 disabled={loading || !email}
                 className="recuperar-senha-botao"
               >
-                {loading ? <CircularProgress size={24} /> : "Enviar Código"}
+                {loading ? (
+                  <CircularProgress size={24} sx={{ color: "#1B3562" }} />
+                ) : (
+                  "Enviar Código"
+                )}
               </Button>
             </motion.div>
           )}
@@ -177,7 +189,11 @@ export default function RecuperarSenha({ open, onClose }: RecuperarSenhaProps) {
                 disabled={loading || !codigo}
                 className="recuperar-senha-botao"
               >
-                {loading ? <CircularProgress size={24} /> : "Verificar Código"}
+                {loading ? (
+                  <CircularProgress size={24} sx={{ color: "#1B3562" }} />
+                ) : (
+                  "Verificar Código"
+                )}
               </Button>
             </motion.div>
           )}
@@ -207,7 +223,7 @@ export default function RecuperarSenha({ open, onClose }: RecuperarSenhaProps) {
                 type={mostrarConfirmarSenha ? "text" : "password"}
                 value={confirmarSenha}
                 onChange={(e) => setConfirmarSenha(e.target.value)}
-                className="recuperar-senha-input"
+                className="recuperar-senha-input-confirmar"
                 InputProps={{ endAdornment: adornmentConfirmarSenha }}
               />
               <Button
@@ -217,7 +233,11 @@ export default function RecuperarSenha({ open, onClose }: RecuperarSenhaProps) {
                 disabled={loading || !novaSenha || !confirmarSenha}
                 className="recuperar-senha-botao"
               >
-                {loading ? <CircularProgress size={24} /> : "Alterar Senha"}
+                {loading ? (
+                  <CircularProgress size={24} sx={{ color: "#1B3562" }} />
+                ) : (
+                  "Alterar Senha"
+                )}
               </Button>
             </motion.div>
           )}
