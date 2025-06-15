@@ -147,7 +147,7 @@ async function obterOpcoesDinamicas(session: unknown) {
         { label: "Não", value: "false" },
       ],
     };
-  } catch (error) {
+  } catch {
     return {
       id_veiculo: [],
       id_manutencao: [],

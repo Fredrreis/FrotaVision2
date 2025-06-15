@@ -1,20 +1,19 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { ApiGateway } from "@/api/api";
+import { jwtDecode } from "jwt-decode";
 
 const api = new ApiGateway();
 
-// Type guard para validar o retorno do login
-function isUsuarioResponse(obj: unknown): obj is { id: number; nome: string; cnpj: string; permissao: string | number } {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "id" in obj &&
-    "nome" in obj &&
-    "cnpj" in obj &&
-    "permissao" in obj
-  );
-}
+// Defina o tipo esperado do payload do JWT
+type JwtUserPayload = {
+  Id: number;
+  Nome: string;
+  Email: string;
+  Cnpj: string;
+  Permissao: string | number;
+  [key: string]: unknown;
+};
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -28,22 +27,28 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
-          const response = await api.post(
-            `/Usuario/login/${credentials.email},${credentials.password}`,
-            {}
-          );
+          const response: unknown = await api.post("/Usuario/loginJWT", {
+            email: credentials.email,
+            password: credentials.password,
+            twoFactorCode: "",
+            twoFactorRecoveryCode: ""
+          });
 
-          if (isUsuarioResponse(response)) {
-            return {
-              id: response.id,
-              nome: response.nome,
-              email: credentials.email,
-              cnpj: response.cnpj,
-              permissao: Number(response.permissao),
-            };
+          // Garante que response é um objeto com a propriedade token
+          if (!response || typeof response !== 'object' || !('token' in response)) {
+            return null;
           }
+          const token = (response as { token: string }).token;
+          const decoded: JwtUserPayload = jwtDecode<JwtUserPayload>(token);
 
-          return null;
+          return {
+            id: decoded.Id,
+            nome: decoded.Nome,
+            email: decoded.Email,
+            cnpj: decoded.Cnpj,
+            permissao: Number(decoded.Permissao) || 0,
+            token,
+          };
         } catch (error) {
           console.error("Erro no authorize:", error);
           return null;
